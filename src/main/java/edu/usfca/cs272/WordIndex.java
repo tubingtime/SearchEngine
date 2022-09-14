@@ -21,8 +21,8 @@ public class WordIndex {
 		private final String word;
 		private final HashMap<Path,LocationsObj> locations;
 
-		private WordObj(String word) {
-			this.word = word;
+		private WordObj() {
+			this.word = null;
 			this.locations = new HashMap<>();
 		}
 
@@ -39,6 +39,11 @@ public class WordIndex {
 	private class LocationsObj {
 		private final Path path;
 		public final ArrayList<Integer> lineLocations;
+
+		public LocationsObj() {
+			this.path = null;
+			this.lineLocations = new ArrayList<>();
+		}
 
 		public LocationsObj(Path path) {
 			this.path = path;
@@ -69,7 +74,7 @@ public class WordIndex {
 
 	@Override
 	public int size(Path location) {
-		return wIndex.getOrDefault(location,new HashSet<>()).size();
+		return wIndex.getOrDefault(location,new WordObj()).locations.size();
 	}
 
 	@Override

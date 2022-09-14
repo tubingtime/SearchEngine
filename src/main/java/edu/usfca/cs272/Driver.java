@@ -2,6 +2,7 @@ package edu.usfca.cs272;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
@@ -29,7 +30,11 @@ public class Driver {
 		System.out.println(argumentParser.getPath("-text"));
 		System.out.println(argumentParser.toString());
 		try {
-			WordCleaner.listStems(argumentParser.getPath("-text"));
+			ArrayList<String> stems = WordCleaner.listStems(argumentParser.getPath("-text"));
+			// ^^ no we should read and stem line by line so we can preserve line numbers for position
+			for (String stem : stems){
+
+			}
 		} catch (Exception e){
 			System.out.println(e);
 			return;
