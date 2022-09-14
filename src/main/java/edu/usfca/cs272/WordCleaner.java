@@ -132,7 +132,7 @@ public class WordCleaner {
 	 * using the default stemmer for English.
 	 *
 	 * @param input the input file to parse and stem
-	 * @return a list of stems from file in parsed order
+	 * @return a list of stems from file in parsed order, and a "\n" for every new line
 	 * @throws IOException if unable to read or parse file
 	 *
 	 * @see SnowballStemmer
@@ -148,6 +148,7 @@ public class WordCleaner {
 			ArrayList<String> stems = new ArrayList<>();
 			while ((line = reader.readLine()) != null){
 				addStems(line,defaultStemmer,stems);
+				stems.add("\\n");
 			}
 			return stems;
 		} catch (IOException e){
