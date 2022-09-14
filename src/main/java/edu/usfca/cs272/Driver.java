@@ -1,5 +1,10 @@
 package edu.usfca.cs272;
 
+import java.io.IOException;
+import java.nio.file.DirectoryIteratorException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -26,20 +31,45 @@ public class Driver {
 		Instant start = Instant.now();
 		ArgumentParser argumentParser = new ArgumentParser(args);
 
-		System.out.println(Arrays.toString(args));
-		System.out.println(argumentParser.getPath("-text"));
-		System.out.println(argumentParser.toString());
-		try {
-			ArrayList<String> stems = WordCleaner.listStems(argumentParser.getPath("-text"));
-			// ^^ no we should read and stem line by line so we can preserve line numbers for position
-			for (String stem : stems){
+		System.out.println("Actual args: " + Arrays.toString(args));
+		System.out.println("Parsed args: " + argumentParser);
+		System.out.println("Path: " + argumentParser.getPath("-text"));
+		Path userPath = argumentParser.getPath("-text");
 
+
+		/*			Create and populate list of files if it's a directory.		*/
+		ArrayList<Path> files = new ArrayList<Path>();
+		if (Files.isDirectory(userPath)) {
+			try (DirectoryStream<Path> stream = Files.newDirectoryStream(userPath)) {
+				for (Path file : stream) {
+					System.out.println("Paths: " + file.getFileName());
+					if (file.endsWith(".txt") || file.endsWith(".text")) {
+						files.add(file); // ^-^
+					}
+				}
+			} catch (IOException | DirectoryIteratorException x) {
+				System.err.println(x);
 			}
-		} catch (Exception e){
-			System.out.println(e);
-			return;
-		}
+		} else { files.add(userPath); }
+		WordIndex wordIndex = new WordIndex();
+		for (Path file : files) {
+			try { //first we parse and stem
+				ArrayList<String> stems = WordCleaner.listStems(file);
+				// ^^reads and stems line by line and inserts \n for new line
+				int lineNumber = 0;
+				for (String stem : stems) {
+					if (stem.equals("\\n")) {
+						lineNumber++;
+					} else {
+						wordIndex.add(stem,file,lineNumber);
+					}
 
+				}
+			} catch (Exception e) {
+				System.out.println(e);
+				return;
+			}
+		}
 
 
 
