@@ -1,7 +1,13 @@
 package edu.usfca.cs272;
 
+import java.io.IOException;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.nio.file.Path;
 import java.util.*;
+
+import static edu.usfca.cs272.PrettyJsonWriter.newline;
+import static edu.usfca.cs272.PrettyJsonWriter.*;
 
 /**
  * An program that indexes the UNIQUE words that
@@ -17,12 +23,12 @@ public class WordIndex {
 	/**
 	 ** Nested HashMap and HashSet data structure to store the locations and words
 	 */
-	private final HashMap<String,WordObj> wIndex; /* Maybe i could use a hashset if I could do a custom hash func for just the word*/
+	private final TreeMap<String,WordObj> wIndex; /* Maybe i could use a hashset if I could do a custom hash func for just the word*/
 
 	/**
 	 * A data structure that holds a word along with where it was found
 	 */
-	private class WordObj implements Comparable<String>{
+	public class WordObj implements Comparable<String>{
 		private final String word;
 		private final HashMap<Path,LocationsObj> locations;
 
@@ -41,11 +47,25 @@ public class WordIndex {
 		public int compareTo(String o) {
 			return this.word.compareTo(o);
 		}
+		public void toJSON(Writer writer, int indent) throws IOException {
+			writer.write("{");
+			var iterator = locations.entrySet().iterator();
+			while (iterator.hasNext()){
+				Map.Entry<Path,LocationsObj> locObjEntry = iterator.next();
+				writer.write(newline);
+				writeIndent(writer,indent+1);
+				writeQuote(locObjEntry.getKey().toString(),writer,0);writer.write(": ");
+				writeArray(locObjEntry.getValue().lineLocations,writer, indent+1); //locationsObj.toJSON
+				if (iterator.hasNext()){writer.write(",");}
+			}
+			writer.write(newline);
+			writeIndent(writer,indent);
+			writer.write("}");
+		}
 	}
 
 	/**
 	 * Data structure to hold the file locations and line locations of a word.
-	 * Might not be needed. Just use HashMap<Path,ArrayList<Integer>> locations;
 	 */
 	private class LocationsObj {
 		private final Path path;
@@ -61,7 +81,7 @@ public class WordIndex {
 	 ** Constructs a new instance of WordIndex.
 	 */
 	public WordIndex(){
-		this.wIndex = new HashMap<>();
+		this.wIndex = new TreeMap<>();
 	}
 
 	public void add(String word, Path location, Integer line) {
@@ -89,8 +109,21 @@ public class WordIndex {
 		return Collections.unmodifiableCollection(wIndex.values());
 	}
 
-
-
+	public void toJSON(Writer writer, int indent) throws IOException {
+		writer.write("{");
+		var iterator = wIndex.entrySet().iterator();
+		while (iterator.hasNext()){
+			Map.Entry<String, WordObj> wordObjEntry = iterator.next();
+			writer.write(newline);
+			writeIndent(writer,indent+1);
+			writeQuote(wordObjEntry.getKey().toString(),writer,0);writer.write(": ");
+			wordObjEntry.getValue().toJSON(writer, indent+1); //locationsObj.toJSON
+			if (iterator.hasNext()){writer.write(",");}
+		}
+		writer.write(newline);
+		writeIndent(writer,indent);
+		writer.write("}");
+	}
 
 	/**
 	 * Demonstrates this class.

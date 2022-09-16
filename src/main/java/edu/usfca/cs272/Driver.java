@@ -1,5 +1,6 @@
 package edu.usfca.cs272;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.DirectoryIteratorException;
 import java.nio.file.DirectoryStream;
@@ -10,6 +11,8 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 /**
  * Class responsible for running this project based on the provided command-line
  * arguments. See the README for details.
@@ -19,25 +22,38 @@ import java.util.Arrays;
  * @version Fall 2022
  */
 public class Driver {
+
+	public Driver() {
+	}
+
 	/**
-	 * Initializes the classes necessary based on the provided command-line
-	 * arguments. This includes (but is not limited to) how to build or search an
-	 * inverted index.
-	 *
-	 * @param args flag/value pairs used to start this program
+	 * Scans files and puts them into a provided wordIndex
 	 */
-	public static void main(String[] args) {
-		// store initial start time
-		Instant start = Instant.now();
-		ArgumentParser argumentParser = new ArgumentParser(args);
+	private void scan(ArrayList<Path> files, WordIndex wordIndex){
+		for (Path file : files) {
+			try { //first we parse and stem
+				ArrayList<String> stems = WordCleaner.listStems(file);
+				// ^^reads and stems line by line and inserts \n for new line
+				int lineNumber = 0;
+				for (String stem : stems) {
+					if (stem.equals("\\n")) {
+						lineNumber++;
+					} else {
+						wordIndex.add(stem,file,lineNumber);
+					}
+				}
+			} catch (Exception e) {
+				System.out.println(e);
+				return;
+			}
+		}
+	}
 
-		System.out.println("Actual args: " + Arrays.toString(args));
-		System.out.println("Parsed args: " + argumentParser);
-		System.out.println("Path: " + argumentParser.getPath("-text"));
-		Path userPath = argumentParser.getPath("-text");
+	/**
+	 * Create and populate list of files if it's a directory.
+	 */
+	private ArrayList<Path> scanDirectory(Path userPath){
 
-
-		/*			Create and populate list of files if it's a directory.		*/
 		ArrayList<Path> files = new ArrayList<Path>();
 		if (Files.isDirectory(userPath)) {
 			try (DirectoryStream<Path> stream = Files.newDirectoryStream(userPath)) {
@@ -51,26 +67,41 @@ public class Driver {
 				System.err.println(x);
 			}
 		} else { files.add(userPath); }
-		WordIndex wordIndex = new WordIndex();
-		for (Path file : files) {
-			try { //first we parse and stem
-				ArrayList<String> stems = WordCleaner.listStems(file);
-				// ^^reads and stems line by line and inserts \n for new line
-				int lineNumber = 0;
-				for (String stem : stems) {
-					if (stem.equals("\\n")) {
-						lineNumber++;
-					} else {
-						wordIndex.add(stem,file,lineNumber);
-					}
+		return files;
+	}
 
-				}
-			} catch (Exception e) {
-				System.out.println(e);
-				return;
-			}
+
+	/**
+	 * Initializes the classes necessary based on the provided command-line
+	 * arguments. This includes (but is not limited to) how to build or search an
+	 * inverted index.
+	 *
+	 * @param args flag/value pairs used to start this program
+	 */
+	public static void main(String[] args) {
+		// store initial start time
+		Instant start = Instant.now();
+		ArgumentParser argumentParser = new ArgumentParser(args);
+		WordIndex wordIndex = new WordIndex();
+
+		System.out.println("Actual args: " + Arrays.toString(args));
+		System.out.println("Parsed args: " + argumentParser);
+		System.out.println("Path: " + argumentParser.getPath("-text"));
+		Path userPath = argumentParser.getPath("-text");
+		Path outPath = argumentParser.getPath("-index",Path.of("index.json"));
+		if (userPath != null) {
+			Driver driver = new Driver();
+			ArrayList<Path> files = driver.scanDirectory(userPath);
+
+			driver.scan(files, wordIndex); /* populate wordIndex*/
+		}
+		try (BufferedWriter bufWriter = Files.newBufferedWriter(outPath, UTF_8)) {
+			wordIndex.toJSON(bufWriter,0);
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 
+		System.out.println("Output:" + outPath.toAbsolutePath().toString());
 
 
 		// calculate time elapsed and output
