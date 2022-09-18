@@ -23,11 +23,16 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  */
 public class Driver {
 
+	/**
+	 * Makes  new instance of driver so it's functions can be used
+	 */
 	public Driver() {
 	}
 
 	/**
 	 * Scans files and puts them into a provided wordIndex
+	 * @param files a list of files.
+	 * @param wordIndex a {@link WordIndex} to store the words.
 	 */
 	private void scan(ArrayList<Path> files, WordIndex wordIndex){
 		for (Path file : files) {
@@ -48,8 +53,10 @@ public class Driver {
 	}
 
 	/**
-	 * Create and populate list of files if it's a directory.
+	 * Create and populate list of files if it's a directory. Or just adds the file if not
 	 * Could make this recursive to reduce code
+	 * @param userPath path given to Driver by user params
+	 * @return an {@link ArrayList} of files found
 	 */
 	private ArrayList<Path> scanDirectory(Path userPath){
 
@@ -69,10 +76,15 @@ public class Driver {
 			} catch (IOException | DirectoryIteratorException x) {
 				System.err.println(x);
 			}
-		} else { files.add(userPath); }
+		} else { files.add(userPath); } /* need to check if ends in .txt ? */
 		return files;
 	}
 
+	/**
+	 * Recursive step for scanDirectory()
+	 * @param files the list of files to add new ones to
+	 * @param subdir the subdirectory to scan
+	 */
 	private void scanSubDirs(ArrayList<Path> files, Path subdir){
 		try (DirectoryStream<Path> stream = Files.newDirectoryStream(subdir)) {
 			for (Path file : stream) {
