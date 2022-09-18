@@ -1,12 +1,7 @@
 package edu.usfca.cs272;
 
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
-import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.HashMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Parses and stores command-line arguments into simple flag/value pairs.

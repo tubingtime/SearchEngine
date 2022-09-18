@@ -1,7 +1,6 @@
 package edu.usfca.cs272;
 
 import java.io.IOException;
-import java.io.StringWriter;
 import java.io.Writer;
 import java.nio.file.Path;
 import java.util.*;
@@ -127,7 +126,7 @@ public class WordIndex {
 	public void add(String word, Path location, Integer line) {
 		wIndex.putIfAbsent(word,new WordObj(word,location));
 		wIndex.get(word).locations.putIfAbsent(location,new LocationsObj(location));
-		wIndex.get(word).locations.get(location).lineLocations.add(line); //so many dots o_o TODO: simplify
+		wIndex.get(word).locations.get(location).lineLocations.add(line); //so many dots o_o
 	}
 
 	/**

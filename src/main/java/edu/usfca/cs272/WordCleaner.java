@@ -210,7 +210,7 @@ public class WordCleaner {
 		){
 			String line;
 			TreeSet<String> stems = new TreeSet<>(); //this line only diff between this and
-													 //uniqueStems ArrayList. TODO: condense
+													 //uniqueStems ArrayList. can be condense
 			while ((line = reader.readLine()) != null){
 				addStems(line,defaultStemmer,stems);
 			}

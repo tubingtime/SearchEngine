@@ -307,7 +307,7 @@ public class PrettyJsonWriter {
 			writer.write(newline);
 			writeIndent(writer, indent+1);
 			writeObject(object,writer,indent+1);
-			if (iterator.hasNext()){writer.write(",");} /*TODO: Move down a line & test*/
+			if (iterator.hasNext()){writer.write(",");} /* don't need to check everytime*/
 		}
 		writer.write(newline);
 		writeIndent(writer,indent);
