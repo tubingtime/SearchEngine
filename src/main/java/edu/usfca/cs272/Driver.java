@@ -45,8 +45,8 @@ public class Driver {
 						wordIndex.add(stem, file, lineNumber++);
 					}
 				}
-			} catch (Exception e) {
-				System.out.println(e);
+			} catch (IOException e) {
+				System.out.println("IO Error while stemming: " + file);
 				return;
 			}
 		}
@@ -60,11 +60,10 @@ public class Driver {
 	 */
 	private ArrayList<Path> scanDirectory(Path userPath){
 
-		ArrayList<Path> files = new ArrayList<Path>();
+		ArrayList<Path> files = new ArrayList<>();
 		if (Files.isDirectory(userPath)) {
 			try (DirectoryStream<Path> stream = Files.newDirectoryStream(userPath)) {
 				for (Path file : stream) {
-					System.out.println("Paths: " + file.getFileName());
 					String fileName = file.toString().toUpperCase(); /* Maybe make substring with only last 4 chars? for efficiency */
 					if (Files.isDirectory(file)){
 						scanSubDirs(files,file);
@@ -74,7 +73,7 @@ public class Driver {
 					}
 				}
 			} catch (IOException | DirectoryIteratorException x) {
-				System.err.println(x);
+				System.out.println("IO Error while scanning directory: " + userPath);
 			}
 		} else { files.add(userPath); } /* need to check if ends in .txt ? */
 		return files;
@@ -97,8 +96,8 @@ public class Driver {
 					files.add(file); // ^-^
 				}
 			}
-		} catch (IOException | DirectoryIteratorException x) {
-			System.err.println(x);
+		} catch (IOException x) {
+			System.out.println("IO Error while scanning directory: " + subdir);
 		}
 	}
 
@@ -134,8 +133,7 @@ public class Driver {
 				e.printStackTrace();
 			}
 		}
-		System.out.println("Output:" + outPath.toAbsolutePath().toString());
-		System.out.println("RESULT:" + wordIndex);
+		System.out.println("Output:" + outPath.toAbsolutePath());
 
 		// calculate time elapsed and output
 		long elapsed = Duration.between(start, Instant.now()).toMillis();
