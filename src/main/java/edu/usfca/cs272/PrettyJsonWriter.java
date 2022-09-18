@@ -1,7 +1,5 @@
 package edu.usfca.cs272;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -10,6 +8,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * Outputs several simple data structures in "pretty" JSON format where newlines
@@ -222,7 +222,7 @@ public class PrettyJsonWriter {
 	 * @see #writeIndent(String, Writer, int)
 	 * @see #writeArray(Collection)
 	 */
-	public static void writeNestedArrays(
+	public static void writeNestedArrays( /* Wierd that writeNestedArrays uses {} and wNestedObjs uses [] ??*/
 			Map<String, ? extends Collection<? extends Number>> elements,
 			Writer writer, int indent) throws IOException {
 		writer.write("{");
@@ -307,7 +307,7 @@ public class PrettyJsonWriter {
 			writer.write(newline);
 			writeIndent(writer, indent+1);
 			writeObject(object,writer,indent+1);
-			if (iterator.hasNext()){writer.write(",");}
+			if (iterator.hasNext()){writer.write(",");} /*TODO: Move down a line & test*/
 		}
 		writer.write(newline);
 		writeIndent(writer,indent);
@@ -353,8 +353,6 @@ public class PrettyJsonWriter {
 			return null;
 		}
 	}
-
-
 
 	/**
 	 * Demonstrates this class.

@@ -34,12 +34,10 @@ public class Driver {
 			try { //first we parse and stem
 				ArrayList<String> stems = WordCleaner.listStems(file);
 				// ^^reads and stems line by line and inserts \n for new line
-				int lineNumber = 0;
+				int lineNumber = 1;
 				for (String stem : stems) {
-					if (stem.equals("\\n")) {
-						lineNumber++;
-					} else {
-						wordIndex.add(stem,file,lineNumber);
+					if (!stem.equals("\\n")) {
+						wordIndex.add(stem, file, lineNumber++);
 					}
 				}
 			} catch (Exception e) {
@@ -51,6 +49,7 @@ public class Driver {
 
 	/**
 	 * Create and populate list of files if it's a directory.
+	 * Could make this recursive to reduce code
 	 */
 	private ArrayList<Path> scanDirectory(Path userPath){
 
@@ -59,7 +58,11 @@ public class Driver {
 			try (DirectoryStream<Path> stream = Files.newDirectoryStream(userPath)) {
 				for (Path file : stream) {
 					System.out.println("Paths: " + file.getFileName());
-					if (file.endsWith(".txt") || file.endsWith(".text")) {
+					String fileName = file.toString().toUpperCase(); /* Maybe make substring with only last 4 chars? for efficiency */
+					if (Files.isDirectory(file)){
+						scanSubDirs(files,file);
+					}
+					else if (fileName.endsWith(".TXT") || fileName.endsWith(".TEXT")) {
 						files.add(file); // ^-^
 					}
 				}
@@ -68,6 +71,23 @@ public class Driver {
 			}
 		} else { files.add(userPath); }
 		return files;
+	}
+
+	private void scanSubDirs(ArrayList<Path> files, Path subdir){
+		try (DirectoryStream<Path> stream = Files.newDirectoryStream(subdir)) {
+			for (Path file : stream) {
+				System.out.println("Paths: " + file.getFileName());
+				String fileName = file.toString().toUpperCase(); /* Maybe make substring with only last 4 chars? for efficiency */
+				if (Files.isDirectory(file)){
+					scanSubDirs(files,file);
+				}
+				else if (fileName.endsWith(".TXT") || fileName.endsWith(".TEXT")) {
+					files.add(file); // ^-^
+				}
+			}
+		} catch (IOException | DirectoryIteratorException x) {
+			System.err.println(x);
+		}
 	}
 
 
@@ -103,7 +123,7 @@ public class Driver {
 			}
 		}
 		System.out.println("Output:" + outPath.toAbsolutePath().toString());
-
+		System.out.println("RESULT:" + wordIndex);
 
 		// calculate time elapsed and output
 		long elapsed = Duration.between(start, Instant.now()).toMillis();
