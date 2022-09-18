@@ -30,16 +30,16 @@ public class WordIndex {
 	 */
 	public class WordObj implements Comparable<String>{
 		private final String word;
-		private final HashMap<Path,LocationsObj> locations;
+		private final TreeMap<Path,LocationsObj> locations;
 
 		private WordObj() {
 			this.word = null;
-			this.locations = new HashMap<>();
+			this.locations = new TreeMap<>();
 		}
 
 		private WordObj(String word, Path location) {
 			this.word = word;
-			this.locations = new HashMap<>();
+			this.locations = new TreeMap<>();
 			this.locations.put(location,new LocationsObj(location));
 		}
 
@@ -86,6 +86,7 @@ public class WordIndex {
 
 	public void add(String word, Path location, Integer line) {
 		wIndex.putIfAbsent(word,new WordObj(word,location));
+		wIndex.get(word).locations.putIfAbsent(location,new LocationsObj(location));
 		wIndex.get(word).locations.get(location).lineLocations.add(line); //so many dots o_o TODO: simplify
 	}
 
