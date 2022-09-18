@@ -150,12 +150,4 @@ public class WordIndex {
 		writeIndent(writer,indent);
 		writer.write("}");
 	}
-
-	/**
-	 * Demonstrates this class.
-	 *
-	 * @param args unused
-	 */
-	public static void main(String[] args) {
-	}
 }

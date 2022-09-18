@@ -130,7 +130,7 @@ public class Driver {
 			try (BufferedWriter bufWriter = Files.newBufferedWriter(outPath, UTF_8)) {
 				wordIndex.toJSON(bufWriter, 0);
 			} catch (IOException e) {
-				e.printStackTrace();
+				System.out.println("IO Error occurred while attempting to output JSON to " + outPath);
 			}
 		}
 		System.out.println("Output:" + outPath.toAbsolutePath());
