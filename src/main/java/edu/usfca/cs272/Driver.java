@@ -95,12 +95,13 @@ public class Driver {
 
 			driver.scan(files, wordIndex); /* populate wordIndex*/
 		}
-		try (BufferedWriter bufWriter = Files.newBufferedWriter(outPath, UTF_8)) {
-			wordIndex.toJSON(bufWriter,0);
-		} catch (IOException e) {
-			e.printStackTrace();
+		if (argumentParser.hasFlag("-index")) {
+			try (BufferedWriter bufWriter = Files.newBufferedWriter(outPath, UTF_8)) {
+				wordIndex.toJSON(bufWriter, 0);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
-
 		System.out.println("Output:" + outPath.toAbsolutePath().toString());
 
 
