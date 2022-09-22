@@ -2,6 +2,7 @@ package edu.usfca.cs272;
 
 import java.util.*;
 
+// TODO Remove class
 /**
  * An index to store locations and the words found at those locations. Makes no
  * assumption about order or duplicates.

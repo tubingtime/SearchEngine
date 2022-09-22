@@ -13,6 +13,26 @@ import java.util.Arrays;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+/*
+ * TODO
+ * 
+ * Keep WordCleaner and WordIndex super general
+ * But move more of the "building" code outside of Driver to make it more reusable
+ * 
+ * You have two options:
+ * 
+ * 1) Create a DirectoryTraverser or TextFileFinder etc. class that is dedicated 
+ * to returning a list of text files.
+ * 
+ * 2) Create a WordIndexBuilder class that knows how to create an inverted index
+ * from either a single stemmed file or a directory of text files.
+ * 
+ * ---
+ * 
+ * 1) Create an all-in-one builder class that as soon as it finds a text file
+ * immediately builds the index.
+ */
+
 /**
  * Class responsible for running this project based on the provided command-line
  * arguments. See the README for details.
