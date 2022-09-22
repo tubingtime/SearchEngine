@@ -8,6 +8,16 @@ import java.util.*;
 import static edu.usfca.cs272.PrettyJsonWriter.newline;
 import static edu.usfca.cs272.PrettyJsonWriter.*;
 
+/*
+ * TODO Do a code cleanup round
+ * 
+ * Using the Eclipse features to fix up formatting
+ * 
+ * Fix up the naming of the classes, variables, and methods...
+ * – Avoid abbreviation
+ * - Avoid using how something is stored in the name, describe what is stored
+ */
+
 /**
  * An program that indexes the UNIQUE words that
  * were found in a text file (represented by {@link Path} objects) and stores where they
@@ -17,8 +27,12 @@ import static edu.usfca.cs272.PrettyJsonWriter.*;
  * @version Fall 2022
  */
 
-public class WordIndex {
+public class WordIndex { // TODO Make sure to indicate this is an inverted index in the name
 
+	// TODO Undo some of the nested classes and just use the nested data structure directly
+	// TODO Have currently TreeMap<String, TreeMap<Path, ArrayList<Integer>>>
+	// TODO Change this to: TreeMap<String, TreeMap<String, TreeSet<Integer>>>
+	
 	/**
 	 ** Nested HashMap and HashSet data structure to store the locations and words
 	 */

@@ -50,6 +50,15 @@ public class ArgumentParser {
 	 * @see Character#isWhitespace(int)
 	 */
 	public static boolean isFlag(String arg) {
+		/* TODO 
+		if (arg == null || arg.length() < 2 || !arg.startsWith("-")){
+			return false;
+		}
+		
+		int second = arg.codePointAt(1);
+		return !(Character.isDigit(second) || Character.isWhitespace(second));
+		*/
+		
 		if (arg == null || arg.length() < 2){
 			return false;
 		}
@@ -83,7 +92,7 @@ public class ArgumentParser {
 	 * @param flag the flag to be added as a key.
 	 * @param value the value to be added as a value.
 	 */
-	public void storeInMap(String flag, String value) {
+	public void storeInMap(String flag, String value) { // TODO Remove
 		if (value == "null"){
 			value = null;
 		}
@@ -104,9 +113,9 @@ public class ArgumentParser {
 		for(int i = 0; i < args.length; i++){
 			if (isFlag(args[i])){
 				if (args.length > i+1 && isValue(args[i+1])){
-					storeInMap(args[i],args[i+1]);
+					storeInMap(args[i],args[i+1]); // TODO map.put
 				} else {
-					storeInMap(args[i],"null");
+					storeInMap(args[i],"null"); // TODO map.put(args[i], null)
 				}
 			}
 		}
