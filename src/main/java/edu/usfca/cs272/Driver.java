@@ -28,7 +28,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * from either a single stemmed file or a directory of text files.
  * 
  * ---
- * 
+ * yuk option
  * 1) Create an all-in-one builder class that as soon as it finds a text file
  * immediately builds the index.
  */
@@ -52,9 +52,9 @@ public class Driver {
 	/**
 	 * Scans files and puts them into a provided wordIndex
 	 * @param files a list of files.
-	 * @param wordIndex a {@link WordIndex} to store the words.
+	 * @param invertedWordIndex a {@link InvertedWordIndex} to store the words.
 	 */
-	private void scan(ArrayList<Path> files, WordIndex wordIndex){
+	private void scan(ArrayList<Path> files, InvertedWordIndex invertedWordIndex){
 		for (Path file : files) {
 			try { //first we parse and stem
 				ArrayList<String> stems = WordCleaner.listStems(file);
@@ -62,7 +62,7 @@ public class Driver {
 				int lineNumber = 1;
 				for (String stem : stems) {
 					if (!stem.equals("\\n")) {
-						wordIndex.add(stem, file, lineNumber++);
+						invertedWordIndex.add(stem, file, lineNumber++);
 					}
 				}
 			} catch (IOException e) {
@@ -133,7 +133,7 @@ public class Driver {
 		// store initial start time
 		Instant start = Instant.now();
 		ArgumentParser argumentParser = new ArgumentParser(args);
-		WordIndex wordIndex = new WordIndex();
+		InvertedWordIndex invertedWordIndex = new InvertedWordIndex();
 
 		System.out.println("Actual args: " + Arrays.toString(args));
 		System.out.println("Parsed args: " + argumentParser);
@@ -144,11 +144,11 @@ public class Driver {
 			Driver driver = new Driver();
 			ArrayList<Path> files = driver.scanDirectory(userPath);
 
-			driver.scan(files, wordIndex); /* populate wordIndex*/
+			driver.scan(files, invertedWordIndex); /* populate wordIndex*/
 		}
 		if (argumentParser.hasFlag("-index")) {
 			try (BufferedWriter bufWriter = Files.newBufferedWriter(outPath, UTF_8)) {
-				wordIndex.toJSON(bufWriter, 0);
+				invertedWordIndex.toJSON(bufWriter, 0);
 			} catch (IOException e) {
 				System.out.println("IO Error occurred while attempting to output JSON to " + outPath);
 			}
