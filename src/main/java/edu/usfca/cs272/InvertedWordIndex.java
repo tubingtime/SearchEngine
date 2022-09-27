@@ -27,7 +27,7 @@ import static edu.usfca.cs272.PrettyJsonWriter.*;
  * @version Fall 2022
  */
 
-public class WordIndex { // TODO Make sure to indicate this is an inverted index in the name
+public class InvertedWordIndex {
 
 	// TODO Undo some of the nested classes and just use the nested data structure directly
 	// TODO Have currently TreeMap<String, TreeMap<Path, ArrayList<Integer>>>
@@ -127,7 +127,7 @@ public class WordIndex { // TODO Make sure to indicate this is an inverted index
 	/**
 	 ** Constructs a new instance of WordIndex.
 	 */
-	public WordIndex(){
+	public InvertedWordIndex(){
 		this.wIndex = new TreeMap<>();
 	}
 
