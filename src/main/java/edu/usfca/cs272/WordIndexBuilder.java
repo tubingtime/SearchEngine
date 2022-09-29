@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 
+/**
+ * A class that builds a WordIndex given an ArrayList of files
+ */
 public class WordIndexBuilder {
     /**
      * Scans files and puts them into a provided wordIndex

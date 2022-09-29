@@ -91,6 +91,7 @@ public class InvertedWordIndex {
      *
      * @param writer the {@link Writer} to use
      * @param indent the level of indentation to use
+     * @param locations a TreeMap containing all locations the word was found in.
      * @throws IOException if the Writer throws an IOException
      */
     public void locationsToJSON(Writer writer, int indent, TreeMap<String, TreeSet<Integer>> locations) throws IOException {
