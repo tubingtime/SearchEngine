@@ -5,21 +5,11 @@ import java.io.Writer;
 import java.nio.file.Path;
 import java.util.*;
 
-import static edu.usfca.cs272.PrettyJsonWriter.newline;
 import static edu.usfca.cs272.PrettyJsonWriter.*;
 
-/*
- * TODO Do a code cleanup round
- * 
- * Using the Eclipse features to fix up formatting
- * 
- * Fix up the naming of the classes, variables, and methods...
- * – Avoid abbreviation
- * - Avoid using how something is stored in the name, describe what is stored
- */
 
 /**
- * An program that indexes the UNIQUE words that
+ * A program that indexes the UNIQUE words that
  * were found in a text file (represented by {@link Path} objects) and stores where they
  * were found.
  *
@@ -31,7 +21,7 @@ public class InvertedWordIndex {
 
 	
 	/**
-	 ** Nested TreeMap and TreeSet data structure to store words and the locations where those words were found.
+	 ** Nested data structure to store words, what file they were found in, and the line locations.
 	 */
 	private final TreeMap<String, TreeMap<String, TreeSet<Integer>>> wordMap;
 
@@ -81,8 +71,8 @@ public class InvertedWordIndex {
 			var wordEntry = iterator.next();
 			writer.write(newline);
 			writeIndent(writer,indent+1);
-			writeQuote(wordEntry.getKey().toString(),writer,0);writer.write(": ");
-			wordToJSON(writer, indent+1, wordEntry.getValue()); //locationsObj.toJSON
+			writeQuote(wordEntry.getKey(),writer,0);writer.write(": ");
+			locationsToJSON(writer, indent+1, wordEntry.getValue()); //locationsObj.toJSON
 			if (iterator.hasNext()){writer.write(",");}
 		}
 		writer.write(newline);
@@ -96,14 +86,14 @@ public class InvertedWordIndex {
 	 * @param indent the level of indentation to use
 	 * @throws IOException if the Writer throws an IOException
 	 */
-	public void wordToJSON(Writer writer, int indent, TreeMap<String, TreeSet<Integer>> locations) throws IOException {
+	public void locationsToJSON(Writer writer, int indent, TreeMap<String, TreeSet<Integer>> locations) throws IOException {
 		writer.write("{");
 		var iterator = locations.entrySet().iterator();
 		while (iterator.hasNext()){
 			var locationEntry = iterator.next();
 			writer.write(newline);
 			writeIndent(writer,indent+1);
-			writeQuote(locationEntry.getKey().toString(),writer,0);writer.write(": ");
+			writeQuote(locationEntry.getKey(),writer,0);writer.write(": ");
 			writeArray(locationEntry.getValue(),writer, indent+1);
 			if (iterator.hasNext()){writer.write(",");}
 		}
@@ -112,3 +102,4 @@ public class InvertedWordIndex {
 		writer.write("}");
 	}
 }
+

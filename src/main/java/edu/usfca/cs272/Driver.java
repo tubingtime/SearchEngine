@@ -13,25 +13,6 @@ import java.util.Arrays;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-/*
- * TODO
- * 
- * Keep WordCleaner and WordIndex super general
- * But move more of the "building" code outside of Driver to make it more reusable
- * 
- * You have two options:
- * 
- * 1) Create a DirectoryTraverser or TextFileFinder etc. class that is dedicated 
- * to returning a list of text files.
- * 
- * 2) Create a WordIndexBuilder class that knows how to create an inverted index
- * from either a single stemmed file or a directory of text files.
- * 
- * ---
- * yuk option
- * 1) Create an all-in-one builder class that as soon as it finds a text file
- * immediately builds the index.
- */
 
 /**
  * Class responsible for running this project based on the provided command-line
@@ -48,79 +29,6 @@ public class Driver {
 	 */
 	public Driver() {
 	}
-
-	/**
-	 * Scans files and puts them into a provided wordIndex
-	 * @param files a list of files.
-	 * @param invertedWordIndex a {@link InvertedWordIndex} to store the words.
-	 */
-	private void scan(ArrayList<Path> files, InvertedWordIndex invertedWordIndex){
-		for (Path file : files) {
-			try { //first we parse and stem
-				ArrayList<String> stems = WordCleaner.listStems(file);
-				// ^^reads and stems line by line and inserts \n for new line
-				int lineNumber = 1;
-				for (String stem : stems) {
-					if (!stem.equals("\\n")) {
-						invertedWordIndex.add(stem, file, lineNumber++);
-					}
-				}
-			} catch (IOException e) {
-				System.out.println("IO Error while stemming: " + file);
-				return;
-			}
-		}
-	}
-
-	/**
-	 * Create and populate list of files if it's a directory. Or just adds the file if not
-	 * Could make this recursive to reduce code
-	 * @param userPath path given to Driver by user params
-	 * @return an {@link ArrayList} of files found
-	 */
-	private ArrayList<Path> scanDirectory(Path userPath){
-
-		ArrayList<Path> files = new ArrayList<>();
-		if (Files.isDirectory(userPath)) {
-			try (DirectoryStream<Path> stream = Files.newDirectoryStream(userPath)) {
-				for (Path file : stream) {
-					String fileName = file.toString().toUpperCase(); /* Maybe make substring with only last 4 chars? for efficiency */
-					if (Files.isDirectory(file)){
-						scanSubDirs(files,file);
-					}
-					else if (fileName.endsWith(".TXT") || fileName.endsWith(".TEXT")) {
-						files.add(file); // ^-^
-					}
-				}
-			} catch (IOException | DirectoryIteratorException x) {
-				System.out.println("IO Error while scanning directory: " + userPath);
-			}
-		} else { files.add(userPath); } /* need to check if ends in .txt ? */
-		return files;
-	}
-
-	/**
-	 * Recursive step for scanDirectory()
-	 * @param files the list of files to add new ones to
-	 * @param subdir the subdirectory to scan
-	 */
-	private void scanSubDirs(ArrayList<Path> files, Path subdir){
-		try (DirectoryStream<Path> stream = Files.newDirectoryStream(subdir)) {
-			for (Path file : stream) {
-				System.out.println("Paths: " + file.getFileName());
-				String fileName = file.toString().toUpperCase(); /* Maybe make substring with only last 4 chars? for efficiency */
-				if (Files.isDirectory(file)){
-					scanSubDirs(files,file);
-				}
-				else if (fileName.endsWith(".TXT") || fileName.endsWith(".TEXT")) {
-					files.add(file); // ^-^
-				}
-			}
-		} catch (IOException x) {
-			System.out.println("IO Error while scanning directory: " + subdir);
-		}
-	}
-
 
 	/**
 	 * Initializes the classes necessary based on the provided command-line
@@ -141,10 +49,9 @@ public class Driver {
 		Path userPath = argumentParser.getPath("-text");
 		Path outPath = argumentParser.getPath("-index",Path.of("index.json"));
 		if (userPath != null) {
-			Driver driver = new Driver();
-			ArrayList<Path> files = driver.scanDirectory(userPath);
-
-			driver.scan(files, invertedWordIndex); /* populate wordIndex*/
+			DirectoryTraverser dirTraverser = new DirectoryTraverser();
+			ArrayList<Path> files = dirTraverser.scanDirectory(userPath); /* scan directory */
+			WordIndexBuilder.scan(files, invertedWordIndex); /* populate wordIndex*/
 		}
 		if (argumentParser.hasFlag("-index")) {
 			try (BufferedWriter bufWriter = Files.newBufferedWriter(outPath, UTF_8)) {
