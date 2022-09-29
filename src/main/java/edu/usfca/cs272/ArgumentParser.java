@@ -54,7 +54,7 @@ public class ArgumentParser {
 		if (arg == null || arg.length() < 2 || !arg.startsWith("-")){
 			return false;
 		}
-		char c = arg.charAt(1);
+		int c = arg.codePointAt(1);
 		return !Character.isDigit(c) && !Character.isWhitespace(c);
 	}
 
