@@ -7,10 +7,11 @@ import java.util.ArrayList;
 public class WordIndexBuilder {
     /**
      * Scans files and puts them into a provided wordIndex
-     * @param files a list of files.
+     *
+     * @param files             a list of files.
      * @param invertedWordIndex a {@link InvertedWordIndex} to store the words.
      */
-    public static void scan(ArrayList<Path> files, InvertedWordIndex invertedWordIndex){
+    public static void scan(ArrayList<Path> files, InvertedWordIndex invertedWordIndex) {
         for (Path file : files) {
             try { //first we parse and stem
                 ArrayList<String> stems = WordCleaner.listStems(file);

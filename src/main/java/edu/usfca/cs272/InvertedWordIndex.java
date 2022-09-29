@@ -19,87 +19,97 @@ import static edu.usfca.cs272.PrettyJsonWriter.*;
 
 public class InvertedWordIndex {
 
-	
-	/**
-	 ** Nested data structure to store words, what file they were found in, and the line locations.
-	 */
-	private final TreeMap<String, TreeMap<String, TreeSet<Integer>>> wordMap;
 
-	/**
-	 ** Constructs a new instance of WordIndex.
-	 */
-	public InvertedWordIndex(){
-		this.wordMap = new TreeMap<>();
-	}
+    /**
+     * * Nested data structure to store words, what file they were found in, and the line locations.
+     */
+    private final TreeMap<String, TreeMap<String, TreeSet<Integer>>> wordMap;
 
-	/**
-	 * Constructs a new nested TreeMap that stores file locations and puts the first location in.
-	 * @param location the first location to put into the map
-	 * @return a nested TreeMap and TreeSet containing the location provided.
-	 */
-	public TreeMap<String, TreeSet<Integer>> newLocation(String location) {
-		TreeMap<String,TreeSet<Integer>> locationMap = new TreeMap<>();
-		TreeSet<Integer> lineLocations = new TreeSet<>();
-		locationMap.put(location, lineLocations);
-		return locationMap;
-	}
+    /**
+     * * Constructs a new instance of WordIndex.
+     */
+    public InvertedWordIndex() {
+        this.wordMap = new TreeMap<>();
+    }
+
+    /**
+     * Constructs a new nested TreeMap that stores file locations and puts the first location in.
+     *
+     * @param location the first location to put into the map
+     * @return a nested TreeMap and TreeSet containing the location provided.
+     */
+    public TreeMap<String, TreeSet<Integer>> newLocation(String location) {
+        TreeMap<String, TreeSet<Integer>> locationMap = new TreeMap<>();
+        TreeSet<Integer> lineLocations = new TreeSet<>();
+        locationMap.put(location, lineLocations);
+        return locationMap;
+    }
 
 
-	/**
-	 * Adds a new word to the WordIndex. Given the word, it's Path location, and the line number it was found at.
-	 * @param word the word to add
-	 * @param location where the wod was found
-	 * @param line what line the word was found at
-	 */
-	public void add(String word, Path location, Integer line) {
-		String locationString = location.toString();
-		wordMap.putIfAbsent(word,newLocation(locationString));
-		wordMap.get(word).putIfAbsent(locationString,new TreeSet<>());
-		wordMap.get(word).get(locationString).add(line);
-	}
+    /**
+     * Adds a new word to the WordIndex. Given the word, it's Path location, and the line number it was found at.
+     *
+     * @param word     the word to add
+     * @param location where the wod was found
+     * @param line     what line the word was found at
+     */
+    public void add(String word, Path location, Integer line) {
+        String locationString = location.toString();
+        wordMap.putIfAbsent(word, newLocation(locationString));
+        wordMap.get(word).putIfAbsent(locationString, new TreeSet<>());
+        wordMap.get(word).get(locationString).add(line);
+    }
 
-	/**
-	 * Uses wordToJSON toJSON method to convert a wordIndex to JSON.
-	 * @param writer the {@link Writer} to use
-	 * @param indent the level of indentation.
-	 * @throws IOException if the writer throws and IOException
-	 */
-	public void toJSON(Writer writer, int indent) throws IOException {
-		writer.write("{");
-		var iterator = wordMap.entrySet().iterator();
-		while (iterator.hasNext()){
-			var wordEntry = iterator.next();
-			writer.write(newline);
-			writeIndent(writer,indent+1);
-			writeQuote(wordEntry.getKey(),writer,0);writer.write(": ");
-			locationsToJSON(writer, indent+1, wordEntry.getValue()); //locationsObj.toJSON
-			if (iterator.hasNext()){writer.write(",");}
-		}
-		writer.write(newline);
-		writeIndent(writer,indent);
-		writer.write("}");
-	}
+    /**
+     * Uses wordToJSON toJSON method to convert a wordIndex to JSON.
+     *
+     * @param writer the {@link Writer} to use
+     * @param indent the level of indentation.
+     * @throws IOException if the writer throws and IOException
+     */
+    public void toJSON(Writer writer, int indent) throws IOException {
+        writer.write("{");
+        var iterator = wordMap.entrySet().iterator();
+        while (iterator.hasNext()) {
+            var wordEntry = iterator.next();
+            writer.write(newline);
+            writeIndent(writer, indent + 1);
+            writeQuote(wordEntry.getKey(), writer, 0);
+            writer.write(": ");
+            locationsToJSON(writer, indent + 1, wordEntry.getValue()); //locationsObj.toJSON
+            if (iterator.hasNext()) {
+                writer.write(",");
+            }
+        }
+        writer.write(newline);
+        writeIndent(writer, indent);
+        writer.write("}");
+    }
 
-	/**
-	 * Uses the help of PrettyJSONWriter to convert a wordObj to JSON
-	 * @param writer the {@link Writer} to use
-	 * @param indent the level of indentation to use
-	 * @throws IOException if the Writer throws an IOException
-	 */
-	public void locationsToJSON(Writer writer, int indent, TreeMap<String, TreeSet<Integer>> locations) throws IOException {
-		writer.write("{");
-		var iterator = locations.entrySet().iterator();
-		while (iterator.hasNext()){
-			var locationEntry = iterator.next();
-			writer.write(newline);
-			writeIndent(writer,indent+1);
-			writeQuote(locationEntry.getKey(),writer,0);writer.write(": ");
-			writeArray(locationEntry.getValue(),writer, indent+1);
-			if (iterator.hasNext()){writer.write(",");}
-		}
-		writer.write(newline);
-		writeIndent(writer,indent);
-		writer.write("}");
-	}
+    /**
+     * Uses the help of PrettyJSONWriter to convert a wordObj to JSON
+     *
+     * @param writer the {@link Writer} to use
+     * @param indent the level of indentation to use
+     * @throws IOException if the Writer throws an IOException
+     */
+    public void locationsToJSON(Writer writer, int indent, TreeMap<String, TreeSet<Integer>> locations) throws IOException {
+        writer.write("{");
+        var iterator = locations.entrySet().iterator();
+        while (iterator.hasNext()) {
+            var locationEntry = iterator.next();
+            writer.write(newline);
+            writeIndent(writer, indent + 1);
+            writeQuote(locationEntry.getKey(), writer, 0);
+            writer.write(": ");
+            writeArray(locationEntry.getValue(), writer, indent + 1);
+            if (iterator.hasNext()) {
+                writer.write(",");
+            }
+        }
+        writer.write(newline);
+        writeIndent(writer, indent);
+        writer.write("}");
+    }
 }
 
