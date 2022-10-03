@@ -11,6 +11,8 @@ import java.util.*;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+// TODO See Piazza post for how to refactor
+
 /**
  * Outputs several simple data structures in "pretty" JSON format where newlines
  * are used to separate elements and nested elements are indented using spaces.

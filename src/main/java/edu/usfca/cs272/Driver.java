@@ -22,6 +22,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  */
 public class Driver {
 
+	// TODO Remove the constructor
     /**
      * Makes  new instance of driver so it's functions can be used
      */
@@ -44,15 +45,18 @@ public class Driver {
 
         System.out.println("Actual args: " + Arrays.toString(args));
         System.out.println("Parsed args: " + argumentParser);
-        System.out.println("Path: " + argumentParser.getPath("-text"));
+        System.out.println("Path: " + argumentParser.getPath("-text")); // TODO Move inside of the -text block
 
-        Path inputPath = argumentParser.getPath("-text");
-        Path outputPath = argumentParser.getPath("-index", Path.of("index.json"));
+        Path inputPath = argumentParser.getPath("-text"); // TODO Move inside of -text block
+        Path outputPath = argumentParser.getPath("-index", Path.of("index.json")); // TODO Move inside of -index block
+        
         if (inputPath != null) {
+        	// TODO There should be exceptions being caught here!
             DirectoryTraverser dirTraverser = new DirectoryTraverser();
             ArrayList<Path> files = dirTraverser.scanDirectory(inputPath); /* scan directory */
             WordIndexBuilder.scan(files, invertedWordIndex); /* populate wordIndex*/
         }
+        
         if (argumentParser.hasFlag("-index")) {
             try (BufferedWriter bufWriter = Files.newBufferedWriter(outputPath, UTF_8)) {
                 invertedWordIndex.toJSON(bufWriter, 0);
@@ -60,7 +64,7 @@ public class Driver {
                 System.out.println("IO Error occurred while attempting to output JSON to " + outputPath);
             }
         }
-        System.out.println("Output:" + outputPath.toAbsolutePath());
+        System.out.println("Output:" + outputPath.toAbsolutePath()); // TODO Move this inside of the -index if block
 
         // calculate time elapsed and output
         long elapsed = Duration.between(start, Instant.now()).toMillis();
