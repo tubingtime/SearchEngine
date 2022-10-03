@@ -53,13 +53,31 @@ public class InvertedWordIndex {
      * @param location where the wod was found
      * @param line     what line the word was found at
      */
-    public void add(String word, Path location, Integer line) {
+    public void add(String word, Path location, Integer line) { // TODO String location
         String locationString = location.toString();
         wordMap.putIfAbsent(word, newLocation(locationString));
         wordMap.get(word).putIfAbsent(locationString, new TreeSet<>());
         wordMap.get(word).get(locationString).add(line);
     }
+    
+    /*
+     * TODO 
+     * add(List<String> words, String location) or addAll or addWords
+     * 
+     * 3x has/contains, num/size, view/get methods
+     * toString
+     * 
+     * getWords() --> safely return an unmodifiable view of the outer keyset
+     * getLocations(String word) --> the inner keyset
+     * getPosition(String word, String location) --> safely return the inner set of positions
+     */
 
+    /*
+     * TODO Move more JSON writing logic into PrettyJsonWriter
+     * 
+     * Keep... toJSON(Path path) { calls 1 line from your json writer }
+     */
+    
     /**
      * Uses wordToJSON toJSON method to convert a wordIndex to JSON.
      *
