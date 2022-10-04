@@ -1,6 +1,7 @@
 package edu.usfca.cs272;
 
 import java.io.IOException;
+import java.io.StringWriter;
 import java.io.Writer;
 import java.nio.file.Path;
 import java.util.*;
@@ -58,24 +59,127 @@ public class InvertedWordIndex {
         wordMap.get(word).putIfAbsent(location, new TreeSet<>());
         wordMap.get(word).get(location).add(line);
     }
-    
-    /*
-     * TODO 
-     * add(List<String> words, String location) or addAll or addWords
-     * 
-     * 3x has/contains, num/size, view/get methods
-     * toString
-     * 
-     * getWords() --> safely return an unmodifiable view of the outer keyset
-     * getLocations(String word) --> the inner keyset
-     * getPosition(String word, String location) --> safely return the inner set of positions
-     */
 
-    /*
-     * TODO Move more JSON writing logic into PrettyJsonWriter
-     * 
-     * Keep... toJSON(Path path) { calls 1 line from your json writer }
+    /**
+     * Adds a list of words to the WordIndex. Given the word, it's Path location, and the line number it was found at.
+     *
+     * @param words     the words to add
+     * @param location where the wod was found
+     * @param line     what line the word was found at
      */
+    public void addAll(ArrayList<String> words, String location, Integer line){
+        for (String word : words){
+            add(word, location, line);
+        }
+    }
+
+    /**
+     * Check if the wordMap contains a word
+     * @param word the word to check
+     * @return true if the word exists, false if not.
+     */
+    public boolean contains(String word){
+        return wordMap.containsKey(word);
+    }
+
+    /**
+     * Check if a word exists in a particular location
+     * @param word the word to check
+     * @param location the location to check
+     * @return true if exists, false if not.
+     */
+    public boolean contains(String word, String location){
+        TreeMap<String,TreeSet<Integer>> locationMap = wordMap.get(word);
+        return (locationMap != null && locationMap.containsKey(location));
+    }
+
+    /**
+     * Check if a position exists in a particular location and word.
+     * @param word the word to check
+     * @param location the location to check
+     * @param position the position to check
+     * @return true if the position exists or false if not
+     */
+    public boolean contains(String word, String location, Integer position){
+        Set<Integer> positions = getPositions(word, location);
+        return positions.contains(position);
+    }
+
+    /**
+     * @return an unmodifiable view of the outer keySet, aka the words.
+     */
+    public Set<String> getWords(){
+        return Collections.unmodifiableSet(wordMap.keySet());
+    }
+
+    /**
+     *
+     * @param word the word whose associated locations to return
+     * @return an unmodifiable view of the locations or an empty set
+     *         if the word doesn't exist
+     */
+    public Set<String> getLocations(String word){
+        TreeMap<String,TreeSet<Integer>> locationMap = wordMap.get(word);
+        if (locationMap == null)
+            return Collections.emptySet();
+        return Collections.unmodifiableSet(locationMap.keySet());
+    }
+
+    /**
+     *
+     * @param word the word whose associated positions to return
+     * @param location the locations whose associated positions to return
+     * @return an unmodifiable view of the positions or an empty set if the
+     *         positions couldn't be found.
+     */
+    public Set<Integer> getPositions(String word, String location){
+        TreeMap<String,TreeSet<Integer>> locationMap = wordMap.get(word);
+        TreeSet<Integer> positions;
+        if (locationMap == null || (positions = locationMap.get(location)) == null)
+            return Collections.emptySet();
+        return Collections.unmodifiableSet(positions);
+    }
+
+    /**
+     * @return the number of words in the index
+     */
+    public Integer size(){
+        return wordMap.size();
+    }
+
+    /**
+     * Checks the number of locations a word has
+     * @param word The word whose size to check
+     * @return the number of locations a word has
+     */
+    public Integer size(String word){
+        return getLocations(word).size();
+    }
+
+    /**
+     * Returns the number of times a word appears in a particular location
+     * @param word the word to check
+     * @param location the location to check
+     * @return the number of times a word appears in a particular location
+     */
+    public Integer size(String word, String location){
+        return getPositions(word,location).size();
+    }
+
+    /**
+     * Converts this Word Index to JSON and returns as a string
+     * @return a string of the word index in json format
+     */
+    @Override
+    public String toString() {
+        StringWriter writer = new StringWriter();
+        try {
+            toJSON(writer, 0);
+        } catch (IOException e) {
+            System.out.println("IO Error occurred while converting JSON to String");
+        }
+        return writer.toString();
+    }
     
     /**
      * Uses wordToJSON toJSON method to convert a wordIndex to JSON.
@@ -85,49 +189,7 @@ public class InvertedWordIndex {
      * @throws IOException if the writer throws and IOException
      */
     public void toJSON(Writer writer, int indent) throws IOException {
-        writer.write("{");
-        var iterator = wordMap.entrySet().iterator();
-        while (iterator.hasNext()) {
-            var wordEntry = iterator.next();
-            writer.write(newline);
-            writeIndent(writer, indent + 1);
-            writeQuote(wordEntry.getKey(), writer, 0);
-            writer.write(": ");
-            locationsToJSON(writer, indent + 1, wordEntry.getValue()); //locationsObj.toJSON
-            if (iterator.hasNext()) {
-                writer.write(",");
-            }
-        }
-        writer.write(newline);
-        writeIndent(writer, indent);
-        writer.write("}");
-    }
-
-    /**
-     * Uses the help of PrettyJSONWriter to convert a wordObj to JSON
-     *
-     * @param writer the {@link Writer} to use
-     * @param indent the level of indentation to use
-     * @param locations a TreeMap containing all locations the word was found in.
-     * @throws IOException if the Writer throws an IOException
-     */
-    public void locationsToJSON(Writer writer, int indent, TreeMap<String, TreeSet<Integer>> locations) throws IOException {
-        writer.write("{");
-        var iterator = locations.entrySet().iterator();
-        while (iterator.hasNext()) {
-            var locationEntry = iterator.next();
-            writer.write(newline);
-            writeIndent(writer, indent + 1);
-            writeQuote(locationEntry.getKey(), writer, 0);
-            writer.write(": ");
-            writeArray(locationEntry.getValue(), writer, indent + 1);
-            if (iterator.hasNext()) {
-                writer.write(",");
-            }
-        }
-        writer.write(newline);
-        writeIndent(writer, indent);
-        writer.write("}");
+        PrettyJsonWriter.invertedWordIndextoJSON(writer, indent, wordMap);
     }
 }
 
