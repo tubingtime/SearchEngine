@@ -22,13 +22,6 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  */
 public class Driver {
 
-	// TODO Remove the constructor
-    /**
-     * Makes  new instance of driver so it's functions can be used
-     */
-    public Driver() {
-    }
-
     /**
      * Initializes the classes necessary based on the provided command-line
      * arguments. This includes (but is not limited to) how to build or search an
@@ -40,18 +33,15 @@ public class Driver {
         // store initial start time
         Instant start = Instant.now();
 
-        ArgumentParser argumentParser = new ArgumentParser(args); /* parse args */
-        InvertedWordIndex invertedWordIndex = new InvertedWordIndex();
 
+        ArgumentParser argumentParser = new ArgumentParser(args); /* parse args */
         System.out.println("Actual args: " + Arrays.toString(args));
         System.out.println("Parsed args: " + argumentParser);
-        System.out.println("Path: " + argumentParser.getPath("-text")); // TODO Move inside of the -text block
 
-        Path inputPath = argumentParser.getPath("-text"); // TODO Move inside of -text block
-        Path outputPath = argumentParser.getPath("-index", Path.of("index.json")); // TODO Move inside of -index block
-        
+        InvertedWordIndex invertedWordIndex = new InvertedWordIndex();
+        Path inputPath = argumentParser.getPath("-text");
         if (inputPath != null) {
-        	// TODO There should be exceptions being caught here!
+            System.out.println("Input: " + inputPath);
             try {
                 ArrayList<Path> files = TextFileTraverser.scanDirectory(inputPath); /* scan directory */
                 WordIndexBuilder.scan(files, invertedWordIndex); /* populate wordIndex*/
@@ -60,15 +50,17 @@ public class Driver {
             }
 
         }
-        
+
+
+        Path outputPath = argumentParser.getPath("-index", Path.of("index.json"));
         if (argumentParser.hasFlag("-index")) {
             try (BufferedWriter bufWriter = Files.newBufferedWriter(outputPath, UTF_8)) {
                 invertedWordIndex.toJSON(bufWriter, 0);
+                System.out.println("Output:" + outputPath.toAbsolutePath());
             } catch (IOException e) {
                 System.out.println("IO Error occurred while attempting to output JSON to " + outputPath);
             }
         }
-        System.out.println("Output:" + outputPath.toAbsolutePath()); // TODO Move this inside of the -index if block
 
         // calculate time elapsed and output
         long elapsed = Duration.between(start, Instant.now()).toMillis();
