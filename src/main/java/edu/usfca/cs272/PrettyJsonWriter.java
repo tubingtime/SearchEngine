@@ -350,4 +350,52 @@ public class PrettyJsonWriter {
             return null;
         }
     }
+
+
+    public static void invertedWordIndextoJSON(Writer writer, int indent,
+                                TreeMap<String, TreeMap<String, TreeSet<Integer>>> wordMap) throws IOException {
+        writer.write("{");
+        var iterator = wordMap.entrySet().iterator();
+        while (iterator.hasNext()) {
+            var wordEntry = iterator.next();
+            writer.write(newline);
+            writeIndent(writer, indent + 1);
+            writeQuote(wordEntry.getKey(), writer, 0);
+            writer.write(": ");
+            locationsToJSON(writer, indent + 1, wordEntry.getValue()); //locationsObj.toJSON
+            if (iterator.hasNext()) {
+                writer.write(",");
+            }
+        }
+        writer.write(newline);
+        writeIndent(writer, indent);
+        writer.write("}");
+    }
+
+    /**
+     * Converts a wordObj to JSON
+     *
+     * @param writer the {@link Writer} to use
+     * @param indent the level of indentation to use
+     * @param locations a TreeMap containing all locations the word was found in.
+     * @throws IOException if the Writer throws an IOException
+     */
+    public static void locationsToJSON(Writer writer, int indent, TreeMap<String, TreeSet<Integer>> locations) throws IOException {
+        writer.write("{");
+        var iterator = locations.entrySet().iterator();
+        while (iterator.hasNext()) {
+            var locationEntry = iterator.next();
+            writer.write(newline);
+            writeIndent(writer, indent + 1);
+            writeQuote(locationEntry.getKey(), writer, 0);
+            writer.write(": ");
+            writeArray(locationEntry.getValue(), writer, indent + 1);
+            if (iterator.hasNext()) {
+                writer.write(",");
+            }
+        }
+        writer.write(newline);
+        writeIndent(writer, indent);
+        writer.write("}");
+    }
 }
