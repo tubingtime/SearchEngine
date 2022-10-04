@@ -19,7 +19,7 @@ public class TextFileTraverser {
      * @param userPath path given to Driver by user params
      * @return an {@link ArrayList} of files found
      */
-    public static ArrayList<Path> scanDirectory(Path userPath) { // TODO throw exception, handle in Driver instead
+    public static ArrayList<Path> scanDirectory(Path userPath) throws IOException { // TODO throw exception, handle in Driver instead
         ArrayList<Path> files = new ArrayList<>();
 
         if (Files.isDirectory(userPath)) {
@@ -38,17 +38,14 @@ public class TextFileTraverser {
      * @param files  the list of files to add new ones to
      * @param subdir the subdirectory to scan
      */
-    private static void scanSubDirs(ArrayList<Path> files, Path subdir) { // TODO throw the exception instead
-        try (DirectoryStream<Path> stream = Files.newDirectoryStream(subdir)) {
-            for (Path file : stream) {
-                if (Files.isDirectory(file)) {
-                    scanSubDirs(files, file);
-                } else if (isTextFile(file)) {
-                    files.add(file); // ^-^
-                }
+    private static void scanSubDirs(ArrayList<Path> files, Path subdir) throws IOException { // TODO throw the exception instead
+        DirectoryStream<Path> stream = Files.newDirectoryStream(subdir);
+        for (Path file : stream) {
+            if (Files.isDirectory(file)) {
+                scanSubDirs(files, file);
+            } else if (isTextFile(file)) {
+                files.add(file); // ^-^
             }
-        } catch (IOException x) {
-            System.out.println("IO Error while scanning directory: " + subdir);
         }
     }
 

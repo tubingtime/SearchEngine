@@ -52,9 +52,13 @@ public class Driver {
         
         if (inputPath != null) {
         	// TODO There should be exceptions being caught here!
-            DirectoryTraverser dirTraverser = new DirectoryTraverser();
-            ArrayList<Path> files = dirTraverser.scanDirectory(inputPath); /* scan directory */
-            WordIndexBuilder.scan(files, invertedWordIndex); /* populate wordIndex*/
+            try {
+                ArrayList<Path> files = TextFileTraverser.scanDirectory(inputPath); /* scan directory */
+                WordIndexBuilder.scan(files, invertedWordIndex); /* populate wordIndex*/
+            } catch (IOException e){
+                System.out.println("IO Error while scanning directory: " + inputPath );
+            }
+
         }
         
         if (argumentParser.hasFlag("-index")) {
