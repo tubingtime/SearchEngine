@@ -22,7 +22,7 @@ public class WordIndexBuilder {
                 int lineNumber = 1;
                 for (String stem : stems) {
                     if (!stem.equals("\\n")) {
-                        invertedWordIndex.add(stem, file, lineNumber++);
+                        invertedWordIndex.add(stem, file.toString(), lineNumber++);
                     }
                 }
             } catch (IOException e) {

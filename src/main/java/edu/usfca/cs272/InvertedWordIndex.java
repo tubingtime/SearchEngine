@@ -53,11 +53,10 @@ public class InvertedWordIndex {
      * @param location where the wod was found
      * @param line     what line the word was found at
      */
-    public void add(String word, Path location, Integer line) { // TODO String location
-        String locationString = location.toString();
-        wordMap.putIfAbsent(word, newLocation(locationString));
-        wordMap.get(word).putIfAbsent(locationString, new TreeSet<>());
-        wordMap.get(word).get(locationString).add(line);
+    public void add(String word, String location, Integer line) {
+        wordMap.putIfAbsent(word, newLocation(location));
+        wordMap.get(word).putIfAbsent(location, new TreeSet<>());
+        wordMap.get(word).get(location).add(line);
     }
     
     /*
