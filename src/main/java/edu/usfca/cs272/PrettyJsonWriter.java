@@ -11,7 +11,6 @@ import java.util.*;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-// TODO See Piazza post for how to refactor
 
 /**
  * Outputs several simple data structures in "pretty" JSON format where newlines
@@ -352,20 +351,26 @@ public class PrettyJsonWriter {
     }
 
 
-    public static void invertedWordIndextoJSON(Writer writer, int indent,
-                                TreeMap<String, TreeMap<String, TreeSet<Integer>>> wordMap) throws IOException {
+    public static void invertedWordIndexToJSON(Writer writer, int indent,
+                                               TreeMap<String, TreeMap<String, TreeSet<Integer>>> wordMap) throws IOException {
         writer.write("{");
         var iterator = wordMap.entrySet().iterator();
-        while (iterator.hasNext()) {
+        if (iterator.hasNext()) {
             var wordEntry = iterator.next();
             writer.write(newline);
             writeIndent(writer, indent + 1);
             writeQuote(wordEntry.getKey(), writer, 0);
             writer.write(": ");
             locationsToJSON(writer, indent + 1, wordEntry.getValue()); //locationsObj.toJSON
-            if (iterator.hasNext()) {
-                writer.write(",");
-            }
+        }
+        while (iterator.hasNext()) {
+            var wordEntry = iterator.next();
+            writer.write(",");
+            writer.write(newline);
+            writeIndent(writer, indent + 1);
+            writeQuote(wordEntry.getKey(), writer, 0);
+            writer.write(": ");
+            locationsToJSON(writer, indent + 1, wordEntry.getValue()); //locationsObj.toJSON
         }
         writer.write(newline);
         writeIndent(writer, indent);
@@ -383,16 +388,22 @@ public class PrettyJsonWriter {
     public static void locationsToJSON(Writer writer, int indent, TreeMap<String, TreeSet<Integer>> locations) throws IOException {
         writer.write("{");
         var iterator = locations.entrySet().iterator();
-        while (iterator.hasNext()) {
+        if (iterator.hasNext()) {
             var locationEntry = iterator.next();
             writer.write(newline);
             writeIndent(writer, indent + 1);
             writeQuote(locationEntry.getKey(), writer, 0);
             writer.write(": ");
             writeArray(locationEntry.getValue(), writer, indent + 1);
-            if (iterator.hasNext()) {
-                writer.write(",");
-            }
+        }
+        while (iterator.hasNext()) {
+            var locationEntry = iterator.next();
+            writer.write(",");
+            writer.write(newline);
+            writeIndent(writer, indent + 1);
+            writeQuote(locationEntry.getKey(), writer, 0);
+            writer.write(": ");
+            writeArray(locationEntry.getValue(), writer, indent + 1);
         }
         writer.write(newline);
         writeIndent(writer, indent);
