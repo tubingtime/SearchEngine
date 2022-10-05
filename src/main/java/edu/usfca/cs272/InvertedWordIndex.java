@@ -6,8 +6,6 @@ import java.io.Writer;
 import java.nio.file.Path;
 import java.util.*;
 
-import static edu.usfca.cs272.PrettyJsonWriter.*;
-
 
 /**
  * A program that indexes the UNIQUE words that
@@ -182,14 +180,14 @@ public class InvertedWordIndex {
     }
     
     /**
-     * Uses wordToJSON toJSON method to convert a wordIndex to JSON.
+     * Uses PrettyJsonWriter toJSON method to convert a wordIndex to JSON.
      *
      * @param writer the {@link Writer} to use
      * @param indent the level of indentation.
      * @throws IOException if the writer throws and IOException
      */
     public void toJSON(Writer writer, int indent) throws IOException {
-        PrettyJsonWriter.invertedWordIndextoJSON(writer, indent, wordMap);
+        PrettyJsonWriter.invertedWordIndexToJSON(writer, indent, wordMap);
     }
 }
 
