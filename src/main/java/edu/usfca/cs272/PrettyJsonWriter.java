@@ -351,6 +351,13 @@ public class PrettyJsonWriter {
     }
 
 
+    /**
+     * Converts an entire InvertedWordIndex to pretty JSON
+     * @param writer the {@link Writer} to use
+     * @param indent the level of indentation to use
+     * @param wordMap a TreeMap containing the InvertedWordIndex
+     * @throws IOException if the Writer throws an IOException
+     */
     public static void invertedWordIndexToJSON(Writer writer, int indent,
                                                TreeMap<String, TreeMap<String, TreeSet<Integer>>> wordMap) throws IOException {
         writer.write("{");
@@ -378,7 +385,7 @@ public class PrettyJsonWriter {
     }
 
     /**
-     * Converts a wordObj to JSON
+     * Converts a word location Entry to JSON
      *
      * @param writer the {@link Writer} to use
      * @param indent the level of indentation to use

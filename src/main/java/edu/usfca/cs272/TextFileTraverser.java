@@ -18,6 +18,7 @@ public class TextFileTraverser {
      *
      * @param userPath path given to Driver by user params
      * @return an {@link ArrayList} of files found
+     * @throws IOException if an IO Exception occurs while scanning
      */
     public static ArrayList<Path> scanDirectory(Path userPath) throws IOException {
         ArrayList<Path> files = new ArrayList<>();
@@ -37,6 +38,7 @@ public class TextFileTraverser {
      *
      * @param files  the list of files to add new ones to
      * @param subdir the subdirectory to scan
+     * @throws IOException if an IO Exception occurs while scanning
      */
     private static void scanSubDirs(ArrayList<Path> files, Path subdir) throws IOException {
         DirectoryStream<Path> stream = Files.newDirectoryStream(subdir);
@@ -50,6 +52,11 @@ public class TextFileTraverser {
     }
 
 
+    /**
+     * Checks whether a file ends in .txt or .text (case insensitive)
+     * @param path the file to check
+     * @return true if it is a text file, false if not.
+     */
     public static boolean isTextFile(Path path) {
         String fileName = path.toString().toUpperCase(); /* Maybe make substring with only last 4 chars? for efficiency */
         return fileName.endsWith(".TXT") || fileName.endsWith(".TEXT");
