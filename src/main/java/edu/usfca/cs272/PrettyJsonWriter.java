@@ -223,6 +223,7 @@ public class PrettyJsonWriter {
     public static void writeNestedArrays( /* Wierd that writeNestedArrays uses {} and wNestedObjs uses [] ??*/
             Map<String, ? extends Collection<? extends Number>> elements,
             Writer writer, int indent) throws IOException {
+    	// TODO Try to refactor all of these too
         writer.write("{");
         var iterator = elements.entrySet().iterator();
         while (iterator.hasNext()) { /* Iterator lifestyle 8^) */
@@ -359,7 +360,7 @@ public class PrettyJsonWriter {
      * @throws IOException if the Writer throws an IOException
      */
     public static void invertedWordIndexToJSON(Writer writer, int indent,
-                                               TreeMap<String, TreeMap<String, TreeSet<Integer>>> wordMap) throws IOException {
+                                               TreeMap<String, TreeMap<String, TreeSet<Integer>>> wordMap) throws IOException { // TODO See if can figure out the generic types
         writer.write("{");
         var iterator = wordMap.entrySet().iterator();
         if (iterator.hasNext()) {
@@ -392,7 +393,7 @@ public class PrettyJsonWriter {
      * @param locations a TreeMap containing all locations the word was found in.
      * @throws IOException if the Writer throws an IOException
      */
-    public static void locationsToJSON(Writer writer, int indent, TreeMap<String, TreeSet<Integer>> locations) throws IOException {
+    public static void locationsToJSON(Writer writer, int indent, TreeMap<String, TreeSet<Integer>> locations) throws IOException { // TODO See if can use writeNestedArrays instead
         writer.write("{");
         var iterator = locations.entrySet().iterator();
         if (iterator.hasNext()) {

@@ -93,6 +93,7 @@ public class WordCleaner {
         String[] wordList = parse(line);
         for (String word : wordList) {
             stems.add((String) stemmer.stem(word));
+            // TODO stems.add(stemmer.stem(word).toString());
         }
     }
 
@@ -145,13 +146,14 @@ public class WordCleaner {
                 BufferedReader reader = Files.newBufferedReader(input, UTF_8)
         ) {
             String line;
+            // TODO Create a stemmer here
             ArrayList<String> stems = new ArrayList<>();
             while ((line = reader.readLine()) != null) {
                 addStems(line, defaultStemmer, stems);
-                stems.add("\\n");
+                stems.add("\\n"); // TODO Remove
             }
             return stems;
-        } catch (IOException e) {
+        } catch (IOException e) { // TODO Remove catch
             System.out.println("Invalid Path?");
             throw new IOException(e);
         }
@@ -202,6 +204,7 @@ public class WordCleaner {
      * @see #uniqueStems(String, Stemmer)
      */
     public static TreeSet<String> uniqueStems(Path input) throws IOException {
+        // TODO Same changes
         try (
                 BufferedReader reader = Files.newBufferedReader(input, UTF_8)
         ) {
@@ -238,6 +241,7 @@ public class WordCleaner {
         ) {
 
             String line;
+            // TODO Create stemmer per file instead
             ArrayList<TreeSet<String>> uniqueStems = new ArrayList<>();
             while ((line = reader.readLine()) != null) {
                 TreeSet<String> stems = new TreeSet<>();
@@ -245,7 +249,7 @@ public class WordCleaner {
                 uniqueStems.add(stems);
             }
             return uniqueStems;
-        } catch (IOException e) {
+        } catch (IOException e) { // TODO Remove catch
             System.out.println("Invalid Path?");
             throw new IOException(e);
         }

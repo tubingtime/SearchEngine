@@ -37,7 +37,7 @@ public class InvertedWordIndex {
      * @param location the first location to put into the map
      * @return a nested TreeMap and TreeSet containing the location provided.
      */
-    public TreeMap<String, TreeSet<Integer>> newLocation(String location) {
+    public TreeMap<String, TreeSet<Integer>> newLocation(String location) { // TODO Remove
         TreeMap<String, TreeSet<Integer>> locationMap = new TreeMap<>();
         TreeSet<Integer> lineLocations = new TreeSet<>();
         locationMap.put(location, lineLocations);
@@ -52,8 +52,9 @@ public class InvertedWordIndex {
      * @param location where the wod was found
      * @param line     what line the word was found at
      */
-    public void add(String word, String location, Integer line) {
+    public void add(String word, String location, Integer line) { // TODO line --> position
         wordMap.putIfAbsent(word, newLocation(location));
+        // TODO wordMap.putIfAbsent(word, new TreeMap<>());
         wordMap.get(word).putIfAbsent(location, new TreeSet<>());
         wordMap.get(word).get(location).add(line);
     }
@@ -65,9 +66,10 @@ public class InvertedWordIndex {
      * @param location where the wod was found
      * @param line     what line the word was found at
      */
-    public void addAll(ArrayList<String> words, String location, Integer line){
+    public void addAll(ArrayList<String> words, String location, Integer line) { // TODO line --> position
         for (String word : words){
             add(word, location, line);
+            // TODO add(word, location, line++);
         }
     }
 
@@ -99,6 +101,7 @@ public class InvertedWordIndex {
      * @return true if the position exists or false if not
      */
     public boolean contains(String word, String location, Integer position){
+    	// TODO Take a consistent approach for the contains methods... either check if keys exist or rely on the get methods
         Set<Integer> positions = getPositions(word, location);
         return positions.contains(position);
     }
@@ -161,7 +164,7 @@ public class InvertedWordIndex {
      * @return the number of times a word appears in a particular location
      */
     public Integer size(String word, String location){
-        return getPositions(word,location).size();
+        return getPositions(word, location).size();
     }
 
     /**
@@ -170,11 +173,12 @@ public class InvertedWordIndex {
      */
     @Override
     public String toString() {
+    	// TODO Make a method to return the JSON string in PrettyJSonwriter instead of here
         StringWriter writer = new StringWriter();
         try {
             toJSON(writer, 0);
         } catch (IOException e) {
-            System.out.println("IO Error occurred while converting JSON to String");
+            System.out.println("IO Error occurred while converting JSON to String"); // TODO No console output
         }
         return writer.toString();
     }
@@ -189,5 +193,7 @@ public class InvertedWordIndex {
     public void toJSON(Writer writer, int indent) throws IOException {
         PrettyJsonWriter.invertedWordIndexToJSON(writer, indent, wordMap);
     }
+    
+    // TODO public void toJSON(Path path) 
 }
 
