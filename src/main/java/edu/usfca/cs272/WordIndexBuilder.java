@@ -25,11 +25,27 @@ public class WordIndexBuilder {
                         invertedWordIndex.add(stem, file.toString(), lineNumber++);
                     }
                 }
-            } catch (IOException e) {
+            } catch (IOException e) { // TODO throw exceptions
                 System.out.println("IO Error while stemming: " + file);
                 return;
             }
         }
     }
+    
+    /* TODO 
+    public static void build(Path start, InvertedWordIndex index) throws IOException {
+    	ArrayList<Path> files = TextFileTraverser.scanDirectory(inputPath);
+    	for (...) {
+    		scanFile(...)
+    	}
+    }
 
+    public static void scanFile(Path file, ...) {
+    	adding to the index
+    	
+    	copy/paste logic from WordCleaner
+    	
+    	open a buffered reader, ready line by line, parse, stem, then add directly to the index
+    }
+    */
 }

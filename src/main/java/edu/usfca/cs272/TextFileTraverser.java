@@ -1,7 +1,7 @@
 package edu.usfca.cs272;
 
 import java.io.IOException;
-import java.nio.file.DirectoryIteratorException;
+import java.nio.file.DirectoryIteratorException; // TODO Remove
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -41,7 +41,7 @@ public class TextFileTraverser {
      * @throws IOException if an IO Exception occurs while scanning
      */
     private static void scanSubDirs(ArrayList<Path> files, Path subdir) throws IOException {
-        DirectoryStream<Path> stream = Files.newDirectoryStream(subdir);
+        DirectoryStream<Path> stream = Files.newDirectoryStream(subdir); // TODO Put in a try with resources block
         for (Path file : stream) {
             if (Files.isDirectory(file)) {
                 scanSubDirs(files, file);
