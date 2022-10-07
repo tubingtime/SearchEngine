@@ -39,8 +39,8 @@ public class Driver {
         System.out.println("Parsed args: " + argumentParser);
 
         InvertedWordIndex invertedWordIndex = new InvertedWordIndex();
-        Path inputPath = argumentParser.getPath("-text"); // TODO Put inside the if statement
-        if (inputPath != null) {
+        if (argumentParser.hasFlag("-text")) {
+            Path inputPath = argumentParser.getPath("-text");
             System.out.println("Input: " + inputPath);
             try {
                 ArrayList<Path> files = TextFileTraverser.scanDirectory(inputPath); /* scan directory */
@@ -50,9 +50,8 @@ public class Driver {
             }
         }
 
-        Path outputPath = argumentParser.getPath("-index", Path.of("index.json"));
         if (argumentParser.hasFlag("-index")) {
-            // TODO Path outputPath = argumentParser.getPath("-index", Path.of("index.json"));
+            Path outputPath = argumentParser.getPath("-index", Path.of("index.json"));
             try (BufferedWriter bufWriter = Files.newBufferedWriter(outputPath, UTF_8)) {
                 invertedWordIndex.toJSON(bufWriter, 0);
                 System.out.println("Output:" + outputPath.toAbsolutePath());
