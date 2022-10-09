@@ -1,10 +1,14 @@
 package edu.usfca.cs272;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 
 /**
@@ -31,45 +35,30 @@ public class InvertedWordIndex {
         this.wordMap = new TreeMap<>();
     }
 
-    /**
-     * Constructs a new nested TreeMap that stores file locations and puts the first location in.
-     *
-     * @param location the first location to put into the map
-     * @return a nested TreeMap and TreeSet containing the location provided.
-     */
-    public TreeMap<String, TreeSet<Integer>> newLocation(String location) { // TODO Remove
-        TreeMap<String, TreeSet<Integer>> locationMap = new TreeMap<>();
-        TreeSet<Integer> lineLocations = new TreeSet<>();
-        locationMap.put(location, lineLocations);
-        return locationMap;
-    }
-
 
     /**
-     * Adds a new word to the WordIndex. Given the word, it's Path location, and the line number it was found at.
+     * Adds a new word to the WordIndex. Given the word, it's Path location, and the position number it was found at.
      *
      * @param word     the word to add
      * @param location where the wod was found
-     * @param line     what line the word was found at
+     * @param position     what position the word was found at
      */
-    public void add(String word, String location, Integer line) { // TODO line --> position
-        wordMap.putIfAbsent(word, newLocation(location));
-        // TODO wordMap.putIfAbsent(word, new TreeMap<>());
-        wordMap.get(word).putIfAbsent(location, new TreeSet<>());
-        wordMap.get(word).get(location).add(line);
+    public void add(String word, String location, Integer position) {
+        wordMap.putIfAbsent(word, new TreeMap<>());               // new location map if it doesn't exist
+        wordMap.get(word).putIfAbsent(location, new TreeSet<>()); // new position set if it doesn't exist
+        wordMap.get(word).get(location).add(position);            // finally add
     }
 
     /**
-     * Adds a list of words to the WordIndex. Given the word, it's Path location, and the line number it was found at.
+     * Adds a list of words to the WordIndex. Given the word, it's Path location, and the position number it was found at.
      *
      * @param words     the words to add
      * @param location where the wod was found
-     * @param line     what line the word was found at
+     * @param position     what position the word was found at
      */
-    public void addAll(ArrayList<String> words, String location, Integer line) { // TODO line --> position
+    public void addAll(ArrayList<String> words, String location, Integer position) {
         for (String word : words){
-            add(word, location, line);
-            // TODO add(word, location, line++);
+            add(word, location, position++);
         }
     }
 
@@ -89,8 +78,8 @@ public class InvertedWordIndex {
      * @return true if exists, false if not.
      */
     public boolean contains(String word, String location){
-        TreeMap<String,TreeSet<Integer>> locationMap = wordMap.get(word);
-        return (locationMap != null && locationMap.containsKey(location));
+        Set<String> locationMap = getLocations(word);
+        return (locationMap.contains(location));
     }
 
     /**
@@ -101,7 +90,6 @@ public class InvertedWordIndex {
      * @return true if the position exists or false if not
      */
     public boolean contains(String word, String location, Integer position){
-    	// TODO Take a consistent approach for the contains methods... either check if keys exist or rely on the get methods
         Set<Integer> positions = getPositions(word, location);
         return positions.contains(position);
     }
@@ -173,13 +161,10 @@ public class InvertedWordIndex {
      */
     @Override
     public String toString() {
-    	// TODO Make a method to return the JSON string in PrettyJSonwriter instead of here
         StringWriter writer = new StringWriter();
         try {
-            toJSON(writer, 0);
-        } catch (IOException e) {
-            System.out.println("IO Error occurred while converting JSON to String"); // TODO No console output
-        }
+            PrettyJsonWriter.invertedWordIndexToString(writer, wordMap);
+        } catch (IOException ignored) {}
         return writer.toString();
     }
     
@@ -191,9 +176,13 @@ public class InvertedWordIndex {
      * @throws IOException if the writer throws and IOException
      */
     public void toJSON(Writer writer, int indent) throws IOException {
-        PrettyJsonWriter.invertedWordIndexToJSON(writer, indent, wordMap);
+        PrettyJsonWriter.invertedWordIndexToJSON(writer, indent, this.wordMap);
     }
-    
-    // TODO public void toJSON(Path path) 
+
+    public void toJSON(Path path) throws IOException {
+        try (BufferedWriter bufWriter = Files.newBufferedWriter(path, UTF_8)) {
+            PrettyJsonWriter.invertedWordIndexToJSON(bufWriter, 0, this.wordMap);
+        }
+    }
 }
 

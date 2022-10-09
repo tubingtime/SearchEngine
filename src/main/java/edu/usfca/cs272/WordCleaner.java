@@ -92,8 +92,7 @@ public class WordCleaner {
     public static void addStems(String line, Stemmer stemmer, Collection<String> stems) {
         String[] wordList = parse(line);
         for (String word : wordList) {
-            stems.add((String) stemmer.stem(word));
-            // TODO stems.add(stemmer.stem(word).toString());
+            stems.add(stemmer.stem(word).toString());
         }
     }
 
@@ -142,25 +141,20 @@ public class WordCleaner {
      * @see #listStems(String, Stemmer)
      */
     public static ArrayList<String> listStems(Path input) throws IOException {
-        try (
-                BufferedReader reader = Files.newBufferedReader(input, UTF_8)
-        ) {
+        try (BufferedReader reader = Files.newBufferedReader(input, UTF_8)) {
             String line;
-            // TODO Create a stemmer here
+            SnowballStemmer stemmer = new SnowballStemmer(ENGLISH);
             ArrayList<String> stems = new ArrayList<>();
             while ((line = reader.readLine()) != null) {
-                addStems(line, defaultStemmer, stems);
-                stems.add("\\n"); // TODO Remove
+                addStems(line, stemmer, stems);
             }
             return stems;
-        } catch (IOException e) { // TODO Remove catch
-            System.out.println("Invalid Path?");
-            throw new IOException(e);
         }
     }
 
     /**
      * Parses the line into a set of unique, sorted, cleaned, and stemmed words.
+     * Not thread safe! need to create new stemmer for each new thread?
      *
      * @param line    the line of words to parse and stem
      * @param stemmer the stemmer to use
@@ -204,20 +198,14 @@ public class WordCleaner {
      * @see #uniqueStems(String, Stemmer)
      */
     public static TreeSet<String> uniqueStems(Path input) throws IOException {
-        // TODO Same changes
-        try (
-                BufferedReader reader = Files.newBufferedReader(input, UTF_8)
-        ) {
+        try (BufferedReader reader = Files.newBufferedReader(input, UTF_8)) {
             String line;
-            TreeSet<String> stems = new TreeSet<>(); //this line only diff between this and
-            //uniqueStems ArrayList. can be condense
+            TreeSet<String> stems = new TreeSet<>();                //this line only diff between this and
+            SnowballStemmer stemmer = new SnowballStemmer(ENGLISH); //uniqueStems ArrayList. can be condense
             while ((line = reader.readLine()) != null) {
-                addStems(line, defaultStemmer, stems);
+                addStems(line, stemmer, stems);
             }
             return stems;
-        } catch (IOException e) {
-            System.out.println("Invalid Path?");
-            throw new IOException(e);
         }
     }
 
@@ -236,22 +224,16 @@ public class WordCleaner {
      * @see #uniqueStems(String, Stemmer)
      */
     public static ArrayList<TreeSet<String>> listUniqueStems(Path input) throws IOException {
-        try (
-                BufferedReader reader = Files.newBufferedReader(input, UTF_8)
-        ) {
-
+        try (BufferedReader reader = Files.newBufferedReader(input, UTF_8)) {
             String line;
-            // TODO Create stemmer per file instead
             ArrayList<TreeSet<String>> uniqueStems = new ArrayList<>();
+            SnowballStemmer stemmer = new SnowballStemmer(ENGLISH);
             while ((line = reader.readLine()) != null) {
                 TreeSet<String> stems = new TreeSet<>();
-                addStems(line, defaultStemmer, stems);
+                addStems(line, stemmer, stems);
                 uniqueStems.add(stems);
             }
             return uniqueStems;
-        } catch (IOException e) { // TODO Remove catch
-            System.out.println("Invalid Path?");
-            throw new IOException(e);
         }
     }
 }

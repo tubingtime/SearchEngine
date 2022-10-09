@@ -1,8 +1,15 @@
 package edu.usfca.cs272;
 
+import opennlp.tools.stemmer.snowball.SnowballStemmer;
+
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static opennlp.tools.stemmer.snowball.SnowballStemmer.ALGORITHM.ENGLISH;
 
 /**
  * A class that builds a WordIndex given an ArrayList of files
@@ -12,40 +19,50 @@ public class WordIndexBuilder {
      * Scans files and puts them into a provided wordIndex
      *
      * @param files             a list of files.
-     * @param invertedWordIndex a {@link InvertedWordIndex} to store the words.
+     * @param index a {@link InvertedWordIndex} to store the words.
      */
-    public static void scan(ArrayList<Path> files, InvertedWordIndex invertedWordIndex) {
+    public static void scan(ArrayList<Path> files, InvertedWordIndex index) throws IOException {
         for (Path file : files) {
-            try { //first we parse and stem
-                ArrayList<String> stems = WordCleaner.listStems(file);
-                // ^^reads and stems line by line and inserts \n for new line
-                int lineNumber = 1;
-                for (String stem : stems) {
-                    if (!stem.equals("\\n")) {
-                        invertedWordIndex.add(stem, file.toString(), lineNumber++);
-                    }
+            //first we parse and stem
+            ArrayList<String> stems = WordCleaner.listStems(file);
+            // ^^reads and stems line by line and inserts \n for new line
+            int lineNumber = 1;
+            for (String stem : stems) {
+                if (!stem.equals("\\n")) {
+                    index.add(stem, file.toString(), lineNumber++);
                 }
-            } catch (IOException e) { // TODO throw exceptions
-                System.out.println("IO Error while stemming: " + file);
-                return;
             }
         }
     }
     
-    /* TODO 
+
     public static void build(Path start, InvertedWordIndex index) throws IOException {
-    	ArrayList<Path> files = TextFileTraverser.scanDirectory(inputPath);
-    	for (...) {
-    		scanFile(...)
+    	ArrayList<Path> files = TextFileTraverser.scanDirectory(start);
+    	for (Path file : files) {
+    		scanFile(file, index);
     	}
     }
 
-    public static void scanFile(Path file, ...) {
-    	adding to the index
+    public static void scanFile(Path file, InvertedWordIndex index) throws IOException {
+        try (BufferedReader reader = Files.newBufferedReader(file, UTF_8)) {
+            SnowballStemmer stemmer = new SnowballStemmer(ENGLISH);
+            ArrayList<String> stems = new ArrayList<>();
+            String fileString = file.toString();
+            int lineNumber = 1;
+            String[] parsedLine;
+            String line;
+            while ((line = reader.readLine()) != null) {
+                parsedLine = WordCleaner.parse(line);
+                for (String word : parsedLine){
+                    index.add(stemmer.stem(word).toString(), fileString, lineNumber++);
+                }
+            }
+        }
+/*    	adding to the index
     	
     	copy/paste logic from WordCleaner
     	
-    	open a buffered reader, ready line by line, parse, stem, then add directly to the index
+    	open a buffered reader, ready line by line, parse, stem, then add directly to the index*/
     }
-    */
+
 }

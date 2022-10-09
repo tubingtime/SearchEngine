@@ -223,19 +223,24 @@ public class PrettyJsonWriter {
     public static void writeNestedArrays( /* Wierd that writeNestedArrays uses {} and wNestedObjs uses [] ??*/
             Map<String, ? extends Collection<? extends Number>> elements,
             Writer writer, int indent) throws IOException {
-    	// TODO Try to refactor all of these too
         writer.write("{");
         var iterator = elements.entrySet().iterator();
-        while (iterator.hasNext()) { /* Iterator lifestyle 8^) */
+        if (iterator.hasNext()) {
             var collection = iterator.next();
             writer.write(newline);
             writeIndent(writer, indent + 1);
             writeQuote(collection.getKey(), writer, 0);
             writer.write(": ");
             writeArray(collection.getValue(), writer, indent + 1);
-            if (iterator.hasNext()) {
-                writer.write(",");
-            }
+        }
+        while (iterator.hasNext()) { /* Iterator lifestyle 8^) */
+            var collection = iterator.next();
+            writer.write(",");
+            writer.write(newline);
+            writeIndent(writer, indent + 1);
+            writeQuote(collection.getKey(), writer, 0);
+            writer.write(": ");
+            writeArray(collection.getValue(), writer, indent + 1);
         }
         writer.write(newline);
         writeIndent(writer, indent);
@@ -359,8 +364,9 @@ public class PrettyJsonWriter {
      * @param wordMap a TreeMap containing the InvertedWordIndex
      * @throws IOException if the Writer throws an IOException
      */
-    public static void invertedWordIndexToJSON(Writer writer, int indent,
-                                               TreeMap<String, TreeMap<String, TreeSet<Integer>>> wordMap) throws IOException { // TODO See if can figure out the generic types
+    public static void invertedWordIndexToJSON(
+            Writer writer, int indent, Map<String, ? extends Map<String, ? extends Set<Integer>>> wordMap
+    ) throws IOException {
         writer.write("{");
         var iterator = wordMap.entrySet().iterator();
         if (iterator.hasNext()) {
@@ -369,7 +375,7 @@ public class PrettyJsonWriter {
             writeIndent(writer, indent + 1);
             writeQuote(wordEntry.getKey(), writer, 0);
             writer.write(": ");
-            locationsToJSON(writer, indent + 1, wordEntry.getValue()); //locationsObj.toJSON
+            writeNestedArrays(wordEntry.getValue(), writer, indent + 1); //locationsObj.toJSON
         }
         while (iterator.hasNext()) {
             var wordEntry = iterator.next();
@@ -378,43 +384,16 @@ public class PrettyJsonWriter {
             writeIndent(writer, indent + 1);
             writeQuote(wordEntry.getKey(), writer, 0);
             writer.write(": ");
-            locationsToJSON(writer, indent + 1, wordEntry.getValue()); //locationsObj.toJSON
+            writeNestedArrays(wordEntry.getValue(), writer, indent + 1); //locationsObj.toJSON
         }
         writer.write(newline);
         writeIndent(writer, indent);
         writer.write("}");
     }
 
-    /**
-     * Converts a word location Entry to JSON
-     *
-     * @param writer the {@link Writer} to use
-     * @param indent the level of indentation to use
-     * @param locations a TreeMap containing all locations the word was found in.
-     * @throws IOException if the Writer throws an IOException
-     */
-    public static void locationsToJSON(Writer writer, int indent, TreeMap<String, TreeSet<Integer>> locations) throws IOException { // TODO See if can use writeNestedArrays instead
-        writer.write("{");
-        var iterator = locations.entrySet().iterator();
-        if (iterator.hasNext()) {
-            var locationEntry = iterator.next();
-            writer.write(newline);
-            writeIndent(writer, indent + 1);
-            writeQuote(locationEntry.getKey(), writer, 0);
-            writer.write(": ");
-            writeArray(locationEntry.getValue(), writer, indent + 1);
-        }
-        while (iterator.hasNext()) {
-            var locationEntry = iterator.next();
-            writer.write(",");
-            writer.write(newline);
-            writeIndent(writer, indent + 1);
-            writeQuote(locationEntry.getKey(), writer, 0);
-            writer.write(": ");
-            writeArray(locationEntry.getValue(), writer, indent + 1);
-        }
-        writer.write(newline);
-        writeIndent(writer, indent);
-        writer.write("}");
+    public static void invertedWordIndexToString(
+            Writer writer, Map<String, ? extends Map<String, ? extends Set<Integer>>> wordMap
+    ) throws IOException {
+        invertedWordIndexToJSON(writer,0,wordMap);
     }
 }

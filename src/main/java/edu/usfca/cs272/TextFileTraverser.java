@@ -1,7 +1,6 @@
 package edu.usfca.cs272;
 
 import java.io.IOException;
-import java.nio.file.DirectoryIteratorException; // TODO Remove
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -13,8 +12,8 @@ import java.util.ArrayList;
 public class TextFileTraverser {
 
     /**
-     * Create and populate list of files if it's a directory. Or just adds the file if not
-     * Could make this recursive to reduce code
+     * Create and populate list of files if it's a directory. If provided with a file and not a dir,
+     * this will return an arraylist containing the one file.
      *
      * @param userPath path given to Driver by user params
      * @return an {@link ArrayList} of files found
@@ -41,12 +40,13 @@ public class TextFileTraverser {
      * @throws IOException if an IO Exception occurs while scanning
      */
     private static void scanSubDirs(ArrayList<Path> files, Path subdir) throws IOException {
-        DirectoryStream<Path> stream = Files.newDirectoryStream(subdir); // TODO Put in a try with resources block
-        for (Path file : stream) {
-            if (Files.isDirectory(file)) {
-                scanSubDirs(files, file);
-            } else if (isTextFile(file)) {
-                files.add(file); // ^-^
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(subdir)) {
+            for (Path file : stream) {
+                if (Files.isDirectory(file)) {
+                    scanSubDirs(files, file);
+                } else if (isTextFile(file)) {
+                    files.add(file); // ^-^
+                }
             }
         }
     }

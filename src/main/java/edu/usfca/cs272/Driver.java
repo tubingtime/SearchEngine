@@ -6,7 +6,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.Arrays;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -39,12 +38,11 @@ public class Driver {
         System.out.println("Parsed args: " + argumentParser);
 
         InvertedWordIndex invertedWordIndex = new InvertedWordIndex();
-        if (argumentParser.hasFlag("-text")) {
+        if (argumentParser.hasValue("-text")) {
             Path inputPath = argumentParser.getPath("-text");
             System.out.println("Input: " + inputPath);
             try {
-                ArrayList<Path> files = TextFileTraverser.scanDirectory(inputPath); /* scan directory */
-                WordIndexBuilder.scan(files, invertedWordIndex); /* populate wordIndex*/
+                WordIndexBuilder.build(inputPath, invertedWordIndex); /* populate wordIndex*/
             } catch (IOException e){
                 System.out.println("IO Error while scanning directory: " + inputPath );
             }
