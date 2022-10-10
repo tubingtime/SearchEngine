@@ -32,7 +32,6 @@ public class Driver {
         // store initial start time
         Instant start = Instant.now();
 
-
         ArgumentParser argumentParser = new ArgumentParser(args); /* parse args */
         System.out.println("Actual args: " + Arrays.toString(args));
         System.out.println("Parsed args: " + argumentParser);

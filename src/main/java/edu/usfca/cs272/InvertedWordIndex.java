@@ -133,7 +133,7 @@ public class InvertedWordIndex {
     /**
      * @return the number of words in the index
      */
-    public Integer size() {
+    public Integer size() { // TODO Change the size methods to return int values instead
         return wordMap.size();
     }
 
@@ -165,6 +165,7 @@ public class InvertedWordIndex {
      */
     @Override
     public String toString() {
+    	  // TODO return PrettyJsonWriter.invertedWordIndexToJSON(wordMap);
         StringWriter writer = new StringWriter();
         try {
             PrettyJsonWriter.invertedWordIndexToString(writer, wordMap);
@@ -191,6 +192,7 @@ public class InvertedWordIndex {
      * @throws IOException if the writer throws and IOException
      */
     public void toJSON(Path path) throws IOException {
+        //  TODO PrettyJsonWriter.invertedWordIndexToJSON(path, wordMap);
         try (BufferedWriter bufWriter = Files.newBufferedWriter(path, UTF_8)) {
             PrettyJsonWriter.invertedWordIndexToJSON(bufWriter, 0, this.wordMap);
         }

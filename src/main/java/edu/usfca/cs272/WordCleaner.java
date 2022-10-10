@@ -232,6 +232,8 @@ public class WordCleaner {
                 TreeSet<String> stems = new TreeSet<>();
                 addStems(line, stemmer, stems);
                 uniqueStems.add(stems);
+                
+                // TODO uniqueStems.add(uniqueStems(line, stemmer));
             }
             return uniqueStems;
         }
