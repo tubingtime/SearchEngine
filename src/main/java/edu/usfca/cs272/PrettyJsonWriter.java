@@ -7,7 +7,10 @@ import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -359,8 +362,9 @@ public class PrettyJsonWriter {
 
     /**
      * Converts an entire InvertedWordIndex to pretty JSON
-     * @param writer the {@link Writer} to use
-     * @param indent the level of indentation to use
+     *
+     * @param writer  the {@link Writer} to use
+     * @param indent  the level of indentation to use
      * @param wordMap a TreeMap containing the InvertedWordIndex
      * @throws IOException if the Writer throws an IOException
      */
@@ -394,13 +398,14 @@ public class PrettyJsonWriter {
 
     /**
      * invertedWordIndex toString helper method
-     * @param writer the writer to use
+     *
+     * @param writer  the writer to use
      * @param wordMap the word index to use
      * @throws IOException if the writer throws an IOException
      */
     public static void invertedWordIndexToString(
             Writer writer, Map<String, ? extends Map<String, ? extends Set<Integer>>> wordMap
     ) throws IOException {
-        invertedWordIndexToJSON(writer,0,wordMap);
+        invertedWordIndexToJSON(writer, 0, wordMap);
     }
 }

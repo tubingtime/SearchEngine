@@ -43,8 +43,8 @@ public class Driver {
             System.out.println("Input: " + inputPath);
             try {
                 WordIndexBuilder.build(inputPath, invertedWordIndex); /* populate wordIndex*/
-            } catch (IOException e){
-                System.out.println("IO Error while scanning directory: " + inputPath );
+            } catch (IOException e) {
+                System.out.println("IO Error while scanning directory: " + inputPath);
             }
         }
 

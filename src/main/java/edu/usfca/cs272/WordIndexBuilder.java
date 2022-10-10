@@ -18,7 +18,7 @@ public class WordIndexBuilder {
     /**
      * Scans files and puts them into a provided wordIndex
      *
-     * @param files             a list of files.
+     * @param files a list of files.
      * @param index a {@link InvertedWordIndex} to store the words.
      * @throws IOException if listStems throws an IOException while parsing
      */
@@ -39,20 +39,22 @@ public class WordIndexBuilder {
 
     /**
      * Builds a provided InvertedWordIndex from a path to a file or directory
+     *
      * @param start file or directory containing the words
      * @param index a {@link InvertedWordIndex} to store the words.
      * @throws IOException if listStems throws an IOException while parsing
      */
     public static void build(Path start, InvertedWordIndex index) throws IOException {
-    	ArrayList<Path> files = TextFileTraverser.scanDirectory(start);
-    	for (Path file : files) {
-    		scanFile(file, index);
-    	}
+        ArrayList<Path> files = TextFileTraverser.scanDirectory(start);
+        for (Path file : files) {
+            scanFile(file, index);
+        }
     }
 
     /**
      * Scans a single text file and puts the words into an InvertedWordIndex
-     * @param file path to a single text file
+     *
+     * @param file  path to a single text file
      * @param index a {@link InvertedWordIndex} to store the words.
      * @throws IOException if the buffered reader throws an IOException
      */
@@ -65,7 +67,7 @@ public class WordIndexBuilder {
             String line;
             while ((line = reader.readLine()) != null) {
                 parsedLine = WordCleaner.parse(line);
-                for (String word : parsedLine){
+                for (String word : parsedLine) {
                     index.add(stemmer.stem(word).toString(), fileString, lineNumber++);
                 }
             }

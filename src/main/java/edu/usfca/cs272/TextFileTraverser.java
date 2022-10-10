@@ -54,6 +54,7 @@ public class TextFileTraverser {
 
     /**
      * Checks whether a file ends in .txt or .text (case insensitive)
+     *
      * @param path the file to check
      * @return true if it is a text file, false if not.
      */
