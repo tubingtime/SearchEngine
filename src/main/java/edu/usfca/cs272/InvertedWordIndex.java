@@ -179,6 +179,11 @@ public class InvertedWordIndex {
         PrettyJsonWriter.invertedWordIndexToJSON(writer, indent, this.wordMap);
     }
 
+    /**
+     * Uses PrettyJsonWriter toJSON method to convert a wordIndex to JSON.
+     * @param path the path to output the json file to
+     * @throws IOException if the writer throws and IOException
+     */
     public void toJSON(Path path) throws IOException {
         try (BufferedWriter bufWriter = Files.newBufferedWriter(path, UTF_8)) {
             PrettyJsonWriter.invertedWordIndexToJSON(bufWriter, 0, this.wordMap);

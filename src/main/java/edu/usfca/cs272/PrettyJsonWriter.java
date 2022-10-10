@@ -391,6 +391,13 @@ public class PrettyJsonWriter {
         writer.write("}");
     }
 
+
+    /**
+     * invertedWordIndex toString helper method
+     * @param writer the writer to use
+     * @param wordMap the word index to use
+     * @throws IOException if the writer throws an IOException
+     */
     public static void invertedWordIndexToString(
             Writer writer, Map<String, ? extends Map<String, ? extends Set<Integer>>> wordMap
     ) throws IOException {

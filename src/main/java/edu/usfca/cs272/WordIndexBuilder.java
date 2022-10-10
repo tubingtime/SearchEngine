@@ -20,6 +20,7 @@ public class WordIndexBuilder {
      *
      * @param files             a list of files.
      * @param index a {@link InvertedWordIndex} to store the words.
+     * @throws IOException if listStems throws an IOException while parsing
      */
     public static void scan(ArrayList<Path> files, InvertedWordIndex index) throws IOException {
         for (Path file : files) {
@@ -34,8 +35,14 @@ public class WordIndexBuilder {
             }
         }
     }
-    
 
+
+    /**
+     * Builds a provided InvertedWordIndex from a path to a file or directory
+     * @param start file or directory containing the words
+     * @param index a {@link InvertedWordIndex} to store the words.
+     * @throws IOException if listStems throws an IOException while parsing
+     */
     public static void build(Path start, InvertedWordIndex index) throws IOException {
     	ArrayList<Path> files = TextFileTraverser.scanDirectory(start);
     	for (Path file : files) {
@@ -43,10 +50,15 @@ public class WordIndexBuilder {
     	}
     }
 
+    /**
+     * Scans a single text file and puts the words into an InvertedWordIndex
+     * @param file path to a single text file
+     * @param index a {@link InvertedWordIndex} to store the words.
+     * @throws IOException if the buffered reader throws an IOException
+     */
     public static void scanFile(Path file, InvertedWordIndex index) throws IOException {
         try (BufferedReader reader = Files.newBufferedReader(file, UTF_8)) {
             SnowballStemmer stemmer = new SnowballStemmer(ENGLISH);
-            ArrayList<String> stems = new ArrayList<>();
             String fileString = file.toString();
             int lineNumber = 1;
             String[] parsedLine;
