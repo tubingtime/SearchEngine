@@ -90,7 +90,7 @@ public class PrettyJsonWriter {
                                   Writer writer, int indent) throws IOException {
         writer.write("[");
         Iterator<? extends Number> iterator = elements.iterator();
-        while (iterator.hasNext()) {
+        while (iterator.hasNext()) { // TODO Use the if/while approach here
             Number element = iterator.next();
             writer.write(newline);
             writeIndent(writer, indent + 1);
@@ -156,7 +156,7 @@ public class PrettyJsonWriter {
                                    Writer writer, int indent) throws IOException {
         writer.write("{");
         var iterator = elements.entrySet().iterator();
-        while (iterator.hasNext()) {
+        while (iterator.hasNext()) { // TODO Use the if/while approach
             Map.Entry<String, ? extends Number> element = iterator.next();
             writer.write(newline);
             writeIndent(writer, indent + 1);
@@ -307,7 +307,7 @@ public class PrettyJsonWriter {
             Collection<? extends Map<String, ? extends Number>> elements,
             Writer writer, int indent) throws IOException {
         writer.write("[");
-        var iterator = elements.iterator();
+        var iterator = elements.iterator(); // TODO Use the if/while approach
         while (iterator.hasNext()) { /* Iterator lifestyle 8^) */
             var object = iterator.next();
             writer.write(newline);
@@ -408,4 +408,11 @@ public class PrettyJsonWriter {
     ) throws IOException {
         invertedWordIndexToJSON(writer, 0, wordMap);
     }
+    
+    /*
+     * TODO Create 1 that takes a path and writes to file
+     * Create 1 that returns a String
+     * 
+     * Similar to the other write methods in here
+     */
 }

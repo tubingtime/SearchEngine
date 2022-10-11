@@ -15,6 +15,7 @@ import static opennlp.tools.stemmer.snowball.SnowballStemmer.ALGORITHM.ENGLISH;
  * A class that builds a WordIndex given an ArrayList of files
  */
 public class WordIndexBuilder {
+	// TODO Remove
     /**
      * Scans files and puts them into a provided wordIndex
      *
@@ -72,6 +73,7 @@ public class WordIndexBuilder {
                 }
             }
         }
+        // TODO Cleanup
 /*    	adding to the index
     	
     	copy/paste logic from WordCleaner
