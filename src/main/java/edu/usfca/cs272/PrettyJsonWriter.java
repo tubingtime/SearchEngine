@@ -90,14 +90,18 @@ public class PrettyJsonWriter {
                                   Writer writer, int indent) throws IOException {
         writer.write("[");
         Iterator<? extends Number> iterator = elements.iterator();
-        while (iterator.hasNext()) { // TODO Use the if/while approach here
+        if (iterator.hasNext()) {
             Number element = iterator.next();
             writer.write(newline);
             writeIndent(writer, indent + 1);
             writer.write(element.toString());
-            if (iterator.hasNext()) {
-                writer.write(",");
-            }
+        }
+        while (iterator.hasNext()) {
+            writer.write(",");
+            Number element = iterator.next();
+            writer.write(newline);
+            writeIndent(writer, indent + 1);
+            writer.write(element.toString());
         }
         writer.write(newline);
         writeIndent(writer, indent);
@@ -156,16 +160,22 @@ public class PrettyJsonWriter {
                                    Writer writer, int indent) throws IOException {
         writer.write("{");
         var iterator = elements.entrySet().iterator();
-        while (iterator.hasNext()) { // TODO Use the if/while approach
+        if (iterator.hasNext()) {
             Map.Entry<String, ? extends Number> element = iterator.next();
             writer.write(newline);
             writeIndent(writer, indent + 1);
             writeQuote(element.getKey(), writer, 0);
             writer.write(": ");
-            writer.write(element.getValue().toString()); /*writer u better be writing*/
-            if (iterator.hasNext()) {
-                writer.write(",");
-            }
+            writer.write(element.getValue().toString());
+        }
+        while (iterator.hasNext()) {
+            writer.write(",");
+            Map.Entry<String, ? extends Number> element = iterator.next();
+            writer.write(newline);
+            writeIndent(writer, indent + 1);
+            writeQuote(element.getKey(), writer, 0);
+            writer.write(": ");
+            writer.write(element.getValue().toString());
         }
         writer.write(newline);
         writeIndent(writer, indent);
@@ -307,15 +317,19 @@ public class PrettyJsonWriter {
             Collection<? extends Map<String, ? extends Number>> elements,
             Writer writer, int indent) throws IOException {
         writer.write("[");
-        var iterator = elements.iterator(); // TODO Use the if/while approach
-        while (iterator.hasNext()) { /* Iterator lifestyle 8^) */
+        var iterator = elements.iterator();
+        if (iterator.hasNext()) {
             var object = iterator.next();
             writer.write(newline);
             writeIndent(writer, indent + 1);
             writeObject(object, writer, indent + 1);
-            if (iterator.hasNext()) {
-                writer.write(",");
-            } /* don't need to check everytime*/
+        }
+        while (iterator.hasNext()) {
+            writer.write(",");
+            var object = iterator.next();
+            writer.write(newline);
+            writeIndent(writer, indent + 1);
+            writeObject(object, writer, indent + 1);
         }
         writer.write(newline);
         writeIndent(writer, indent);
@@ -395,24 +409,34 @@ public class PrettyJsonWriter {
         writer.write("}");
     }
 
+    /**
+     * Converts a InvertedWordIndex to Pretty JSON and returns as a String
+     *
+     * @param wordMap the data to use
+     * @return a String containing the elements in pretty JSON format
+     */
+    public static String invertedWordIndexToJSON(
+            Map<String, ? extends Map<String, ? extends Set<Integer>>> wordMap) {
+        try {
+            StringWriter writer = new StringWriter();
+            invertedWordIndexToJSON(writer, 0, wordMap);
+            return writer.toString();
+        } catch (IOException e) {
+            return null;
+        }
+    }
 
     /**
-     * invertedWordIndex toString helper method
+     * Converts a InvertedWordIndex to Pretty JSON and returns as a String
      *
-     * @param writer  the writer to use
-     * @param wordMap the word index to use
-     * @throws IOException if the writer throws an IOException
+     * @param wordMap       the data to use
+     * @param path          the file path to write to
+     * @throws IOException  if the writer throws an IOException while writing
      */
-    public static void invertedWordIndexToString(
-            Writer writer, Map<String, ? extends Map<String, ? extends Set<Integer>>> wordMap
-    ) throws IOException {
-        invertedWordIndexToJSON(writer, 0, wordMap);
+    public static void invertedWordIndexToJSON(
+            Map<String, ? extends Map<String, ? extends Set<Integer>>> wordMap, Path path) throws IOException {
+        try (BufferedWriter buffwriter = Files.newBufferedWriter(path, UTF_8)) {
+            invertedWordIndexToJSON(buffwriter, 0, wordMap);
+        }
     }
-    
-    /*
-     * TODO Create 1 that takes a path and writes to file
-     * Create 1 that returns a String
-     * 
-     * Similar to the other write methods in here
-     */
 }

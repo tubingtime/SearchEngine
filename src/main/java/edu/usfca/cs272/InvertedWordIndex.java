@@ -1,14 +1,9 @@
 package edu.usfca.cs272;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.StringWriter;
 import java.io.Writer;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
-
-import static java.nio.charset.StandardCharsets.UTF_8;
 
 
 /**
@@ -133,7 +128,7 @@ public class InvertedWordIndex {
     /**
      * @return the number of words in the index
      */
-    public Integer size() { // TODO Change the size methods to return int values instead
+    public int size() {
         return wordMap.size();
     }
 
@@ -143,7 +138,7 @@ public class InvertedWordIndex {
      * @param word The word whose size to check
      * @return the number of locations a word has
      */
-    public Integer size(String word) {
+    public int size(String word) {
         return getLocations(word).size();
     }
 
@@ -154,7 +149,7 @@ public class InvertedWordIndex {
      * @param location the location to check
      * @return the number of times a word appears in a particular location
      */
-    public Integer size(String word, String location) {
+    public int size(String word, String location) {
         return getPositions(word, location).size();
     }
 
@@ -165,13 +160,7 @@ public class InvertedWordIndex {
      */
     @Override
     public String toString() {
-    	  // TODO return PrettyJsonWriter.invertedWordIndexToJSON(wordMap);
-        StringWriter writer = new StringWriter();
-        try {
-            PrettyJsonWriter.invertedWordIndexToString(writer, wordMap);
-        } catch (IOException ignored) {
-        }
-        return writer.toString();
+        return PrettyJsonWriter.invertedWordIndexToJSON(this.wordMap);
     }
 
     /**
@@ -192,10 +181,7 @@ public class InvertedWordIndex {
      * @throws IOException if the writer throws and IOException
      */
     public void toJSON(Path path) throws IOException {
-        //  TODO PrettyJsonWriter.invertedWordIndexToJSON(path, wordMap);
-        try (BufferedWriter bufWriter = Files.newBufferedWriter(path, UTF_8)) {
-            PrettyJsonWriter.invertedWordIndexToJSON(bufWriter, 0, this.wordMap);
-        }
+        PrettyJsonWriter.invertedWordIndexToJSON(wordMap, path);
     }
 }
 
