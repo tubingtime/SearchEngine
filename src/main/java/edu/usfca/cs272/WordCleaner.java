@@ -229,11 +229,7 @@ public class WordCleaner {
             ArrayList<TreeSet<String>> uniqueStems = new ArrayList<>();
             SnowballStemmer stemmer = new SnowballStemmer(ENGLISH);
             while ((line = reader.readLine()) != null) {
-                TreeSet<String> stems = new TreeSet<>();
-                addStems(line, stemmer, stems);
-                uniqueStems.add(stems);
-                
-                // TODO uniqueStems.add(uniqueStems(line, stemmer));
+                uniqueStems.add(uniqueStems(line, stemmer));
             }
             return uniqueStems;
         }
