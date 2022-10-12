@@ -15,28 +15,6 @@ import static opennlp.tools.stemmer.snowball.SnowballStemmer.ALGORITHM.ENGLISH;
  * A class that builds a WordIndex given an ArrayList of files
  */
 public class WordIndexBuilder {
-	// TODO Remove
-    /**
-     * Scans files and puts them into a provided wordIndex
-     *
-     * @param files a list of files.
-     * @param index a {@link InvertedWordIndex} to store the words.
-     * @throws IOException if listStems throws an IOException while parsing
-     */
-    public static void scan(ArrayList<Path> files, InvertedWordIndex index) throws IOException {
-        for (Path file : files) {
-            //first we parse and stem
-            ArrayList<String> stems = WordCleaner.listStems(file);
-            // ^^reads and stems line by line and inserts \n for new line
-            int lineNumber = 1;
-            for (String stem : stems) {
-                if (!stem.equals("\\n")) {
-                    index.add(stem, file.toString(), lineNumber++);
-                }
-            }
-        }
-    }
-
 
     /**
      * Builds a provided InvertedWordIndex from a path to a file or directory
@@ -73,12 +51,6 @@ public class WordIndexBuilder {
                 }
             }
         }
-        // TODO Cleanup
-/*    	adding to the index
-    	
-    	copy/paste logic from WordCleaner
-    	
-    	open a buffered reader, ready line by line, parse, stem, then add directly to the index*/
     }
 
 }
