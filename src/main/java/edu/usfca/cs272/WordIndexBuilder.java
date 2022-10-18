@@ -41,13 +41,13 @@ public class WordIndexBuilder {
         try (BufferedReader reader = Files.newBufferedReader(file, UTF_8)) {
             SnowballStemmer stemmer = new SnowballStemmer(ENGLISH);
             String fileString = file.toString();
-            int lineNumber = 1;
+            int position = 1;
             String[] parsedLine;
             String line;
             while ((line = reader.readLine()) != null) {
                 parsedLine = WordCleaner.parse(line);
                 for (String word : parsedLine) {
-                    index.add(stemmer.stem(word).toString(), fileString, lineNumber++);
+                    index.add(stemmer.stem(word).toString(), fileString, position++);
                 }
             }
         }
