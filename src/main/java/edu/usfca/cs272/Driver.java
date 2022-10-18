@@ -36,6 +36,7 @@ public class Driver {
         System.out.println("Actual args: " + Arrays.toString(args));
         System.out.println("Parsed args: " + argumentParser);
 
+        // Build inverted word index
         InvertedWordIndex invertedWordIndex = new InvertedWordIndex();
         if (argumentParser.hasValue("-text")) {
             Path inputPath = argumentParser.getPath("-text");
@@ -44,6 +45,14 @@ public class Driver {
                 WordIndexBuilder.build(inputPath, invertedWordIndex); /* populate wordIndex*/
             } catch (IOException e) {
                 System.out.println("IO Error while scanning directory: " + inputPath);
+            }
+        }
+        if (argumentParser.hasFlag("-counts")){
+            Path countOutput = argumentParser.getPath("-counts",Path.of("counts.json"));
+            try {
+                invertedWordIndex.wordCount.toJSON(countOutput);
+            } catch (IOException e) {
+                System.out.println("IO Error occurred while attempting to output the word count to: " + countOutput);
             }
         }
 

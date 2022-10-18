@@ -1,5 +1,7 @@
 package edu.usfca.cs272;
 
+
+
 import java.io.IOException;
 import java.io.Writer;
 import java.nio.file.Path;
@@ -24,10 +26,16 @@ public class InvertedWordIndex {
     private final TreeMap<String, TreeMap<String, TreeSet<Integer>>> wordMap;
 
     /**
+     * TreeMap to store how many word stems are in each file
+     */
+    public final WordCounter wordCount;
+
+    /**
      * * Constructs a new instance of WordIndex.
      */
     public InvertedWordIndex() {
         this.wordMap = new TreeMap<>();
+        this.wordCount = new WordCounter();
     }
 
 
@@ -42,6 +50,9 @@ public class InvertedWordIndex {
         wordMap.putIfAbsent(word, new TreeMap<>());               // new location map if it doesn't exist
         wordMap.get(word).putIfAbsent(location, new TreeSet<>()); // new position set if it doesn't exist
         wordMap.get(word).get(location).add(position);            // finally add
+
+        // update word count
+        wordCount.increment(location);
     }
 
     /**
