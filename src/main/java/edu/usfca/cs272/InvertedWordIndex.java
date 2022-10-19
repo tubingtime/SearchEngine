@@ -35,7 +35,7 @@ public class InvertedWordIndex {
      */
     public InvertedWordIndex() {
         this.wordMap = new TreeMap<>();
-        this.wordCount = new WordCounter();
+        this.wordCount = new WordCounter(this);
     }
 
 

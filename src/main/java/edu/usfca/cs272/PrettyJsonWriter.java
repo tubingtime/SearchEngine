@@ -439,4 +439,79 @@ public class PrettyJsonWriter {
             invertedWordIndexToJSON(buffwriter, 0, wordMap);
         }
     }
+
+
+    public static void resultsToJSON(Map<String, ? extends Collection<Object>> elements,
+                                  Writer writer, int indent) throws IOException {
+        writer.write("{");
+        var iterator = elements.entrySet().iterator();
+        if (iterator.hasNext()) {
+            var result = iterator.next();
+            writer.write(newline);
+            writeIndent(writer, indent + 1);
+            writeQuote(result.getKey(), writer, 0);
+            writer.write(": ");
+            writeObject(result.getValue(), writer, indent + 1); //locationsObj.toJSON
+        }
+        while (iterator.hasNext()) {
+            var wordEntry = iterator.next();
+            writer.write(",");
+            writer.write(newline);
+            writeIndent(writer, indent + 1);
+            writeQuote(wordEntry.getKey(), writer, 0);
+            writer.write(": ");
+            writeObject(wordEntry.getValue(), writer, indent + 1); //locationsObj.toJSON
+        }
+        writer.write(newline);
+        writeIndent(writer, indent);
+        writer.write("}");
+    }
+
+    public static void writeObject(Collection<Object> elements,
+                                  Writer writer, int indent) throws IOException {
+        writer.write("[");
+        var iterator = elements.iterator();
+        if (iterator.hasNext()) {
+            Object element = iterator.next();
+            writer.write(newline);
+            writeIndent(writer, indent + 1);
+            writer.write(element.toString());
+        }
+        while (iterator.hasNext()) {
+            writer.write(",");
+            Object element = iterator.next();
+            writer.write(newline);
+            writeIndent(writer, indent + 1);
+            writer.write(element.toString());
+        }
+        writer.write(newline);
+        writeIndent(writer, indent);
+        writer.write("]");
+    }
+
+    public static void searchResultToJSON(Collection<Object> elements,
+                                   Writer writer, int indent) throws IOException {
+        //TODO: convert search result to json
+        writer.write("[");
+        var iterator = elements.iterator();
+        if (iterator.hasNext()) {
+            Object element = iterator.next();
+            writer.write(newline);
+            writeIndent(writer, indent + 1);
+            writer.write(element.toString());
+        }
+        while (iterator.hasNext()) {
+            writer.write(",");
+            Object element = iterator.next();
+            writer.write(newline);
+            writeIndent(writer, indent + 1);
+            writer.write(element.toString());
+        }
+        writer.write(newline);
+        writeIndent(writer, indent);
+        writer.write("]");
+    }
+
 }
+
+
