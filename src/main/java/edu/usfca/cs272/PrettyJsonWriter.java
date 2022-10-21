@@ -441,17 +441,23 @@ public class PrettyJsonWriter {
     }
 
 
-    public static void resultsToJSON(Map<String, ? extends Collection<Object>> elements,
+    public static void resultsToJSON(
+            Map<String, ? extends Collection<WordCounter.SearchResult>> elements, Path path) throws IOException {
+        try (BufferedWriter buffwriter = Files.newBufferedWriter(path, UTF_8)) {
+            resultsToJSON(elements, buffwriter, 0);
+        }
+    }
+    public static void resultsToJSON(Map<String, ? extends Collection<WordCounter.SearchResult>> elements,
                                   Writer writer, int indent) throws IOException {
         writer.write("{");
         var iterator = elements.entrySet().iterator();
         if (iterator.hasNext()) {
-            var result = iterator.next();
+            var entry = iterator.next();
             writer.write(newline);
             writeIndent(writer, indent + 1);
-            writeQuote(result.getKey(), writer, 0);
+            writeQuote(entry.getKey(), writer, 0);
             writer.write(": ");
-            writeObject(result.getValue(), writer, indent + 1); //locationsObj.toJSON
+            writeNestedSearchResults(entry.getValue(), writer, indent + 1);
         }
         while (iterator.hasNext()) {
             var wordEntry = iterator.next();
@@ -460,56 +466,60 @@ public class PrettyJsonWriter {
             writeIndent(writer, indent + 1);
             writeQuote(wordEntry.getKey(), writer, 0);
             writer.write(": ");
-            writeObject(wordEntry.getValue(), writer, indent + 1); //locationsObj.toJSON
+            writeNestedSearchResults(wordEntry.getValue(), writer, indent + 1);
         }
         writer.write(newline);
         writeIndent(writer, indent);
         writer.write("}");
     }
 
-    public static void writeObject(Collection<Object> elements,
-                                  Writer writer, int indent) throws IOException {
+    public static void writeNestedSearchResults(
+            Collection<WordCounter.SearchResult> elements,
+            Writer writer, int indent) throws IOException {
         writer.write("[");
         var iterator = elements.iterator();
         if (iterator.hasNext()) {
-            Object element = iterator.next();
+            var object = iterator.next();
             writer.write(newline);
             writeIndent(writer, indent + 1);
-            writer.write(element.toString());
+            writeSearchResult(object, writer, indent + 1);
         }
         while (iterator.hasNext()) {
             writer.write(",");
-            Object element = iterator.next();
+            var object = iterator.next();
             writer.write(newline);
             writeIndent(writer, indent + 1);
-            writer.write(element.toString());
+            writeSearchResult(object, writer, indent + 1);
         }
         writer.write(newline);
         writeIndent(writer, indent);
         writer.write("]");
     }
 
-    public static void searchResultToJSON(Collection<Object> elements,
-                                   Writer writer, int indent) throws IOException {
-        //TODO: convert search result to json
-        writer.write("[");
-        var iterator = elements.iterator();
-        if (iterator.hasNext()) {
-            Object element = iterator.next();
-            writer.write(newline);
-            writeIndent(writer, indent + 1);
-            writer.write(element.toString());
-        }
-        while (iterator.hasNext()) {
-            writer.write(",");
-            Object element = iterator.next();
-            writer.write(newline);
-            writeIndent(writer, indent + 1);
-            writer.write(element.toString());
-        }
+    public static void writeSearchResult(
+            WordCounter.SearchResult result, Writer writer, int indent
+    ) throws IOException {
+        writer.write("{");
+        writer.write(newline);
+        writeIndent(writer, indent + 1);
+        writeQuote("count", writer, 0);
+        writer.write(": ");
+        writer.write(String.valueOf(result.count));
+        writer.write(",");
+        writer.write(newline);
+        writeIndent(writer, indent + 1);
+        writeQuote("score", writer, 0);
+        writer.write(": ");
+        writer.write(String.format("%.8f", result.score));
+        writer.write(",");
+        writer.write(newline);
+        writeIndent(writer, indent + 1);
+        writeQuote("where", writer, 0);
+        writer.write(": ");
+        writeQuote(result.where, writer , 0);
         writer.write(newline);
         writeIndent(writer, indent);
-        writer.write("]");
+        writer.write("}");
     }
 
 }

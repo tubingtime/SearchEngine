@@ -55,6 +55,27 @@ public class Driver {
                 System.out.println("IO Error occurred while attempting to output the word count to: " + countOutput);
             }
         }
+        WordCounter wordCounter = invertedWordIndex.wordCount;
+        if (argumentParser.hasValue("-query")){
+            Path queryPath = argumentParser.getPath("-query");
+            if (argumentParser.hasFlag("-exact")){
+                try {
+                    wordCounter.buildQuery(queryPath);
+                } catch (IOException e) {
+                    System.out.println("IO Error while attempting to use query: " + queryPath);
+                }
+            }
+        }
+
+        if (argumentParser.hasFlag("-results") && (wordCounter != null)){
+            Path queryOutput = argumentParser.getPath("-results",Path.of("results.json"));
+            try {
+                wordCounter.resultsToJSON(queryOutput);
+            } catch (IOException e) {
+                System.out.println("IO Error occurred while attempting to output search results to: " + queryOutput);
+
+            }
+        }
 
         if (argumentParser.hasFlag("-index")) {
             Path outputPath = argumentParser.getPath("-index", Path.of("index.json"));

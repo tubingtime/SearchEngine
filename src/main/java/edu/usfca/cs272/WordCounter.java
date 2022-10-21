@@ -3,6 +3,8 @@ package edu.usfca.cs272;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
@@ -14,11 +16,11 @@ public class WordCounter {
 
     public static class SearchResult implements Comparable<SearchResult> {
 
-        private final long count;
+        public final long count;
 
-        private final double score;
+        public final double score;
 
-        private final String where;
+        public final String where;
 
         public SearchResult(long count, double score, String where) {
             this.count = count;
@@ -28,20 +30,14 @@ public class WordCounter {
 
         @Override
         public int compareTo(SearchResult other) {
-            int result = Double.compare(this.score, other.score);
+            int result = Double.compare(other.score, this.score);
             if (result == 0){
-                result = Long.compare(this.count, other.count);
+                result = Long.compare(other.count, this.count);
                 if (result == 0){
                     result = this.where.compareToIgnoreCase(other.where);
                 }
             }
             return result;
-        }
-
-
-        public String toJSON() {
-            //TODO: convert ot json
-            return null;
         }
     }
 
@@ -72,10 +68,28 @@ public class WordCounter {
 
     public void buildQuery(Path input) throws IOException {
         ArrayList<TreeSet<String>> queries = WordCleaner.listUniqueStems(input);
-        Map<String,List<SearchResult>> results = queries
-                .stream()
-                .collect(toMap( queryLine -> queryLine.toString(), this::query));
-        this.results = results;
+        ArrayList<TreeSet<String>> uniqueQueries = new ArrayList<>();
+
+        for (TreeSet<String> query : queries){
+            if (query.size() > 0){
+
+                uniqueQueries.add(query);
+            }
+        }
+
+        Map<String,List<SearchResult>> results =
+                uniqueQueries
+                .stream()  // Stream<TreeSet<String>>
+                .collect(toMap((querySet) -> {
+                    String key = querySet.toString();
+                    return key.substring(1,key.length() - 1); // remove brackets from key
+                }, this::query, (merge1, merge2) -> merge1));
+        Map<String,List<SearchResult>> sortedResults = new TreeMap<>();
+        var resultsEntrySet = results.entrySet();
+        for (var result : resultsEntrySet){
+            sortedResults.put(result.getKey().replaceAll(",",""), result.getValue());
+        }
+        this.results = sortedResults;
     }
 
 
@@ -97,7 +111,8 @@ public class WordCounter {
     public SearchResult makeResult(TreeSet<String> query, String location){
         long totalMatches = query.stream()
                 .map(word -> wordIndex.getPositions(word, location))
-                .count();
+                .mapToLong(Set::size)
+                .sum();
         double score = (totalMatches / Double.valueOf(totalWords.get(location)));
         SearchResult searchResult = new SearchResult(totalMatches, score, location);;
         return searchResult;
@@ -108,6 +123,6 @@ public class WordCounter {
     }
 
     public void resultsToJSON(Path output) throws IOException {
-        //TODO: convert to JSON
+        PrettyJsonWriter.resultsToJSON(this.results, output);
     }
 }
