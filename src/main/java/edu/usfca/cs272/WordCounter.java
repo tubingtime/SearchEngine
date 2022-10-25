@@ -66,14 +66,37 @@ public class WordCounter {
         totalWords.put(location, totalWords.get(location)+1);
     }
 
-    public void buildQuery(Path input) throws IOException {
+    public void buildQuery(Path input, boolean partialSearch) throws IOException {
         ArrayList<TreeSet<String>> queries = WordCleaner.listUniqueStems(input);
-        ArrayList<TreeSet<String>> uniqueQueries = new ArrayList<>();
+        TreeSet<String> uniqueSet = WordCleaner.uniqueStems(input);
+        ArrayList<TreeSet<String>> uniqueQueries = new ArrayList<>(); //rename
 
-        for (TreeSet<String> query : queries){
-            if (query.size() > 0){
+        for (TreeSet<String> querySet : queries){
 
-                uniqueQueries.add(query);
+            for (String queryWord : querySet){
+                if (querySet.size() > 0 && uniqueSet.contains(queryWord)){
+                    uniqueQueries.add(querySet);
+                    uniqueSet.remove(queryWord);
+                }
+            }
+        }
+
+        if (partialSearch){
+            Set<String> wordList = wordIndex.getWords();
+            // this little maneuver is gonna cost us 41 years
+            for (TreeSet<String> querySet : uniqueQueries){
+                for (String queryWord : querySet){
+                    for (String word : wordList){
+                        if (wordList.contains(queryWord)){
+                            continue;
+                        }
+                        if (word.startsWith(queryWord)){
+                            System.out.println("word: " + word);
+                            System.out.println("query: " + queryWord);
+                            querySet.add(word);
+                        }
+                    }
+                }
             }
         }
 

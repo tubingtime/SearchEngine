@@ -60,9 +60,16 @@ public class Driver {
             Path queryPath = argumentParser.getPath("-query");
             if (argumentParser.hasFlag("-exact")){
                 try {
-                    wordCounter.buildQuery(queryPath);
+                    wordCounter.buildQuery(queryPath, false);
                 } catch (IOException e) {
                     System.out.println("IO Error while attempting to use query: " + queryPath);
+                }
+            }
+            else {
+                try {
+                    wordCounter.buildQuery(queryPath, true);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
                 }
             }
         }
