@@ -442,12 +442,12 @@ public class PrettyJsonWriter {
 
 
     public static void resultsToJSON(
-            Map<String, ? extends Collection<WordCounter.SearchResult>> elements, Path path) throws IOException {
+            Map<String, ? extends Collection<SearchResult>> elements, Path path) throws IOException {
         try (BufferedWriter buffwriter = Files.newBufferedWriter(path, UTF_8)) {
             resultsToJSON(elements, buffwriter, 0);
         }
     }
-    public static void resultsToJSON(Map<String, ? extends Collection<WordCounter.SearchResult>> elements,
+    public static void resultsToJSON(Map<String, ? extends Collection<SearchResult>> elements,
                                   Writer writer, int indent) throws IOException {
         writer.write("{");
         var iterator = elements.entrySet().iterator();
@@ -474,7 +474,7 @@ public class PrettyJsonWriter {
     }
 
     public static void writeNestedSearchResults(
-            Collection<WordCounter.SearchResult> elements,
+            Collection<SearchResult> elements,
             Writer writer, int indent) throws IOException {
         writer.write("[");
         var iterator = elements.iterator();
@@ -497,7 +497,7 @@ public class PrettyJsonWriter {
     }
 
     public static void writeSearchResult(
-            WordCounter.SearchResult result, Writer writer, int indent
+            SearchResult result, Writer writer, int indent
     ) throws IOException {
         writer.write("{");
         writer.write(newline);

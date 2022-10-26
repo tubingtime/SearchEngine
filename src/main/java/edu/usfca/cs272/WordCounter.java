@@ -3,8 +3,6 @@ package edu.usfca.cs272;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
@@ -14,40 +12,13 @@ import static java.util.stream.Collectors.toSet;
  */
 public class WordCounter {
 
-    public static class SearchResult implements Comparable<SearchResult> {
-
-        public final long count;
-
-        public final double score;
-
-        public final String where;
-
-        public SearchResult(long count, double score, String where) {
-            this.count = count;
-            this.score = score;
-            this.where = where;
-        }
-
-        @Override
-        public int compareTo(SearchResult other) {
-            int result = Double.compare(other.score, this.score);
-            if (result == 0){
-                result = Long.compare(other.count, this.count);
-                if (result == 0){
-                    result = this.where.compareToIgnoreCase(other.where);
-                }
-            }
-            return result;
-        }
-    }
-
     /**
      * TreeMap to store how many word stems are in each file
      */
-    private final TreeMap<String,Integer> totalWords;
+    public final TreeMap<String,Integer> totalWords;
     private final InvertedWordIndex wordIndex;
 
-    private Map<String,List<SearchResult>> results;
+    public Map<String,List<SearchResult>> results;
 
 
 
@@ -68,37 +39,36 @@ public class WordCounter {
 
     public void buildQuery(Path input, boolean partialSearch) throws IOException {
         ArrayList<TreeSet<String>> queries = WordCleaner.listUniqueStems(input);
-        TreeSet<String> uniqueSet = WordCleaner.uniqueStems(input);
+        TreeSet<String> uniqueQuerySet = WordCleaner.uniqueStems(input);
         ArrayList<TreeSet<String>> uniqueQueries = new ArrayList<>(); //rename
 
-        for (TreeSet<String> querySet : queries){
-
-            for (String queryWord : querySet){
-                if (querySet.size() > 0 && uniqueSet.contains(queryWord)){
-                    uniqueQueries.add(querySet);
-                    uniqueSet.remove(queryWord);
-                }
+        for (TreeSet<String> querySet : queries) {
+            if (querySet.size() > 0) {
+                uniqueQueries.add(querySet);
             }
         }
 
         if (partialSearch){
             Set<String> wordList = wordIndex.getWords();
-            // this little maneuver is gonna cost us 41 years
-            for (TreeSet<String> querySet : uniqueQueries){
-                for (String queryWord : querySet){
-                    for (String word : wordList){
-                        if (wordList.contains(queryWord)){
-                            continue;
-                        }
+            ArrayList<String> wordBuffer;
+            // this little maneuver is gonna cost us O(n^3) years
+            // scan for partial matches
+            for (String word : wordList){
+                if (uniqueQuerySet.contains(word)){
+                    continue;
+                }
+                for (TreeSet<String> querySet : uniqueQueries){
+                    wordBuffer = new ArrayList<>();
+                    for (String queryWord : querySet){
                         if (word.startsWith(queryWord)){
-                            System.out.println("word: " + word);
-                            System.out.println("query: " + queryWord);
-                            querySet.add(word);
+                            wordBuffer.add(word);
                         }
                     }
+                    querySet.addAll(wordBuffer);
                 }
             }
         }
+        System.out.println("after");
 
         Map<String,List<SearchResult>> results =
                 uniqueQueries

@@ -65,9 +65,9 @@ public class Driver {
                     System.out.println("IO Error while attempting to use query: " + queryPath);
                 }
             }
-            else {
+            else { // partial serch
                 try {
-                    wordCounter.buildQuery(queryPath, true);
+                    wordCounter.results = invertedWordIndex.partialSearch(queryPath);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }

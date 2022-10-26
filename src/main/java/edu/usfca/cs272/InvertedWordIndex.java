@@ -136,6 +136,75 @@ public class InvertedWordIndex {
         return Collections.unmodifiableSet(positions);
     }
 
+    public Map<String, List<SearchResult>> partialSearch(Path queryInput) throws IOException {
+        ArrayList<TreeSet<String>> queries = WordCleaner.listUniqueStems(queryInput);
+        TreeSet<String> uniqueQuerySet = WordCleaner.uniqueStems(queryInput);
+        ArrayList<TreeSet<String>> uniqueQueries = new ArrayList<>(); //rename
+        ArrayList<String> originalQueries = new ArrayList<>();
+
+        for (TreeSet<String> querySet : queries) {
+            if (querySet.size() > 0) {
+                uniqueQueries.add(querySet);
+                String key = querySet.toString();
+                originalQueries.add(key.substring(1, key.length() - 1).replaceAll(",", ""));
+            }
+        }
+
+        // this little maneuver is gonna cost us O(n^3) years
+        //                    -- Get Partial Matches --
+        Set<String> wordList = this.getWords();
+        ArrayList<String> wordBuffer;
+        ArrayList<ArrayList<String>> partialQueries = new ArrayList<>(); // chhange to allow dupes!9
+        for (TreeSet<String> query : uniqueQueries){
+            partialQueries.add(new ArrayList<>(query));
+        }
+        for (String word : wordList) {
+            if (uniqueQuerySet.contains(word)) {
+                continue;
+            }
+            for (ArrayList<String> querySet : partialQueries) {
+                wordBuffer = new ArrayList<>();
+                for (String queryWord : querySet) {
+                    if (word.startsWith(queryWord)) {
+                        wordBuffer.add(word);
+                    }
+                }
+                querySet.addAll(wordBuffer);
+            }
+        }
+
+        // get all locations
+        // make results with original query
+        Map<String, List<SearchResult>> results = new TreeMap<>();
+        for (int i = 0; i < partialQueries.size(); i++) {
+            ArrayList<String> partialQuery = partialQueries.get(i);
+            String originalQuery = originalQueries.get(i);
+            ArrayList<SearchResult> searchResults = new ArrayList<>();
+            Set<String> partialQueryLocations = new HashSet<>();
+            for (String partialQueryWord : partialQuery) {
+                partialQueryLocations.addAll(getLocations(partialQueryWord));
+
+            }
+            for (String location : partialQueryLocations) {
+                SearchResult result = makeResult(partialQuery, location);
+                searchResults.add(result);
+            }
+            Collections.sort(searchResults);
+            results.put(originalQuery, searchResults);
+        }
+        return results;
+
+    }
+
+    public SearchResult makeResult(ArrayList<String> query, String location) {
+        long totalMatches = query.stream()
+                .map(word -> this.getPositions(word, location))
+                .mapToLong(Set::size)
+                .sum();
+        double score = (totalMatches / Double.valueOf(wordCount.totalWords.get(location)));
+        return new SearchResult(totalMatches, score, location);
+    }
+
     /**
      * @return the number of words in the index
      */
