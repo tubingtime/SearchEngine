@@ -1,5 +1,8 @@
 package edu.usfca.cs272;
 
+/**
+ * A data structure to hold a search result.
+ */
 public class SearchResult implements Comparable<SearchResult> {
 
     /**
