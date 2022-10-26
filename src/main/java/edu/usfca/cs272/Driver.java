@@ -69,7 +69,7 @@ public class Driver {
                 try {
                     wordCounter.results = invertedWordIndex.partialSearch(queryPath);
                 } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    System.out.println("IO Error while attempting to use query: " + queryPath);
                 }
             }
         }

@@ -15,26 +15,38 @@ public class WordCounter {
     /**
      * TreeMap to store how many word stems are in each file
      */
-    public final TreeMap<String,Integer> totalWords;
+    public final TreeMap<String, Integer> totalWords;
+
+    /**
+     * Point to an associated InvertedWordIndex
+     */
     private final InvertedWordIndex wordIndex;
 
-    public Map<String,List<SearchResult>> results;
+    /**
+     * Search results data structure
+     */
+    public Map<String, List<SearchResult>> results;
 
 
-
+    /**
+     * Constructs a new instance of this class
+     *
+     * @param wordIndex associated InvertedWordIndex
+     */
     public WordCounter(InvertedWordIndex wordIndex) {
         this.totalWords = new TreeMap<>();
         this.wordIndex = wordIndex;
-        this.results = null;
+        this.results = new TreeMap<>();
     }
 
     /**
      * Increments a locations word count by one
+     *
      * @param location the location to increment
      */
-    public void increment(String location){
+    public void increment(String location) {
         totalWords.putIfAbsent(location, 0);
-        totalWords.put(location, totalWords.get(location)+1);
+        totalWords.put(location, totalWords.get(location) + 1);
     }
 
     public void buildQuery(Path input, boolean partialSearch) throws IOException {
@@ -48,19 +60,19 @@ public class WordCounter {
             }
         }
 
-        if (partialSearch){
+        if (partialSearch) {
             Set<String> wordList = wordIndex.getWords();
             ArrayList<String> wordBuffer;
             // this little maneuver is gonna cost us O(n^3) years
             // scan for partial matches
-            for (String word : wordList){
-                if (uniqueQuerySet.contains(word)){
+            for (String word : wordList) {
+                if (uniqueQuerySet.contains(word)) {
                     continue;
                 }
-                for (TreeSet<String> querySet : uniqueQueries){
+                for (TreeSet<String> querySet : uniqueQueries) {
                     wordBuffer = new ArrayList<>();
-                    for (String queryWord : querySet){
-                        if (word.startsWith(queryWord)){
+                    for (String queryWord : querySet) {
+                        if (word.startsWith(queryWord)) {
                             wordBuffer.add(word);
                         }
                     }
@@ -70,23 +82,23 @@ public class WordCounter {
         }
         System.out.println("after");
 
-        Map<String,List<SearchResult>> results =
+        Map<String, List<SearchResult>> results =
                 uniqueQueries
-                .stream()  // Stream<TreeSet<String>>
-                .collect(toMap((querySet) -> {
-                    String key = querySet.toString();
-                    return key.substring(1,key.length() - 1); // remove brackets from key
-                }, this::query, (merge1, merge2) -> merge1));
-        Map<String,List<SearchResult>> sortedResults = new TreeMap<>();
+                        .stream()  // Stream<TreeSet<String>>
+                        .collect(toMap((querySet) -> {
+                            String key = querySet.toString();
+                            return key.substring(1, key.length() - 1); // remove brackets from key
+                        }, this::query, (merge1, merge2) -> merge1));
+        Map<String, List<SearchResult>> sortedResults = new TreeMap<>();
         var resultsEntrySet = results.entrySet();
-        for (var result : resultsEntrySet){
-            sortedResults.put(result.getKey().replaceAll(",",""), result.getValue());
+        for (var result : resultsEntrySet) {
+            sortedResults.put(result.getKey().replaceAll(",", ""), result.getValue());
         }
         this.results = sortedResults;
     }
 
 
-    public List<SearchResult> query(TreeSet<String> queryLine){
+    public List<SearchResult> query(TreeSet<String> queryLine) {
         return queryLine
                 .stream()
                 .map(wordIndex::getLocations)
@@ -101,13 +113,14 @@ public class WordCounter {
     }
 
 
-    public SearchResult makeResult(TreeSet<String> query, String location){
+    public SearchResult makeResult(TreeSet<String> query, String location) {
         long totalMatches = query.stream()
                 .map(word -> wordIndex.getPositions(word, location))
                 .mapToLong(Set::size)
                 .sum();
         double score = (totalMatches / Double.valueOf(totalWords.get(location)));
-        SearchResult searchResult = new SearchResult(totalMatches, score, location);;
+        SearchResult searchResult = new SearchResult(totalMatches, score, location);
+        ;
         return searchResult;
     }
 

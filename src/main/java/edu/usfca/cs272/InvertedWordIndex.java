@@ -154,27 +154,26 @@ public class InvertedWordIndex {
         //                    -- Get Partial Matches --
         Set<String> wordList = this.getWords();
         ArrayList<String> wordBuffer;
-        ArrayList<ArrayList<String>> partialQueries = new ArrayList<>(); // chhange to allow dupes!9
+        ArrayList<ArrayList<String>> partialQueries = new ArrayList<>();
         for (TreeSet<String> query : uniqueQueries){
             partialQueries.add(new ArrayList<>(query));
         }
-        for (String word : wordList) {
-            if (uniqueQuerySet.contains(word)) {
-                continue;
-            }
-            for (ArrayList<String> querySet : partialQueries) {
-                wordBuffer = new ArrayList<>();
+        ArrayList<ArrayList<String>> realPartialQueries = new ArrayList<>();
+        for (ArrayList<String> querySet : partialQueries) {
+            wordBuffer = new ArrayList<>();
+            for (String word : wordList) {
                 for (String queryWord : querySet) {
                     if (word.startsWith(queryWord)) {
                         wordBuffer.add(word);
                     }
                 }
-                querySet.addAll(wordBuffer);
             }
+            realPartialQueries.add(wordBuffer);
         }
 
         // get all locations
         // make results with original query
+        partialQueries = realPartialQueries;
         Map<String, List<SearchResult>> results = new TreeMap<>();
         for (int i = 0; i < partialQueries.size(); i++) {
             ArrayList<String> partialQuery = partialQueries.get(i);
@@ -183,7 +182,6 @@ public class InvertedWordIndex {
             Set<String> partialQueryLocations = new HashSet<>();
             for (String partialQueryWord : partialQuery) {
                 partialQueryLocations.addAll(getLocations(partialQueryWord));
-
             }
             for (String location : partialQueryLocations) {
                 SearchResult result = makeResult(partialQuery, location);
