@@ -49,6 +49,12 @@ public class WordCounter {
         totalWords.put(location, totalWords.get(location) + 1);
     }
 
+    /**
+     * Builds an exact search using streams. Partial search is WIP.
+     * @param input Path of queries to use
+     * @param partialSearch true for partial (broken), false for exact
+     * @throws IOException if the WordCleaner throws an IOException while cleaning.
+     */
     public void buildQuery(Path input, boolean partialSearch) throws IOException {
         ArrayList<TreeSet<String>> queries = WordCleaner.listUniqueStems(input);
         TreeSet<String> uniqueQuerySet = WordCleaner.uniqueStems(input);
@@ -97,7 +103,11 @@ public class WordCounter {
         this.results = sortedResults;
     }
 
-
+    /**
+     * Processes a single line from a query file
+     * @param queryLine a TreeSet containing a parsed query
+     * @return a list of SearchResult
+     */
     public List<SearchResult> query(TreeSet<String> queryLine) {
         return queryLine
                 .stream()
@@ -113,21 +123,35 @@ public class WordCounter {
     }
 
 
+    /**
+     * Creates a result given a list of word stems and their associated location.
+     * @param query a list of word stems
+     * @param location locations the word stems were found
+     * @return a populated SearchResult
+     */
     public SearchResult makeResult(TreeSet<String> query, String location) {
         long totalMatches = query.stream()
                 .map(word -> wordIndex.getPositions(word, location))
                 .mapToLong(Set::size)
                 .sum();
         double score = (totalMatches / Double.valueOf(totalWords.get(location)));
-        SearchResult searchResult = new SearchResult(totalMatches, score, location);
-        ;
-        return searchResult;
+        return new SearchResult(totalMatches, score, location);
     }
 
-    public void toJSON(Path output) throws IOException {
+    /**
+     * Converts the current word count to JSON
+     * @param output where to write the JSON file to
+     * @throws IOException if the writer throws an Exception
+     */
+    public void wordCountToJSON(Path output) throws IOException {
         PrettyJsonWriter.writeObject(totalWords, output);
     }
 
+    /**
+     * Converts the current SearchResults count to JSON
+     * @param output where to write the JSON file to
+     * @throws IOException if the writer throws an Exception
+     */
     public void resultsToJSON(Path output) throws IOException {
         PrettyJsonWriter.resultsToJSON(this.results, output);
     }

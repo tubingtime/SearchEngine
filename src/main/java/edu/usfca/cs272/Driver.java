@@ -47,25 +47,24 @@ public class Driver {
                 System.out.println("IO Error while scanning directory: " + inputPath);
             }
         }
-        if (argumentParser.hasFlag("-counts")){
-            Path countOutput = argumentParser.getPath("-counts",Path.of("counts.json"));
+        if (argumentParser.hasFlag("-counts")) {
+            Path countOutput = argumentParser.getPath("-counts", Path.of("counts.json"));
             try {
-                invertedWordIndex.wordCount.toJSON(countOutput);
+                invertedWordIndex.wordCount.wordCountToJSON(countOutput);
             } catch (IOException e) {
                 System.out.println("IO Error occurred while attempting to output the word count to: " + countOutput);
             }
         }
         WordCounter wordCounter = invertedWordIndex.wordCount;
-        if (argumentParser.hasValue("-query")){
+        if (argumentParser.hasValue("-query")) {
             Path queryPath = argumentParser.getPath("-query");
-            if (argumentParser.hasFlag("-exact")){
+            if (argumentParser.hasFlag("-exact")) {
                 try {
                     wordCounter.buildQuery(queryPath, false);
                 } catch (IOException e) {
                     System.out.println("IO Error while attempting to use query: " + queryPath);
                 }
-            }
-            else { // partial serch
+            } else { // partial serch
                 try {
                     wordCounter.results = invertedWordIndex.partialSearch(queryPath);
                 } catch (IOException e) {
@@ -74,8 +73,8 @@ public class Driver {
             }
         }
 
-        if (argumentParser.hasFlag("-results") && (wordCounter != null)){
-            Path queryOutput = argumentParser.getPath("-results",Path.of("results.json"));
+        if (argumentParser.hasFlag("-results") && (wordCounter != null)) {
+            Path queryOutput = argumentParser.getPath("-results", Path.of("results.json"));
             try {
                 wordCounter.resultsToJSON(queryOutput);
             } catch (IOException e) {

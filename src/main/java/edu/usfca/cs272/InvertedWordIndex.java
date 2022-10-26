@@ -1,7 +1,6 @@
 package edu.usfca.cs272;
 
 
-
 import java.io.IOException;
 import java.io.Writer;
 import java.nio.file.Path;
@@ -136,6 +135,12 @@ public class InvertedWordIndex {
         return Collections.unmodifiableSet(positions);
     }
 
+    /**
+     * Preforms a partial search. Iterative Approach.
+     * @param queryInput Path of queries to use
+     * @return a Map data structure containing the search results
+     * @throws IOException if the WordCleaner throws an IOException
+     */
     public Map<String, List<SearchResult>> partialSearch(Path queryInput) throws IOException {
         ArrayList<TreeSet<String>> queries = WordCleaner.listUniqueStems(queryInput);
         TreeSet<String> uniqueQuerySet = WordCleaner.uniqueStems(queryInput);
@@ -155,7 +160,7 @@ public class InvertedWordIndex {
         Set<String> wordList = this.getWords();
         ArrayList<String> wordBuffer;
         ArrayList<ArrayList<String>> partialQueries = new ArrayList<>();
-        for (TreeSet<String> query : uniqueQueries){
+        for (TreeSet<String> query : uniqueQueries) {
             partialQueries.add(new ArrayList<>(query));
         }
         ArrayList<ArrayList<String>> realPartialQueries = new ArrayList<>();
@@ -194,6 +199,12 @@ public class InvertedWordIndex {
 
     }
 
+    /**
+     * Creates a result given a list of word stems and their associated location.
+     * @param query a list of word stems
+     * @param location locations the word stems were found
+     * @return a populated SearchResult
+     */
     public SearchResult makeResult(ArrayList<String> query, String location) {
         long totalMatches = query.stream()
                 .map(word -> this.getPositions(word, location))

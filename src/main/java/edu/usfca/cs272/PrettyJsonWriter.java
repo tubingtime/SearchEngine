@@ -440,15 +440,29 @@ public class PrettyJsonWriter {
         }
     }
 
-
+    /**
+     * Converts a SearchResult nested data structure to pretty JSON
+     *
+     * @param elements the SearchResult nested data structure
+     * @param path     where to output the JSON to
+     * @throws IOException if the writer throws an IOException while writing
+     */
     public static void resultsToJSON(
             Map<String, ? extends Collection<SearchResult>> elements, Path path) throws IOException {
         try (BufferedWriter buffwriter = Files.newBufferedWriter(path, UTF_8)) {
             resultsToJSON(elements, buffwriter, 0);
         }
     }
+
+    /**
+     * Converts a SearchResult nested data structure to pretty JSON
+     * @param elements the SearchResult nested data structure
+     * @param writer the writer to use
+     * @param indent the amount of indentation to use
+     * @throws IOException if the writer throws an IOException
+     */
     public static void resultsToJSON(Map<String, ? extends Collection<SearchResult>> elements,
-                                  Writer writer, int indent) throws IOException {
+                                     Writer writer, int indent) throws IOException {
         writer.write("{");
         var iterator = elements.entrySet().iterator();
         if (iterator.hasNext()) {
@@ -473,6 +487,13 @@ public class PrettyJsonWriter {
         writer.write("}");
     }
 
+    /**
+     * Writes a Collection of SearchResult
+     * @param elements a collection of SearchResult
+     * @param writer the writer to use
+     * @param indent the amount of indentation to use
+     * @throws IOException if the writer throws an IOException
+     */
     public static void writeNestedSearchResults(
             Collection<SearchResult> elements,
             Writer writer, int indent) throws IOException {
@@ -496,6 +517,13 @@ public class PrettyJsonWriter {
         writer.write("]");
     }
 
+    /**
+     * Writes a single SearchResult to JSON
+     * @param result the SearchResult to Write
+     * @param writer the writer to use
+     * @param indent the amount of indentation to use
+     * @throws IOException if the writer throws and IOException
+     */
     public static void writeSearchResult(
             SearchResult result, Writer writer, int indent
     ) throws IOException {
