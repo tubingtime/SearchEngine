@@ -137,34 +137,72 @@ public class InvertedWordIndex {
 
     /**
      * Preforms a partial search. Iterative Approach.
+     *
+     * @param queryInput Path of queries to use
+     * @return a Map data structure containing the search results
+     * @throws IOException if the WordCleaner throws an IOException
+     */
+    public Map<String, List<SearchResult>> exactSearch(Path queryInput) throws IOException {
+        ArrayList<TreeSet<String>> queries = WordCleaner.listUniqueStems(queryInput);
+        ArrayList<ArrayList<String>> nonBlankQueries = new ArrayList<>();
+        ArrayList<String> originalQueries = new ArrayList<>();
+
+        for (TreeSet<String> querySet : queries) {
+            if (querySet.size() > 0) {
+                nonBlankQueries.add(new ArrayList<>(querySet));
+                String key = querySet.toString();
+                originalQueries.add(key.substring(1, key.length() - 1).replaceAll(",", ""));
+            }
+        }
+
+        // get all locations
+        // make results with original query
+        Map<String, List<SearchResult>> results = new TreeMap<>();
+        for (int i = 0; i < nonBlankQueries.size(); i++) {
+            ArrayList<String> query = nonBlankQueries.get(i);
+            String originalQuery = originalQueries.get(i);
+            ArrayList<SearchResult> searchResults = new ArrayList<>();
+            Set<String> queryLocations = new HashSet<>();
+            for (String queryWord : query) {
+                queryLocations.addAll(getLocations(queryWord));
+            }
+            for (String location : queryLocations) {
+                SearchResult result = makeResult(query, location);
+                searchResults.add(result);
+            }
+            Collections.sort(searchResults);
+            results.put(originalQuery, searchResults);
+
+        }
+        return results;
+    }
+
+    /**
+     * Preforms a partial search. Iterative Approach.
+     *
      * @param queryInput Path of queries to use
      * @return a Map data structure containing the search results
      * @throws IOException if the WordCleaner throws an IOException
      */
     public Map<String, List<SearchResult>> partialSearch(Path queryInput) throws IOException {
         ArrayList<TreeSet<String>> queries = WordCleaner.listUniqueStems(queryInput);
-        TreeSet<String> uniqueQuerySet = WordCleaner.uniqueStems(queryInput);
-        ArrayList<TreeSet<String>> uniqueQueries = new ArrayList<>(); //rename
+        ArrayList<ArrayList<String>> nonBlankQueries = new ArrayList<>();
         ArrayList<String> originalQueries = new ArrayList<>();
 
         for (TreeSet<String> querySet : queries) {
             if (querySet.size() > 0) {
-                uniqueQueries.add(querySet);
+                nonBlankQueries.add(new ArrayList<>(querySet));
                 String key = querySet.toString();
                 originalQueries.add(key.substring(1, key.length() - 1).replaceAll(",", ""));
             }
         }
 
         // this little maneuver is gonna cost us O(n^3) years
-        //                    -- Get Partial Matches --
+        //                    -- Make Partial Matches --
         Set<String> wordList = this.getWords();
-        ArrayList<String> wordBuffer;
         ArrayList<ArrayList<String>> partialQueries = new ArrayList<>();
-        for (TreeSet<String> query : uniqueQueries) {
-            partialQueries.add(new ArrayList<>(query));
-        }
-        ArrayList<ArrayList<String>> realPartialQueries = new ArrayList<>();
-        for (ArrayList<String> querySet : partialQueries) {
+        ArrayList<String> wordBuffer;
+        for (ArrayList<String> querySet : nonBlankQueries) {
             wordBuffer = new ArrayList<>();
             for (String word : wordList) {
                 for (String queryWord : querySet) {
@@ -173,12 +211,11 @@ public class InvertedWordIndex {
                     }
                 }
             }
-            realPartialQueries.add(wordBuffer);
+            partialQueries.add(wordBuffer);
         }
 
         // get all locations
         // make results with original query
-        partialQueries = realPartialQueries;
         Map<String, List<SearchResult>> results = new TreeMap<>();
         for (int i = 0; i < partialQueries.size(); i++) {
             ArrayList<String> partialQuery = partialQueries.get(i);
@@ -196,12 +233,12 @@ public class InvertedWordIndex {
             results.put(originalQuery, searchResults);
         }
         return results;
-
     }
 
     /**
      * Creates a result given a list of word stems and their associated location.
-     * @param query a list of word stems
+     *
+     * @param query    a list of word stems
      * @param location locations the word stems were found
      * @return a populated SearchResult
      */

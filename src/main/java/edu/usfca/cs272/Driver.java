@@ -7,6 +7,9 @@ import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -47,6 +50,7 @@ public class Driver {
                 System.out.println("IO Error while scanning directory: " + inputPath);
             }
         }
+
         if (argumentParser.hasFlag("-counts")) {
             Path countOutput = argumentParser.getPath("-counts", Path.of("counts.json"));
             try {
@@ -55,18 +59,20 @@ public class Driver {
                 System.out.println("IO Error occurred while attempting to output the word count to: " + countOutput);
             }
         }
+
         WordCounter wordCounter = invertedWordIndex.wordCount;
+        Map<String, List<SearchResult>> results = new TreeMap<>();
         if (argumentParser.hasValue("-query")) {
             Path queryPath = argumentParser.getPath("-query");
             if (argumentParser.hasFlag("-exact")) {
                 try {
-                    wordCounter.buildQuery(queryPath, false);
+                    results = invertedWordIndex.exactSearch(queryPath);
                 } catch (IOException e) {
                     System.out.println("IO Error while attempting to use query: " + queryPath);
                 }
-            } else { // partial serch
+            } else {
                 try {
-                    wordCounter.results = invertedWordIndex.partialSearch(queryPath);
+                    results = invertedWordIndex.partialSearch(queryPath);
                 } catch (IOException e) {
                     System.out.println("IO Error while attempting to use query: " + queryPath);
                 }
@@ -76,7 +82,7 @@ public class Driver {
         if (argumentParser.hasFlag("-results") && (wordCounter != null)) {
             Path queryOutput = argumentParser.getPath("-results", Path.of("results.json"));
             try {
-                wordCounter.resultsToJSON(queryOutput);
+                PrettyJsonWriter.resultsToJSON(results, queryOutput);
             } catch (IOException e) {
                 System.out.println("IO Error occurred while attempting to output search results to: " + queryOutput);
 
@@ -87,7 +93,6 @@ public class Driver {
             Path outputPath = argumentParser.getPath("-index", Path.of("index.json"));
             try (BufferedWriter bufWriter = Files.newBufferedWriter(outputPath, UTF_8)) {
                 invertedWordIndex.toJSON(bufWriter, 0);
-                System.out.println("Output:" + outputPath.toAbsolutePath());
             } catch (IOException e) {
                 System.out.println("IO Error occurred while attempting to output JSON to " + outputPath);
             }

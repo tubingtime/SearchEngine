@@ -50,12 +50,14 @@ public class WordCounter {
     }
 
     /**
-     * Builds an exact search using streams. Partial search is WIP.
-     * @param input Path of queries to use
+     * Builds an exact search using streams.
+     *
+     * @param input         Path of queries to use
      * @param partialSearch true for partial (broken), false for exact
+     * @return a map of the results
      * @throws IOException if the WordCleaner throws an IOException while cleaning.
      */
-    public void buildQuery(Path input, boolean partialSearch) throws IOException {
+    public Map<String, List<SearchResult>> buildQuery(Path input, boolean partialSearch) throws IOException {
         ArrayList<TreeSet<String>> queries = WordCleaner.listUniqueStems(input);
         TreeSet<String> uniqueQuerySet = WordCleaner.uniqueStems(input);
         ArrayList<TreeSet<String>> uniqueQueries = new ArrayList<>(); //rename
@@ -86,7 +88,6 @@ public class WordCounter {
                 }
             }
         }
-        System.out.println("after");
 
         Map<String, List<SearchResult>> results =
                 uniqueQueries
@@ -100,11 +101,12 @@ public class WordCounter {
         for (var result : resultsEntrySet) {
             sortedResults.put(result.getKey().replaceAll(",", ""), result.getValue());
         }
-        this.results = sortedResults;
+        return sortedResults;
     }
 
     /**
      * Processes a single line from a query file
+     *
      * @param queryLine a TreeSet containing a parsed query
      * @return a list of SearchResult
      */
@@ -125,7 +127,8 @@ public class WordCounter {
 
     /**
      * Creates a result given a list of word stems and their associated location.
-     * @param query a list of word stems
+     *
+     * @param query    a list of word stems
      * @param location locations the word stems were found
      * @return a populated SearchResult
      */
@@ -140,6 +143,7 @@ public class WordCounter {
 
     /**
      * Converts the current word count to JSON
+     *
      * @param output where to write the JSON file to
      * @throws IOException if the writer throws an Exception
      */
@@ -149,6 +153,7 @@ public class WordCounter {
 
     /**
      * Converts the current SearchResults count to JSON
+     *
      * @param output where to write the JSON file to
      * @throws IOException if the writer throws an Exception
      */

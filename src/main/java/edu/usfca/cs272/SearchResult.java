@@ -22,6 +22,7 @@ public class SearchResult implements Comparable<SearchResult> {
 
     /**
      * Constructs a new instance of this class
+     *
      * @param count How many times the word stem was found
      * @param score Total matches / Total words in file
      * @param where What file the search was preformed on
