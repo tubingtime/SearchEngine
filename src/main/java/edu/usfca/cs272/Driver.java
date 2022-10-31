@@ -41,6 +41,13 @@ public class Driver {
 
         // Build inverted word index
         InvertedWordIndex invertedWordIndex = new InvertedWordIndex();
+        // TODO Put the other variables here instead
+        
+        /*
+         * TODO Have the flags that read files first (-text, -query)
+         * then the flags that write files last (-counts, -index, -results)
+         */
+        
         if (argumentParser.hasValue("-text")) {
             Path inputPath = argumentParser.getPath("-text");
             System.out.println("Input: " + inputPath);
@@ -60,8 +67,8 @@ public class Driver {
             }
         }
 
-        WordCounter wordCounter = invertedWordIndex.wordCount;
-        Map<String, List<SearchResult>> results = new TreeMap<>();
+        WordCounter wordCounter = invertedWordIndex.wordCount; // TODO Remove
+        Map<String, List<SearchResult>> results = new TreeMap<>(); // TODO Remove... create a QueryFileHandler instance instead
         if (argumentParser.hasValue("-query")) {
             Path queryPath = argumentParser.getPath("-query");
             if (argumentParser.hasFlag("-exact")) {
