@@ -453,6 +453,8 @@ public class PrettyJsonWriter {
             resultsToJSON(elements, buffwriter, 0);
         }
     }
+    
+    // TODO Make public instead
 
     /**
      * Converts a SearchResult nested data structure to pretty JSON

@@ -24,6 +24,8 @@ public class InvertedWordIndex {
      */
     private final TreeMap<String, TreeMap<String, TreeSet<Integer>>> wordMap;
 
+    // TODO public final TreeMap<String, Integer> totalWords; // TODO private, move in some of the WordCounter methods here too
+    
     /**
      * TreeMap to store how many word stems are in each file
      */
@@ -135,6 +137,29 @@ public class InvertedWordIndex {
         return Collections.unmodifiableSet(positions);
     }
 
+    /* TODO 
+    public List<SearchResult> exactSearch(Set<String> queries) {
+   
+       Map<String location, Integer matchCount> counts = ...
+   
+       for every query in your queries...
+          if the query exists in your inverted index...
+             for every location for that word in the inverted index...
+                 update the # of matches found for this word and location
+                 
+       for every entry in the match counts...
+          create the search result
+   
+    }
+
+    public List<SearchResult> partialSearch(Set<String> queries) {
+    	
+    }
+    
+    Move the stemming and joining of lines into the QueryFileHandler class
+    (or the current WordCounter class)
+    */
+    
     /**
      * Preforms a partial search. Iterative Approach.
      *
@@ -143,7 +168,7 @@ public class InvertedWordIndex {
      * @throws IOException if the WordCleaner throws an IOException
      */
     public Map<String, List<SearchResult>> exactSearch(Path queryInput) throws IOException {
-        ArrayList<TreeSet<String>> queries = WordCleaner.listUniqueStems(queryInput);
+        ArrayList<TreeSet<String>> queries = WordCleaner.listUniqueStems(queryInput); // TODO No stemming inside of data structure
         ArrayList<ArrayList<String>> nonBlankQueries = new ArrayList<>();
         ArrayList<String> originalQueries = new ArrayList<>();
 
@@ -151,6 +176,7 @@ public class InvertedWordIndex {
             if (querySet.size() > 0) {
                 nonBlankQueries.add(new ArrayList<>(querySet));
                 String key = querySet.toString();
+                // TODO Call String.join instead
                 originalQueries.add(key.substring(1, key.length() - 1).replaceAll(",", ""));
             }
         }

@@ -1,10 +1,16 @@
 package edu.usfca.cs272;
 
+// TODO Make this a public non-static inner class inside of InvertedWordIndex
+
 /**
  * A data structure to hold a search result.
  */
 public class SearchResult implements Comparable<SearchResult> {
 
+	/*
+	 * TODO Make these non-final but keep them public (don't create getters/setters yet)
+	 */
+	
     /**
      * How many times the word stem was found
      */

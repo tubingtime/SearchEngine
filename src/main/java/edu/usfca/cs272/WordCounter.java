@@ -10,12 +10,12 @@ import static java.util.stream.Collectors.toSet;
 /**
  * Counts the words in a InvertedWordIndex
  */
-public class WordCounter {
+public class WordCounter { // TODO QueryFileHandler
 
     /**
      * TreeMap to store how many word stems are in each file
      */
-    public final TreeMap<String, Integer> totalWords;
+    public final TreeMap<String, Integer> totalWords; // TODO Remove
 
     /**
      * Point to an associated InvertedWordIndex
@@ -25,7 +25,7 @@ public class WordCounter {
     /**
      * Search results data structure
      */
-    public Map<String, List<SearchResult>> results;
+    public Map<String, List<SearchResult>> results; // TODO private
 
 
     /**
