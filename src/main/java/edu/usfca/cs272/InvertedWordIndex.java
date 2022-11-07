@@ -24,24 +24,29 @@ public class InvertedWordIndex {
      */
     private final TreeMap<String, TreeMap<String, TreeSet<Integer>>> wordMap;
 
-    // TODO public final TreeMap<String, Integer> totalWords; // TODO private, move in some of the WordCounter methods here too
-    
-    /**
-     * TreeMap to store how many word stems are in each file
-     */
-    public final WordCounter wordCount;
+    private final TreeMap<String, Integer> totalWords;
 
     /**
      * * Constructs a new instance of WordIndex.
      */
     public InvertedWordIndex() {
         this.wordMap = new TreeMap<>();
-        this.wordCount = new WordCounter(this);
+        this.totalWords = new TreeMap<>();
     }
 
+    /**
+     * Increments a locations word count by one
+     *
+     * @param location the location to increment
+     */
+    public void increment(String location) {
+        totalWords.putIfAbsent(location, 0);
+        totalWords.put(location, totalWords.get(location) + 1);
+    }
 
     /**
      * Adds a new word to the WordIndex. Given the word, it's Path location, and the position number it was found at.
+     * Also increments the word count
      *
      * @param word     the word to add
      * @param location where the wod was found
@@ -53,7 +58,7 @@ public class InvertedWordIndex {
         wordMap.get(word).get(location).add(position);            // finally add
 
         // update word count
-        wordCount.increment(location);
+        increment(location);
     }
 
     /**
@@ -273,7 +278,7 @@ public class InvertedWordIndex {
                 .map(word -> this.getPositions(word, location))
                 .mapToLong(Set::size)
                 .sum();
-        double score = (totalMatches / Double.valueOf(wordCount.totalWords.get(location)));
+        double score = (totalMatches / Double.valueOf(totalWords.get(location)));
         return new SearchResult(totalMatches, score, location);
     }
 
@@ -334,6 +339,16 @@ public class InvertedWordIndex {
      */
     public void toJSON(Path path) throws IOException {
         PrettyJsonWriter.invertedWordIndexToJSON(wordMap, path);
+    }
+
+    /**
+     * Converts the current word count to JSON
+     *
+     * @param output where to write the JSON file to
+     * @throws IOException if the writer throws an Exception
+     */
+    public void wordCountToJSON(Path output) throws IOException {
+        PrettyJsonWriter.writeObject(totalWords, output);
     }
 }
 

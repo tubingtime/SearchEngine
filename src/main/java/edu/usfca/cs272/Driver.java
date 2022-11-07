@@ -41,12 +41,9 @@ public class Driver {
 
         // Build inverted word index
         InvertedWordIndex invertedWordIndex = new InvertedWordIndex();
-        // TODO Put the other variables here instead
-        
-        /*
-         * TODO Have the flags that read files first (-text, -query)
-         * then the flags that write files last (-counts, -index, -results)
-         */
+
+        QueryFileHandler queryFileHandler = new QueryFileHandler(invertedWordIndex);
+
         
         if (argumentParser.hasValue("-text")) {
             Path inputPath = argumentParser.getPath("-text");
@@ -58,41 +55,30 @@ public class Driver {
             }
         }
 
-        if (argumentParser.hasFlag("-counts")) {
-            Path countOutput = argumentParser.getPath("-counts", Path.of("counts.json"));
-            try {
-                invertedWordIndex.wordCount.wordCountToJSON(countOutput);
-            } catch (IOException e) {
-                System.out.println("IO Error occurred while attempting to output the word count to: " + countOutput);
-            }
-        }
 
-        WordCounter wordCounter = invertedWordIndex.wordCount; // TODO Remove
-        Map<String, List<SearchResult>> results = new TreeMap<>(); // TODO Remove... create a QueryFileHandler instance instead
         if (argumentParser.hasValue("-query")) {
             Path queryPath = argumentParser.getPath("-query");
             if (argumentParser.hasFlag("-exact")) {
                 try {
-                    results = invertedWordIndex.exactSearch(queryPath);
+                    queryFileHandler.exactSearch(queryPath);
                 } catch (IOException e) {
                     System.out.println("IO Error while attempting to use query: " + queryPath);
                 }
             } else {
                 try {
-                    results = invertedWordIndex.partialSearch(queryPath);
+                    queryFileHandler.partialSearch(queryPath);
                 } catch (IOException e) {
                     System.out.println("IO Error while attempting to use query: " + queryPath);
                 }
             }
         }
 
-        if (argumentParser.hasFlag("-results") && (wordCounter != null)) {
-            Path queryOutput = argumentParser.getPath("-results", Path.of("results.json"));
+        if (argumentParser.hasFlag("-counts")) {
+            Path countOutput = argumentParser.getPath("-counts", Path.of("counts.json"));
             try {
-                PrettyJsonWriter.resultsToJSON(results, queryOutput);
+                invertedWordIndex.wordCountToJSON(countOutput);
             } catch (IOException e) {
-                System.out.println("IO Error occurred while attempting to output search results to: " + queryOutput);
-
+                System.out.println("IO Error occurred while attempting to output the word count to: " + countOutput);
             }
         }
 
@@ -102,6 +88,16 @@ public class Driver {
                 invertedWordIndex.toJSON(bufWriter, 0);
             } catch (IOException e) {
                 System.out.println("IO Error occurred while attempting to output JSON to " + outputPath);
+            }
+        }
+
+        if (argumentParser.hasFlag("-results")) {
+            Path queryOutput = argumentParser.getPath("-results", Path.of("results.json"));
+            try {
+                queryFileHandler.resultsToJSON(queryOutput);
+            } catch (IOException e) {
+                System.out.println("IO Error occurred while attempting to output search results to: " + queryOutput);
+
             }
         }
 
