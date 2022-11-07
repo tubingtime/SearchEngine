@@ -19,7 +19,7 @@ public class QueryFileHandler {
     /**
      * Search results data structure
      */
-    private Map<String, List<SearchResult>> results; // TODO private
+    private Map<String, List<SearchResult>> results;
 
 
     /**
