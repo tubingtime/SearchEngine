@@ -454,7 +454,6 @@ public class PrettyJsonWriter {
         }
     }
     
-    // TODO Make public instead
 
     /**
      * Converts a SearchResult nested data structure to pretty JSON
@@ -463,7 +462,7 @@ public class PrettyJsonWriter {
      * @param indent the amount of indentation to use
      * @throws IOException if the writer throws an IOException
      */
-    private static void resultsToJSON(Map<String, ? extends Collection<SearchResult>> elements,
+    public static void resultsToJSON(Map<String, ? extends Collection<SearchResult>> elements,
                                      Writer writer, int indent) throws IOException {
         writer.write("{");
         var iterator = elements.entrySet().iterator();
@@ -496,7 +495,7 @@ public class PrettyJsonWriter {
      * @param indent the amount of indentation to use
      * @throws IOException if the writer throws an IOException
      */
-    private static void writeNestedSearchResults(
+    public static void writeNestedSearchResults(
             Collection<SearchResult> elements,
             Writer writer, int indent) throws IOException {
         writer.write("[");
@@ -526,7 +525,7 @@ public class PrettyJsonWriter {
      * @param indent the amount of indentation to use
      * @throws IOException if the writer throws and IOException
      */
-    private static void writeSearchResult(
+    public static void writeSearchResult(
             SearchResult result, Writer writer, int indent
     ) throws IOException {
         writer.write("{");
