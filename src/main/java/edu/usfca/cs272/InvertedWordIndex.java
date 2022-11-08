@@ -148,6 +148,7 @@ public class InvertedWordIndex {
 
     /**
      * Preforms an exact search on a Set of queries
+     *
      * @param queries the queries to use
      * @return a List of SearchResult containing the results
      */
@@ -176,6 +177,7 @@ public class InvertedWordIndex {
 
     /**
      * Preforms an exact search on a Set of queries
+     *
      * @param queries the queries to use
      * @return a List of SearchResult containing the results
      */
@@ -204,6 +206,7 @@ public class InvertedWordIndex {
 
     /**
      * Calls exactSearch for every query found in the given path
+     *
      * @param queryInput the file containing queries
      * @return a Map data structure containing the search results
      * @throws IOException if the WordCleaner throws an IOException
@@ -220,6 +223,7 @@ public class InvertedWordIndex {
 
     /**
      * Preforms an partial search on a Set of queries
+     *
      * @param queries the queries to use
      * @return a List of SearchResult containing the results
      */
@@ -240,6 +244,7 @@ public class InvertedWordIndex {
 
     /**
      * Calls partialSearch for every query found in the given path
+     *
      * @param queryInput the file containing queries
      * @return a Map data structure containing the search results
      * @throws IOException if the WordCleaner throws an IOException

@@ -71,6 +71,7 @@ public class QueryFileHandler {
 
     /**
      * Preforms an exact search
+     *
      * @param queryPath the location of the queries
      * @throws IOException if an IO error occurs while reading and stemming from file
      */
@@ -80,6 +81,7 @@ public class QueryFileHandler {
 
     /**
      * Preforms a partial search
+     *
      * @param queryPath the location of the queries
      * @throws IOException if an IO error occurs while reading and stemming from file
      */
