@@ -146,17 +146,17 @@ public class InvertedWordIndex {
     public List<SearchResult> exactSearch(Set<String> queries) {
         List<SearchResult> results = new ArrayList<>();
         Map<String, Integer> matchCounts = new HashMap<>();  /* <Location, matchCount> */
-        for (String queryWord : queries){
-            if (contains(queryWord)){
+        for (String queryWord : queries) {
+            if (contains(queryWord)) {
                 Set<String> wordLocations = getLocations(queryWord);
-                for (String location : wordLocations){
+                for (String location : wordLocations) {
                     int matchCount = matchCounts.getOrDefault(location, 0);
                     matchCount += getPositions(queryWord, location).size();
                     matchCounts.put(location, matchCount);
                 }
             }
         }
-        for (var match : matchCounts.entrySet()){
+        for (var match : matchCounts.entrySet()) {
             String location = match.getKey();
             Integer count = match.getValue();
             double score = (count / Double.valueOf(totalWords.get(location)));
@@ -166,20 +166,20 @@ public class InvertedWordIndex {
         return results;
     }
 
-    public List<SearchResult> exactSearch(ArrayList<String> queries){
+    public List<SearchResult> exactSearch(ArrayList<String> queries) {
         List<SearchResult> results = new ArrayList<>();
         Map<String, Integer> matchCounts = new HashMap<>();  /* <Location, matchCount> */
-        for (String queryWord : queries){
-            if (contains(queryWord)){
+        for (String queryWord : queries) {
+            if (contains(queryWord)) {
                 Set<String> wordLocations = getLocations(queryWord);
-                for (String location : wordLocations){
+                for (String location : wordLocations) {
                     int matchCount = matchCounts.getOrDefault(location, 0);
                     matchCount += getPositions(queryWord, location).size();
                     matchCounts.put(location, matchCount);
                 }
             }
         }
-        for (var match : matchCounts.entrySet()){
+        for (var match : matchCounts.entrySet()) {
             String location = match.getKey();
             Integer count = match.getValue();
             double score = (count / Double.valueOf(totalWords.get(location)));
@@ -193,7 +193,7 @@ public class InvertedWordIndex {
         ArrayList<Set<String>> parsedQueries = QueryFileHandler.parseQuerySet(queryInput);
         Map<String, List<SearchResult>> results = new TreeMap<>();
 
-        for (Set<String> queries : parsedQueries){
+        for (Set<String> queries : parsedQueries) {
             results.put(String.join(" ", queries), exactSearch(queries));
         }
         return results;
@@ -217,7 +217,7 @@ public class InvertedWordIndex {
         ArrayList<Set<String>> parsedQueries = QueryFileHandler.parseQuerySet(queryInput);
         Map<String, List<SearchResult>> results = new TreeMap<>();
 
-        for (Set<String> queries : parsedQueries){
+        for (Set<String> queries : parsedQueries) {
             results.put(String.join(" ", queries), partialSearch(queries));
         }
         return results;

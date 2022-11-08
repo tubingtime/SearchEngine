@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
 
-import static java.util.stream.Collectors.toMap;
-
 /**
  * Counts the words in a InvertedWordIndex
  */
@@ -34,6 +32,7 @@ public class QueryFileHandler {
 
     /**
      * Parses queries into unique, sorted, cleaned, and stemmed words
+     *
      * @param queryInput location of queries, each query separated by newline
      * @return An nested ArrayList data structure containing an ArrayList for each query line
      * @throws IOException if an IO error occurs while stemming
@@ -52,6 +51,7 @@ public class QueryFileHandler {
 
     /**
      * Parses queries into unique, sorted, cleaned, and stemmed words
+     *
      * @param queryInput location of queries, each query separated by newline
      * @return A nested ArrayList data structure containing a Set for each query line
      * @throws IOException if an IO error occurs while stemming
@@ -69,11 +69,11 @@ public class QueryFileHandler {
         return nonBlankQueries;
     }
 
-    public void exactSearch (Path queryPath) throws IOException {
+    public void exactSearch(Path queryPath) throws IOException {
         this.results = wordIndex.exactSearch2(queryPath);
     }
 
-    public void partialSearch (Path queryPath) throws IOException {
+    public void partialSearch(Path queryPath) throws IOException {
         this.results = wordIndex.partialSearch2(queryPath);
     }
 

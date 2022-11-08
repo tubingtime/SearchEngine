@@ -7,9 +7,6 @@ import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -44,7 +41,7 @@ public class Driver {
 
         QueryFileHandler queryFileHandler = new QueryFileHandler(invertedWordIndex);
 
-        
+
         if (argumentParser.hasValue("-text")) {
             Path inputPath = argumentParser.getPath("-text");
             System.out.println("Input: " + inputPath);

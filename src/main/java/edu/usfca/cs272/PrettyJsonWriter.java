@@ -429,9 +429,9 @@ public class PrettyJsonWriter {
     /**
      * Converts a InvertedWordIndex to Pretty JSON and returns as a String
      *
-     * @param wordMap       the data to use
-     * @param path          the file path to write to
-     * @throws IOException  if the writer throws an IOException while writing
+     * @param wordMap the data to use
+     * @param path    the file path to write to
+     * @throws IOException if the writer throws an IOException while writing
      */
     public static void invertedWordIndexToJSON(
             Map<String, ? extends Map<String, ? extends Set<Integer>>> wordMap, Path path) throws IOException {
@@ -453,13 +453,14 @@ public class PrettyJsonWriter {
             resultsToJSON(elements, buffwriter, 0);
         }
     }
-    
+
 
     /**
      * Converts a SearchResult nested data structure to pretty JSON
+     *
      * @param elements the SearchResult nested data structure
-     * @param writer the writer to use
-     * @param indent the amount of indentation to use
+     * @param writer   the writer to use
+     * @param indent   the amount of indentation to use
      * @throws IOException if the writer throws an IOException
      */
     public static void resultsToJSON(Map<String, ? extends Collection<InvertedWordIndex.SearchResult>> elements,
@@ -490,9 +491,10 @@ public class PrettyJsonWriter {
 
     /**
      * Writes a Collection of SearchResult
+     *
      * @param elements a collection of SearchResult
-     * @param writer the writer to use
-     * @param indent the amount of indentation to use
+     * @param writer   the writer to use
+     * @param indent   the amount of indentation to use
      * @throws IOException if the writer throws an IOException
      */
     public static void writeNestedSearchResults(
@@ -520,6 +522,7 @@ public class PrettyJsonWriter {
 
     /**
      * Writes a single SearchResult to JSON
+     *
      * @param result the SearchResult to Write
      * @param writer the writer to use
      * @param indent the amount of indentation to use
@@ -545,7 +548,7 @@ public class PrettyJsonWriter {
         writeIndent(writer, indent + 1);
         writeQuote("where", writer, 0);
         writer.write(": ");
-        writeQuote(result.where, writer , 0);
+        writeQuote(result.where, writer, 0);
         writer.write(newline);
         writeIndent(writer, indent);
         writer.write("}");
