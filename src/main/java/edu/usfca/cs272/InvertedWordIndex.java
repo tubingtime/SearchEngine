@@ -24,14 +24,18 @@ public class InvertedWordIndex {
      */
     private final TreeMap<String, TreeMap<String, TreeSet<Integer>>> wordMap;
 
-    private final TreeMap<String, Integer> totalWords;
+    /**
+     * Stores the total number of words at a file location
+     * String location, Integer, count
+     */
+    private final TreeMap<String, Integer> wordCount;
 
     /**
      * * Constructs a new instance of WordIndex.
      */
     public InvertedWordIndex() {
         this.wordMap = new TreeMap<>();
-        this.totalWords = new TreeMap<>();
+        this.wordCount = new TreeMap<>();
     }
 
     /**
@@ -40,8 +44,8 @@ public class InvertedWordIndex {
      * @param location the location to increment
      */
     public void increment(String location) {
-        totalWords.putIfAbsent(location, 0);
-        totalWords.put(location, totalWords.get(location) + 1);
+        wordCount.putIfAbsent(location, 0);
+        wordCount.put(location, wordCount.get(location) + 1);
     }
 
     /**
@@ -142,7 +146,11 @@ public class InvertedWordIndex {
         return Collections.unmodifiableSet(positions);
     }
 
-
+    /**
+     * Preforms an exact search on a Set of queries
+     * @param queries the queries to use
+     * @return a List of SearchResult containing the results
+     */
     public List<SearchResult> exactSearch(Set<String> queries) {
         List<SearchResult> results = new ArrayList<>();
         Map<String, Integer> matchCounts = new HashMap<>();  /* <Location, matchCount> */
@@ -159,13 +167,18 @@ public class InvertedWordIndex {
         for (var match : matchCounts.entrySet()) {
             String location = match.getKey();
             Integer count = match.getValue();
-            double score = (count / Double.valueOf(totalWords.get(location)));
+            double score = (count / Double.valueOf(wordCount.get(location)));
             results.add(new SearchResult(count, score, location));
         }
         Collections.sort(results);
         return results;
     }
 
+    /**
+     * Preforms an exact search on a Set of queries
+     * @param queries the queries to use
+     * @return a List of SearchResult containing the results
+     */
     public List<SearchResult> exactSearch(ArrayList<String> queries) {
         List<SearchResult> results = new ArrayList<>();
         Map<String, Integer> matchCounts = new HashMap<>();  /* <Location, matchCount> */
@@ -182,13 +195,19 @@ public class InvertedWordIndex {
         for (var match : matchCounts.entrySet()) {
             String location = match.getKey();
             Integer count = match.getValue();
-            double score = (count / Double.valueOf(totalWords.get(location)));
+            double score = (count / Double.valueOf(wordCount.get(location)));
             results.add(new SearchResult(count, score, location));
         }
         Collections.sort(results);
         return results;
     }
 
+    /**
+     * Calls exactSearch for every query found in the given path
+     * @param queryInput the file containing queries
+     * @return a Map data structure containing the search results
+     * @throws IOException if the WordCleaner throws an IOException
+     */
     public Map<String, List<SearchResult>> exactSearch2(Path queryInput) throws IOException {
         ArrayList<Set<String>> parsedQueries = QueryFileHandler.parseQuerySet(queryInput);
         Map<String, List<SearchResult>> results = new TreeMap<>();
@@ -199,8 +218,13 @@ public class InvertedWordIndex {
         return results;
     }
 
-
+    /**
+     * Preforms an partial search on a Set of queries
+     * @param queries the queries to use
+     * @return a List of SearchResult containing the results
+     */
     public List<SearchResult> partialSearch(Set<String> queries) {
+        // build partial matches
         Set<String> wordList = this.getWords();
         ArrayList<String> partialQueries = new ArrayList<>();
         for (String word : wordList) {
@@ -210,9 +234,16 @@ public class InvertedWordIndex {
                 }
             }
         }
+        // search partial matches
         return exactSearch(partialQueries);
     }
 
+    /**
+     * Calls partialSearch for every query found in the given path
+     * @param queryInput the file containing queries
+     * @return a Map data structure containing the search results
+     * @throws IOException if the WordCleaner throws an IOException
+     */
     public Map<String, List<SearchResult>> partialSearch2(Path queryInput) throws IOException {
         ArrayList<Set<String>> parsedQueries = QueryFileHandler.parseQuerySet(queryInput);
         Map<String, List<SearchResult>> results = new TreeMap<>();
@@ -225,7 +256,7 @@ public class InvertedWordIndex {
 
 
     /**
-     * Preforms a partial search. Iterative Approach.
+     * Preforms a partial search. Iterative Approach. (OLD)
      *
      * @param queryInput Path of queries to use
      * @return a Map data structure containing the search results
@@ -255,7 +286,7 @@ public class InvertedWordIndex {
     }
 
     /**
-     * Preforms a partial search. Iterative Approach.
+     * Preforms a partial search. Iterative Approach. (OLD)
      *
      * @param queryInput Path of queries to use
      * @return a Map data structure containing the search results
@@ -324,7 +355,7 @@ public class InvertedWordIndex {
                 .map(word -> this.getPositions(word, location))
                 .mapToLong(Set::size)
                 .sum();
-        double score = (totalMatches / Double.valueOf(totalWords.get(location)));
+        double score = (totalMatches / Double.valueOf(wordCount.get(location)));
         return new SearchResult(totalMatches, score, location);
     }
 
@@ -394,7 +425,7 @@ public class InvertedWordIndex {
      * @throws IOException if the writer throws an Exception
      */
     public void wordCountToJSON(Path output) throws IOException {
-        PrettyJsonWriter.writeObject(totalWords, output);
+        PrettyJsonWriter.writeObject(wordCount, output);
     }
 
     /**

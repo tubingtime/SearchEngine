@@ -69,10 +69,20 @@ public class QueryFileHandler {
         return nonBlankQueries;
     }
 
+    /**
+     * Preforms an exact search
+     * @param queryPath the location of the queries
+     * @throws IOException if an IO error occurs while reading and stemming from file
+     */
     public void exactSearch(Path queryPath) throws IOException {
         this.results = wordIndex.exactSearch2(queryPath);
     }
 
+    /**
+     * Preforms a partial search
+     * @param queryPath the location of the queries
+     * @throws IOException if an IO error occurs while reading and stemming from file
+     */
     public void partialSearch(Path queryPath) throws IOException {
         this.results = wordIndex.partialSearch2(queryPath);
     }
