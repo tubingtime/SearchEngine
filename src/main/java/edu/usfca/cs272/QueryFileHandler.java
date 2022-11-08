@@ -32,6 +32,24 @@ public class QueryFileHandler {
         this.results = new TreeMap<>();
     }
 
+    /**
+     * Parses queries into unique, sorted, cleaned, and stemmed words
+     * @param queryInput location of queries
+     * @return TODO:
+     * @throws IOException
+     */
+    public static ArrayList<ArrayList<String>> parseQuery(Path queryInput) throws IOException {
+        ArrayList<TreeSet<String>> queries = WordCleaner.listUniqueStems(queryInput);
+        ArrayList<ArrayList<String>> nonBlankQueries = new ArrayList<>();
+
+        for (TreeSet<String> querySet : queries) {
+            if (querySet.size() > 0) {
+                nonBlankQueries.add(new ArrayList<>(querySet));
+            }
+        }
+        return nonBlankQueries;
+    }
+
     public void exactSearch (Path queryPath) throws IOException {
         this.results = wordIndex.exactSearch(queryPath);
     }

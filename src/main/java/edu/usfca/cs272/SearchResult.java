@@ -6,25 +6,20 @@ package edu.usfca.cs272;
  * A data structure to hold a search result.
  */
 public class SearchResult implements Comparable<SearchResult> {
-
-	/*
-	 * TODO Make these non-final but keep them public (don't create getters/setters yet)
-	 */
-	
     /**
      * How many times the word stem was found
      */
-    public final long count;
+    public long count;
 
     /**
      * score = total matches / total words in file
      */
-    public final double score;
+    public double score;
 
     /**
      * What file the search was preformed on
      */
-    public final String where;
+    public String where;
 
     /**
      * Constructs a new instance of this class

@@ -142,29 +142,37 @@ public class InvertedWordIndex {
         return Collections.unmodifiableSet(positions);
     }
 
-    /* TODO 
+
     public List<SearchResult> exactSearch(Set<String> queries) {
-   
-       Map<String location, Integer matchCount> counts = ...
-   
-       for every query in your queries...
-          if the query exists in your inverted index...
-             for every location for that word in the inverted index...
-                 update the # of matches found for this word and location
-                 
-       for every entry in the match counts...
-          create the search result
-   
+        List<SearchResult> results = new ArrayList<>();
+        Map<String, Integer> matchCounts = new TreeMap<>();  /* <Location, matchCount> */
+        for (String queryWord : queries){
+            if (contains(queryWord)){
+                Set<String> wordLocations = getLocations(queryWord);
+                for (String location : wordLocations){
+                    Integer matchCount = getPositions(queryWord, location).size();
+                    matchCounts.put(location, matchCount);
+                }
+            }
+        }
+        for (var match : matchCounts.entrySet()){
+            String location = match.getKey();
+            Integer count = match.getValue();
+            double score = (count / Double.valueOf(totalWords.get(location)));
+            results.add(new SearchResult(count, score, location));
+        }
+        return results;
     }
+/*
+TODO:
 
     public List<SearchResult> partialSearch(Set<String> queries) {
-    	
+        List<SearchResult> results = new ArrayList<>();
     }
-    
-    Move the stemming and joining of lines into the QueryFileHandler class
-    (or the current WordCounter class)
-    */
-    
+
+    public Map<String, List<SearchResult>>
+*/
+
     /**
      * Preforms a partial search. Iterative Approach.
      *
@@ -173,25 +181,12 @@ public class InvertedWordIndex {
      * @throws IOException if the WordCleaner throws an IOException
      */
     public Map<String, List<SearchResult>> exactSearch(Path queryInput) throws IOException {
-        ArrayList<TreeSet<String>> queries = WordCleaner.listUniqueStems(queryInput); // TODO No stemming inside of data structure
-        ArrayList<ArrayList<String>> nonBlankQueries = new ArrayList<>();
-        ArrayList<String> originalQueries = new ArrayList<>();
-
-        for (TreeSet<String> querySet : queries) {
-            if (querySet.size() > 0) {
-                nonBlankQueries.add(new ArrayList<>(querySet));
-                String key = querySet.toString();
-                // TODO Call String.join instead
-                originalQueries.add(key.substring(1, key.length() - 1).replaceAll(",", ""));
-            }
-        }
+        ArrayList<ArrayList<String>> parsedQueries = QueryFileHandler.parseQuery(queryInput);
 
         // get all locations
         // make results with original query
         Map<String, List<SearchResult>> results = new TreeMap<>();
-        for (int i = 0; i < nonBlankQueries.size(); i++) {
-            ArrayList<String> query = nonBlankQueries.get(i);
-            String originalQuery = originalQueries.get(i);
+        for (ArrayList<String> query : parsedQueries) {
             ArrayList<SearchResult> searchResults = new ArrayList<>();
             Set<String> queryLocations = new HashSet<>();
             for (String queryWord : query) {
@@ -202,9 +197,9 @@ public class InvertedWordIndex {
                 searchResults.add(result);
             }
             Collections.sort(searchResults);
-            results.put(originalQuery, searchResults);
-
+            results.put(String.join(" ", query), searchResults);
         }
+
         return results;
     }
 
@@ -264,6 +259,18 @@ public class InvertedWordIndex {
             results.put(originalQuery, searchResults);
         }
         return results;
+    }
+
+    /**
+     * Creates a result given a words match count and an associated location.
+     * TODO: delete?
+     * @param location locations the word stems were found
+     * @param count    a list of word stems
+     * @return a populated SearchResult
+     */
+    public SearchResult makeResult(String location, Long count) {
+        double score = (count / Double.valueOf(totalWords.get(location)));
+        return new SearchResult(count, score, location);
     }
 
     /**
