@@ -150,7 +150,31 @@ public class InvertedWordIndex {
             if (contains(queryWord)){
                 Set<String> wordLocations = getLocations(queryWord);
                 for (String location : wordLocations){
-                    Integer matchCount = getPositions(queryWord, location).size();
+                    int matchCount = matchCounts.getOrDefault(location, 0);
+                    matchCount += getPositions(queryWord, location).size();
+                    matchCounts.put(location, matchCount);
+                }
+            }
+        }
+        for (var match : matchCounts.entrySet()){
+            String location = match.getKey();
+            Integer count = match.getValue();
+            double score = (count / Double.valueOf(totalWords.get(location)));
+            results.add(new SearchResult(count, score, location));
+        }
+        Collections.sort(results);
+        return results;
+    }
+
+    public List<SearchResult> exactSearch(ArrayList<String> queries){
+        List<SearchResult> results = new ArrayList<>();
+        Map<String, Integer> matchCounts = new HashMap<>();  /* <Location, matchCount> */
+        for (String queryWord : queries){
+            if (contains(queryWord)){
+                Set<String> wordLocations = getLocations(queryWord);
+                for (String location : wordLocations){
+                    int matchCount = matchCounts.getOrDefault(location, 0);
+                    matchCount += getPositions(queryWord, location).size();
                     matchCounts.put(location, matchCount);
                 }
             }
@@ -174,15 +198,31 @@ public class InvertedWordIndex {
         }
         return results;
     }
-/*
-TODO:
+
 
     public List<SearchResult> partialSearch(Set<String> queries) {
-        List<SearchResult> results = new ArrayList<>();
+        Set<String> wordList = this.getWords();
+        ArrayList<String> partialQueries = new ArrayList<>();
+        for (String word : wordList) {
+            for (String queryWord : queries) {
+                if (word.startsWith(queryWord)) {
+                    partialQueries.add(word);
+                }
+            }
+        }
+        return exactSearch(partialQueries);
     }
 
-    public Map<String, List<SearchResult>>
-*/
+    public Map<String, List<SearchResult>> partialSearch2(Path queryInput) throws IOException {
+        ArrayList<Set<String>> parsedQueries = QueryFileHandler.parseQuerySet(queryInput);
+        Map<String, List<SearchResult>> results = new TreeMap<>();
+
+        for (Set<String> queries : parsedQueries){
+            results.put(String.join(" ", queries), partialSearch(queries));
+        }
+        return results;
+    }
+
 
     /**
      * Preforms a partial search. Iterative Approach.
@@ -273,18 +313,6 @@ TODO:
     }
 
     /**
-     * Creates a result given a words match count and an associated location.
-     * TODO: delete?
-     * @param location locations the word stems were found
-     * @param count    a list of word stems
-     * @return a populated SearchResult
-     */
-    public SearchResult makeResult(String location, Long count) {
-        double score = (count / Double.valueOf(totalWords.get(location)));
-        return new SearchResult(count, score, location);
-    }
-
-    /**
      * Creates a result given a list of word stems and their associated location.
      *
      * @param query    a list of word stems
@@ -367,6 +395,51 @@ TODO:
      */
     public void wordCountToJSON(Path output) throws IOException {
         PrettyJsonWriter.writeObject(totalWords, output);
+    }
+
+    /**
+     * A data structure to hold a search result.
+     */
+    public static class SearchResult implements Comparable<SearchResult> {
+        /**
+         * How many times the word stem was found
+         */
+        public long count;
+
+        /**
+         * score = total matches / total words in file
+         */
+        public double score;
+
+        /**
+         * What file the search was preformed on
+         */
+        public String where;
+
+        /**
+         * Constructs a new instance of this class
+         *
+         * @param count How many times the word stem was found
+         * @param score Total matches / Total words in file
+         * @param where What file the search was preformed on
+         */
+        public SearchResult(long count, double score, String where) {
+            this.count = count;
+            this.score = score;
+            this.where = where;
+        }
+
+        @Override
+        public int compareTo(SearchResult other) {
+            int result = Double.compare(other.score, this.score);
+            if (result == 0) {
+                result = Long.compare(other.count, this.count);
+                if (result == 0) {
+                    result = this.where.compareToIgnoreCase(other.where);
+                }
+            }
+            return result;
+        }
     }
 }
 

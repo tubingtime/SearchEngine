@@ -19,7 +19,7 @@ public class QueryFileHandler {
     /**
      * Search results data structure
      */
-    private Map<String, List<SearchResult>> results;
+    private Map<String, List<InvertedWordIndex.SearchResult>> results;
 
 
     /**
@@ -34,9 +34,9 @@ public class QueryFileHandler {
 
     /**
      * Parses queries into unique, sorted, cleaned, and stemmed words
-     * @param queryInput location of queries
-     * @return TODO:
-     * @throws IOException
+     * @param queryInput location of queries, each query separated by newline
+     * @return An nested ArrayList data structure containing an ArrayList for each query line
+     * @throws IOException if an IO error occurs while stemming
      */
     public static ArrayList<ArrayList<String>> parseQuery(Path queryInput) throws IOException {
         ArrayList<TreeSet<String>> queries = WordCleaner.listUniqueStems(queryInput);
@@ -52,9 +52,9 @@ public class QueryFileHandler {
 
     /**
      * Parses queries into unique, sorted, cleaned, and stemmed words
-     * @param queryInput location of queries
-     * @return TODO:
-     * @throws IOException
+     * @param queryInput location of queries, each query separated by newline
+     * @return A nested ArrayList data structure containing a Set for each query line
+     * @throws IOException if an IO error occurs while stemming
      */
     public static ArrayList<Set<String>> parseQuerySet(Path queryInput) throws IOException {
         ArrayList<TreeSet<String>> queries = WordCleaner.listUniqueStems(queryInput);
@@ -74,7 +74,7 @@ public class QueryFileHandler {
     }
 
     public void partialSearch (Path queryPath) throws IOException {
-        this.results = wordIndex.partialSearch(queryPath);
+        this.results = wordIndex.partialSearch2(queryPath);
     }
 
     /**

@@ -448,7 +448,7 @@ public class PrettyJsonWriter {
      * @throws IOException if the writer throws an IOException while writing
      */
     public static void resultsToJSON(
-            Map<String, ? extends Collection<SearchResult>> elements, Path path) throws IOException {
+            Map<String, ? extends Collection<InvertedWordIndex.SearchResult>> elements, Path path) throws IOException {
         try (BufferedWriter buffwriter = Files.newBufferedWriter(path, UTF_8)) {
             resultsToJSON(elements, buffwriter, 0);
         }
@@ -462,7 +462,7 @@ public class PrettyJsonWriter {
      * @param indent the amount of indentation to use
      * @throws IOException if the writer throws an IOException
      */
-    public static void resultsToJSON(Map<String, ? extends Collection<SearchResult>> elements,
+    public static void resultsToJSON(Map<String, ? extends Collection<InvertedWordIndex.SearchResult>> elements,
                                      Writer writer, int indent) throws IOException {
         writer.write("{");
         var iterator = elements.entrySet().iterator();
@@ -496,7 +496,7 @@ public class PrettyJsonWriter {
      * @throws IOException if the writer throws an IOException
      */
     public static void writeNestedSearchResults(
-            Collection<SearchResult> elements,
+            Collection<InvertedWordIndex.SearchResult> elements,
             Writer writer, int indent) throws IOException {
         writer.write("[");
         var iterator = elements.iterator();
@@ -526,7 +526,7 @@ public class PrettyJsonWriter {
      * @throws IOException if the writer throws and IOException
      */
     public static void writeSearchResult(
-            SearchResult result, Writer writer, int indent
+            InvertedWordIndex.SearchResult result, Writer writer, int indent
     ) throws IOException {
         writer.write("{");
         writer.write(newline);
