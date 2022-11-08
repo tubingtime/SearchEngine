@@ -50,8 +50,27 @@ public class QueryFileHandler {
         return nonBlankQueries;
     }
 
+    /**
+     * Parses queries into unique, sorted, cleaned, and stemmed words
+     * @param queryInput location of queries
+     * @return TODO:
+     * @throws IOException
+     */
+    public static ArrayList<Set<String>> parseQuerySet(Path queryInput) throws IOException {
+        ArrayList<TreeSet<String>> queries = WordCleaner.listUniqueStems(queryInput);
+        //queries.removeIf(TreeSet::isEmpty);
+        ArrayList<Set<String>> nonBlankQueries = new ArrayList<>();
+
+        for (TreeSet<String> querySet : queries) {
+            if (querySet.size() > 0) {
+                nonBlankQueries.add(querySet);
+            }
+        }
+        return nonBlankQueries;
+    }
+
     public void exactSearch (Path queryPath) throws IOException {
-        this.results = wordIndex.exactSearch(queryPath);
+        this.results = wordIndex.exactSearch2(queryPath);
     }
 
     public void partialSearch (Path queryPath) throws IOException {

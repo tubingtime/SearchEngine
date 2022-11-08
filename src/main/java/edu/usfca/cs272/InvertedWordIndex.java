@@ -145,7 +145,7 @@ public class InvertedWordIndex {
 
     public List<SearchResult> exactSearch(Set<String> queries) {
         List<SearchResult> results = new ArrayList<>();
-        Map<String, Integer> matchCounts = new TreeMap<>();  /* <Location, matchCount> */
+        Map<String, Integer> matchCounts = new HashMap<>();  /* <Location, matchCount> */
         for (String queryWord : queries){
             if (contains(queryWord)){
                 Set<String> wordLocations = getLocations(queryWord);
@@ -160,6 +160,17 @@ public class InvertedWordIndex {
             Integer count = match.getValue();
             double score = (count / Double.valueOf(totalWords.get(location)));
             results.add(new SearchResult(count, score, location));
+        }
+        Collections.sort(results);
+        return results;
+    }
+
+    public Map<String, List<SearchResult>> exactSearch2(Path queryInput) throws IOException {
+        ArrayList<Set<String>> parsedQueries = QueryFileHandler.parseQuerySet(queryInput);
+        Map<String, List<SearchResult>> results = new TreeMap<>();
+
+        for (Set<String> queries : parsedQueries){
+            results.put(String.join(" ", queries), exactSearch(queries));
         }
         return results;
     }
