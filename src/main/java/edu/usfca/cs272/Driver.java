@@ -52,9 +52,16 @@ public class Driver {
             }
         }
 
-
         if (argumentParser.hasValue("-query")) {
             Path queryPath = argumentParser.getPath("-query");
+           /* TODO 
+            try {
+              queryFileHandler.parseQuery(queryPath, argumentParser.hasFlag("-exact"));
+            } catch (IOException e) {
+            	System.out.println("IO Error while attempting to use query: " + queryPath);
+            }
+            */
+            
             if (argumentParser.hasFlag("-exact")) {
                 try {
                     queryFileHandler.exactSearch(queryPath);
@@ -94,7 +101,6 @@ public class Driver {
                 queryFileHandler.resultsToJSON(queryOutput);
             } catch (IOException e) {
                 System.out.println("IO Error occurred while attempting to output search results to: " + queryOutput);
-
             }
         }
 
