@@ -383,6 +383,8 @@ public class PrettyJsonWriter {
      * @throws IOException if the Writer throws an IOException
      */
     public static void invertedWordIndexToJSON(
+    		// TODO Set --> Collection, Integer --> ? extends Number
+    		// TODO Keep the same design throughout
             Writer writer, int indent, Map<String, ? extends Map<String, ? extends Set<Integer>>> wordMap
     ) throws IOException {
         writer.write("{");

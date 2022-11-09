@@ -17,7 +17,7 @@ public class QueryFileHandler {
     /**
      * Search results data structure
      */
-    private Map<String, List<InvertedWordIndex.SearchResult>> results;
+    private Map<String, List<InvertedWordIndex.SearchResult>> results; // TODO final
 
 
     /**
@@ -29,6 +29,22 @@ public class QueryFileHandler {
         this.wordIndex = wordIndex;
         this.results = new TreeMap<>();
     }
+    
+    /* TODO replace methods here with:
+    public void parseQuery(Path queryInput, boolean exactSearch) {
+    	buffered reader, read line by line, call parseQuery on each line
+    }
+    
+    public void parseQuery(String line, boolean exactSerch) {
+    	stem the line
+    	join the line
+    	collect the search results for that line
+    	
+    	(figure out if we should skip this line... if its empty etc.)
+    }
+    
+    ...and maybe a nice get methods too
+    */
 
     /**
      * Parses queries into unique, sorted, cleaned, and stemmed words

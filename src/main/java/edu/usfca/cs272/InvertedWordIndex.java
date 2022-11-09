@@ -43,7 +43,7 @@ public class InvertedWordIndex {
      *
      * @param location the location to increment
      */
-    public void increment(String location) {
+    public void increment(String location) { // TODO private
         wordCount.putIfAbsent(location, 0);
         wordCount.put(location, wordCount.get(location) + 1);
     }
@@ -61,6 +61,18 @@ public class InvertedWordIndex {
         wordMap.get(word).putIfAbsent(location, new TreeSet<>()); // new position set if it doesn't exist
         wordMap.get(word).get(location).add(position);            // finally add
 
+        /*
+         * TODO Can't always increment the count...
+         * 
+         * add(hello, hello.txt, 12) --> increment count
+         * add(hello, hello.txt, 12) --> should not increment
+         * add(hello, hello.txt, 12) --> should not increment
+         * add(hello, hello.txt, 12) --> should not increment
+         * 
+         * Use the result of the last add to tell if something new was added...
+         * 
+         * boolean modified = wordMap.get(...).get(...).add(...)
+         */
         // update word count
         increment(location);
     }
@@ -145,6 +157,8 @@ public class InvertedWordIndex {
             return Collections.emptySet();
         return Collections.unmodifiableSet(positions);
     }
+    
+    // TODO Think about get methods for wordCount too
 
     /**
      * Preforms an exact search on a Set of queries
@@ -155,17 +169,30 @@ public class InvertedWordIndex {
     public List<SearchResult> exactSearch(Set<String> queries) {
         List<SearchResult> results = new ArrayList<>();
         Map<String, Integer> matchCounts = new HashMap<>();  /* <Location, matchCount> */
+        
+        // TODO Map<String, SearchResult> matchCounts = new HashMap<>();
         for (String queryWord : queries) {
-            if (contains(queryWord)) {
+            if (contains(queryWord)) { // TODO Directly access the wordMap everywhere you can inside this method
                 Set<String> wordLocations = getLocations(queryWord);
                 for (String location : wordLocations) {
+                			/* TODO 
+                			check if you need to create a new search result
+                				create a new result
+                				add the result to the list
+                				add the result to the map
+                			
+                			get the search result and update its count and score
+                			mathcCounts.get(location).update(queryWord);
+                			*/
+                	
+                	
                     int matchCount = matchCounts.getOrDefault(location, 0);
                     matchCount += getPositions(queryWord, location).size();
                     matchCounts.put(location, matchCount);
                 }
             }
         }
-        for (var match : matchCounts.entrySet()) {
+        for (var match : matchCounts.entrySet()) { // TODO Remove
             String location = match.getKey();
             Integer count = match.getValue();
             double score = (count / Double.valueOf(wordCount.get(location)));
@@ -181,7 +208,7 @@ public class InvertedWordIndex {
      * @param queries the queries to use
      * @return a List of SearchResult containing the results
      */
-    public List<SearchResult> exactSearch(ArrayList<String> queries) {
+    public List<SearchResult> exactSearch(ArrayList<String> queries) { // TODO Remove
         List<SearchResult> results = new ArrayList<>();
         Map<String, Integer> matchCounts = new HashMap<>();  /* <Location, matchCount> */
         for (String queryWord : queries) {
@@ -204,6 +231,7 @@ public class InvertedWordIndex {
         return results;
     }
 
+    // TODO Remove
     /**
      * Calls exactSearch for every query found in the given path
      *
@@ -240,8 +268,20 @@ public class InvertedWordIndex {
         }
         // search partial matches
         return exactSearch(partialQueries);
+        
+        /* TODO 
+        create the list of results
+        create the map of location to search result
+        
+        loop through every query word
+        	loop through the appropriate keys in the wordMap --> use tailMap and break to avoid looping throuhg every key
+        		if the key is a partial match...
+        			then the same loop through locations as exact search
+        */
+        
     }
 
+    // TODO Remove
     /**
      * Calls partialSearch for every query found in the given path
      *
@@ -259,7 +299,7 @@ public class InvertedWordIndex {
         return results;
     }
 
-
+    // TODO Remove
     /**
      * Preforms a partial search. Iterative Approach. (OLD)
      *
@@ -290,6 +330,7 @@ public class InvertedWordIndex {
         return results;
     }
 
+    // TODO Remove?
     /**
      * Preforms a partial search. Iterative Approach. (OLD)
      *
@@ -355,7 +396,7 @@ public class InvertedWordIndex {
      * @param location locations the word stems were found
      * @return a populated SearchResult
      */
-    public SearchResult makeResult(ArrayList<String> query, String location) {
+    public SearchResult makeResult(ArrayList<String> query, String location) { // TODO Remove
         long totalMatches = query.stream()
                 .map(word -> this.getPositions(word, location))
                 .mapToLong(Set::size)
@@ -436,21 +477,21 @@ public class InvertedWordIndex {
     /**
      * A data structure to hold a search result.
      */
-    public static class SearchResult implements Comparable<SearchResult> {
+    public static class SearchResult implements Comparable<SearchResult> { // TODO non-static
         /**
          * How many times the word stem was found
          */
-        public long count;
+        public long count; // TODO private
 
         /**
          * score = total matches / total words in file
          */
-        public double score;
+        public double score; // TODO private
 
         /**
          * What file the search was preformed on
          */
-        public String where;
+        public String where; // TODO private and final
 
         /**
          * Constructs a new instance of this class
@@ -459,9 +500,10 @@ public class InvertedWordIndex {
          * @param score Total matches / Total words in file
          * @param where What file the search was preformed on
          */
+        // TODO public SearchResult(String where) {
         public SearchResult(long count, double score, String where) {
-            this.count = count;
-            this.score = score;
+            this.count = count; // TODO 0
+            this.score = score; // TODO 0
             this.where = where;
         }
 
