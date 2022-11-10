@@ -43,7 +43,7 @@ public class InvertedWordIndex {
      *
      * @param location the location to increment
      */
-    public void increment(String location) { // TODO private
+    private void increment(String location) {
         wordCount.putIfAbsent(location, 0);
         wordCount.put(location, wordCount.get(location) + 1);
     }
@@ -59,22 +59,10 @@ public class InvertedWordIndex {
     public void add(String word, String location, Integer position) {
         wordMap.putIfAbsent(word, new TreeMap<>());               // new location map if it doesn't exist
         wordMap.get(word).putIfAbsent(location, new TreeSet<>()); // new position set if it doesn't exist
-        wordMap.get(word).get(location).add(position);            // finally add
-
-        /*
-         * TODO Can't always increment the count...
-         * 
-         * add(hello, hello.txt, 12) --> increment count
-         * add(hello, hello.txt, 12) --> should not increment
-         * add(hello, hello.txt, 12) --> should not increment
-         * add(hello, hello.txt, 12) --> should not increment
-         * 
-         * Use the result of the last add to tell if something new was added...
-         * 
-         * boolean modified = wordMap.get(...).get(...).add(...)
-         */
-        // update word count
-        increment(location);
+        boolean didNotContain = wordMap.get(word).get(location).add(position);            // finally add
+        if (didNotContain){
+            increment(location);
+        }
     }
 
     /**
@@ -158,7 +146,20 @@ public class InvertedWordIndex {
         return Collections.unmodifiableSet(positions);
     }
     
-    // TODO Think about get methods for wordCount too
+
+    public Map<String, Integer> getWordCount() {
+        return Collections.unmodifiableMap(wordCount);
+    }
+
+    public Integer getCount(String location) {
+        Integer count;
+        if (!wordCount.containsKey(location)) {
+            count = -1;
+        } else {
+            count = wordCount.get(location);
+        }
+        return count;
+    }
 
     /**
      * Preforms an exact search on a Set of queries
