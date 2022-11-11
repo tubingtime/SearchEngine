@@ -1,6 +1,8 @@
 package edu.usfca.cs272;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
@@ -30,21 +32,32 @@ public class QueryFileHandler {
         this.results = new TreeMap<>();
     }
     
-    /* TODO replace methods here with:
-    public void parseQuery(Path queryInput, boolean exactSearch) {
-    	buffered reader, read line by line, call parseQuery on each line
+
+    public void parseQuery(Path queryInput, boolean exactSearch) throws IOException {
+        try (BufferedReader buffReader = Files.newBufferedReader(queryInput)) {
+            String line;
+            while ((line = buffReader.readLine()) != null){
+                parseQuery(line, exactSearch);
+            }
+        }
     }
     
     public void parseQuery(String line, boolean exactSerch) {
-    	stem the line
-    	join the line
+        ArrayList<String> stems = WordCleaner.listStems(line);
+        if (stems.isEmpty()){
+            return;
+        }
+        line = String.join(" ", stems);
+        if (exactSerch){
+            exact
+        }
     	collect the search results for that line
     	
     	(figure out if we should skip this line... if its empty etc.)
     }
     
     ...and maybe a nice get methods too
-    */
+
 
     /**
      * Parses queries into unique, sorted, cleaned, and stemmed words
@@ -93,6 +106,10 @@ public class QueryFileHandler {
      */
     public void exactSearch(Path queryPath) throws IOException {
         this.results = wordIndex.exactSearch2(queryPath);
+    }
+
+    public void exactSearch(String query) {
+        return wordIndex.exactSearch(query);
     }
 
     /**

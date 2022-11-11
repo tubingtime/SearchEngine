@@ -300,112 +300,6 @@ public class InvertedWordIndex {
         return results;
     }
 
-    // TODO Remove
-    /**
-     * Preforms a partial search. Iterative Approach. (OLD)
-     *
-     * @param queryInput Path of queries to use
-     * @return a Map data structure containing the search results
-     * @throws IOException if the WordCleaner throws an IOException
-     */
-    public Map<String, List<SearchResult>> exactSearch(Path queryInput) throws IOException {
-        ArrayList<ArrayList<String>> parsedQueries = QueryFileHandler.parseQuery(queryInput);
-
-        // get all locations
-        // make results with original query
-        Map<String, List<SearchResult>> results = new TreeMap<>();
-        for (ArrayList<String> query : parsedQueries) {
-            ArrayList<SearchResult> searchResults = new ArrayList<>();
-            Set<String> queryLocations = new HashSet<>();
-            for (String queryWord : query) {
-                queryLocations.addAll(getLocations(queryWord));
-            }
-            for (String location : queryLocations) {
-                SearchResult result = makeResult(query, location);
-                searchResults.add(result);
-            }
-            Collections.sort(searchResults);
-            results.put(String.join(" ", query), searchResults);
-        }
-
-        return results;
-    }
-
-    // TODO Remove?
-    /**
-     * Preforms a partial search. Iterative Approach. (OLD)
-     *
-     * @param queryInput Path of queries to use
-     * @return a Map data structure containing the search results
-     * @throws IOException if the WordCleaner throws an IOException
-     */
-    public Map<String, List<SearchResult>> partialSearch(Path queryInput) throws IOException {
-        ArrayList<TreeSet<String>> queries = WordCleaner.listUniqueStems(queryInput);
-        ArrayList<ArrayList<String>> nonBlankQueries = new ArrayList<>();
-        ArrayList<String> originalQueries = new ArrayList<>();
-
-        for (TreeSet<String> querySet : queries) {
-            if (querySet.size() > 0) {
-                nonBlankQueries.add(new ArrayList<>(querySet));
-                String key = querySet.toString();
-                originalQueries.add(key.substring(1, key.length() - 1).replaceAll(",", ""));
-            }
-        }
-
-        // this little maneuver is gonna cost us O(n^3) years
-        //                    -- Make Partial Matches --
-        Set<String> wordList = this.getWords();
-        ArrayList<ArrayList<String>> partialQueries = new ArrayList<>();
-        ArrayList<String> wordBuffer;
-        for (ArrayList<String> querySet : nonBlankQueries) {
-            wordBuffer = new ArrayList<>();
-            for (String word : wordList) {
-                for (String queryWord : querySet) {
-                    if (word.startsWith(queryWord)) {
-                        wordBuffer.add(word);
-                    }
-                }
-            }
-            partialQueries.add(wordBuffer);
-        }
-
-        // get all locations
-        // make results with original query
-        Map<String, List<SearchResult>> results = new TreeMap<>();
-        for (int i = 0; i < partialQueries.size(); i++) {
-            ArrayList<String> partialQuery = partialQueries.get(i);
-            String originalQuery = originalQueries.get(i);
-            ArrayList<SearchResult> searchResults = new ArrayList<>();
-            Set<String> partialQueryLocations = new HashSet<>();
-            for (String partialQueryWord : partialQuery) {
-                partialQueryLocations.addAll(getLocations(partialQueryWord));
-            }
-            for (String location : partialQueryLocations) {
-                SearchResult result = makeResult(partialQuery, location);
-                searchResults.add(result);
-            }
-            Collections.sort(searchResults);
-            results.put(originalQuery, searchResults);
-        }
-        return results;
-    }
-
-    /**
-     * Creates a result given a list of word stems and their associated location.
-     *
-     * @param query    a list of word stems
-     * @param location locations the word stems were found
-     * @return a populated SearchResult
-     */
-    public SearchResult makeResult(ArrayList<String> query, String location) { // TODO Remove
-        long totalMatches = query.stream()
-                .map(word -> this.getPositions(word, location))
-                .mapToLong(Set::size)
-                .sum();
-        double score = (totalMatches / Double.valueOf(wordCount.get(location)));
-        return new SearchResult(totalMatches, score, location);
-    }
-
     /**
      * @return the number of words in the index
      */
@@ -452,7 +346,7 @@ public class InvertedWordIndex {
      * @throws IOException if the writer throws and IOException
      */
     public void toJSON(Writer writer, int indent) throws IOException {
-        PrettyJsonWriter.invertedWordIndexToJSON(writer, indent, this.wordMap);
+        PrettyJsonWriter.invertedWordIndexToJSON(this.wordMap, writer, indent);
     }
 
     /**

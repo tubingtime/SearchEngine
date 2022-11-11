@@ -377,15 +377,13 @@ public class PrettyJsonWriter {
     /**
      * Converts an entire InvertedWordIndex to pretty JSON
      *
+     * @param wordMap a TreeMap containing the InvertedWordIndex
      * @param writer  the {@link Writer} to use
      * @param indent  the level of indentation to use
-     * @param wordMap a TreeMap containing the InvertedWordIndex
      * @throws IOException if the Writer throws an IOException
      */
     public static void invertedWordIndexToJSON(
-    		// TODO Set --> Collection, Integer --> ? extends Number
-    		// TODO Keep the same design throughout
-            Writer writer, int indent, Map<String, ? extends Map<String, ? extends Set<Integer>>> wordMap
+            Map<String, ? extends Map<String, ? extends Set<Integer>>> wordMap, Writer writer, int indent
     ) throws IOException {
         writer.write("{");
         var iterator = wordMap.entrySet().iterator();
@@ -421,7 +419,7 @@ public class PrettyJsonWriter {
             Map<String, ? extends Map<String, ? extends Set<Integer>>> wordMap) {
         try {
             StringWriter writer = new StringWriter();
-            invertedWordIndexToJSON(writer, 0, wordMap);
+            invertedWordIndexToJSON(wordMap, writer, 0);
             return writer.toString();
         } catch (IOException e) {
             return null;
@@ -438,7 +436,7 @@ public class PrettyJsonWriter {
     public static void invertedWordIndexToJSON(
             Map<String, ? extends Map<String, ? extends Set<Integer>>> wordMap, Path path) throws IOException {
         try (BufferedWriter buffwriter = Files.newBufferedWriter(path, UTF_8)) {
-            invertedWordIndexToJSON(buffwriter, 0, wordMap);
+            invertedWordIndexToJSON(wordMap, buffwriter, 0);
         }
     }
 
