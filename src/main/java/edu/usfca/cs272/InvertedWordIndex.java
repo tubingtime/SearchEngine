@@ -146,12 +146,20 @@ public class InvertedWordIndex {
             return Collections.emptySet();
         return Collections.unmodifiableSet(positions);
     }
-    
 
+    /**
+     * Gets the wordCount
+     * @return an unmodifiable version of the wordCount
+     */
     public Map<String, Integer> getWordCount() {
         return Collections.unmodifiableMap(wordCount);
     }
 
+    /**
+     * Gets the word count given a location
+     * @param location the location to find the word count of
+     * @return the Integer value of the word count at a given location
+     */
     public Integer getCount(String location) {
         return wordCount.getOrDefault(location, -1);
     }
@@ -185,7 +193,8 @@ public class InvertedWordIndex {
     }
 
     /**
-     * Preforms an partial search on a Set of queries
+     * Preforms a partial search on a Set of queries. Uses tailMap/binary search to avoid
+     * looping through the whole wordMap
      *
      * @param queries the queries to use
      * @return a List of SearchResult containing the results
@@ -214,7 +223,6 @@ public class InvertedWordIndex {
                     searchResult.update(wordMap.get(word).get(location).size());
                 }
             }
-
         }
 
         return results;
@@ -292,41 +300,36 @@ public class InvertedWordIndex {
     /**
      * A data structure to hold a search result.
      */
-    public class SearchResult implements Comparable<SearchResult> { // TODO non-static
+    public class SearchResult implements Comparable<SearchResult> {
         /**
          * How many times the word stem was found
          */
-        public long count; // TODO private
+        private long count;
 
         /**
          * score = total matches / total words in file
          */
-        public double score; // TODO private
+        private double score;
 
         /**
          * What file the search was preformed on
          */
-        public final String where; // TODO private and final
+        private final String where;
 
         /**
          * Constructs a new instance of this class
-         *
-         * @param count How many times the word stem was found
-         * @param score Total matches / Total words in file
-         * @param where What file the search was preformed on
+         * @param where the associated location of this search result
          */
-        public SearchResult(long count, double score, String where) {
-            this.count = count; // TODO 0
-            this.score = score; // TODO 0
-            this.where = where;
-        }
-
         public SearchResult(String where) {
             this.count = 0;
             this.score = 0;
             this.where = where;
         }
 
+        /**
+         * Updates the score and count
+         * @param count the new match count to use
+         */
         public void update(long count){
             this.count += count;
             this.score = (this.count / Double.valueOf(wordCount.get(this.where)));
@@ -342,6 +345,30 @@ public class InvertedWordIndex {
                 }
             }
             return result;
+        }
+
+        /**
+         * Gets the word count
+         * @return a {@link Long} value of the word count
+         */
+        public long getCount() {
+            return count;
+        }
+
+        /**
+         * Gets the results' score
+         * @return a {@link Double} value of the score
+         */
+        public double getScore() {
+            return score;
+        }
+
+        /**
+         * Gets the results' location
+         * @return a {@link String} value of the location
+         */
+        public String getWhere() {
+            return where;
         }
     }
 }

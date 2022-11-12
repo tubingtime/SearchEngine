@@ -19,8 +19,9 @@ public class QueryFileHandler {
 
     /**
      * Search results data structure
+     * String location, List SearchResult
      */
-    private Map<String, List<InvertedWordIndex.SearchResult>> results; // TODO final
+    private final Map<String, List<InvertedWordIndex.SearchResult>> results;
 
 
     /**
@@ -32,8 +33,32 @@ public class QueryFileHandler {
         this.wordIndex = wordIndex;
         this.results = new TreeMap<>();
     }
-    
 
+    /**
+     *
+     * @return an unmodifiable version of the results data structure.
+     */
+    public Map<String, List<SearchResult>> getAllResults(){
+        return Collections.unmodifiableMap(results);
+    }
+
+    /**
+     * Gets results of a given location
+     * @param location the location to get SearchResults from
+     * @return an unmodifiable list of SearchResults
+     */
+    public List<SearchResult> getResults(String location) {
+        List<SearchResult> resultList = results.getOrDefault(location, Collections.emptyList());
+        return Collections.unmodifiableList(resultList);
+    }
+
+    /**
+     * Reads queries from a given {@link Path} line by line and then calls helper method to
+     * stem, search, and add to the results data structure.
+     * @param queryInput the location of the query file
+     * @param exactSearch true for exact search, false to allow partial matches
+     * @throws IOException if an IO error occurs while attemping to read from the file
+     */
     public void parseQuery(Path queryInput, boolean exactSearch) throws IOException {
         try (BufferedReader buffReader = Files.newBufferedReader(queryInput)) {
             String line;
@@ -42,7 +67,13 @@ public class QueryFileHandler {
             }
         }
     }
-    
+
+    /**
+     * Cleans and stems a single query line. Then calls either exact or partial search and
+     * puts the results into the results data structure.
+     * @param line a String of query words separated by spaces
+     * @param exactSearch true for exact search, false to allow partial matches
+     */
     public void parseQuery(String line, boolean exactSearch) {
         TreeSet<String> stems = WordCleaner.uniqueStems(line);
         if (stems.isEmpty()){
@@ -59,8 +90,7 @@ public class QueryFileHandler {
     	Collections.sort(searchResults);
         results.put(key, searchResults);
     }
-    
-    // TODO: ...and maybe a nice get methods too
+
 
     /**
      * Parses queries into unique, sorted, cleaned, and stemmed words
