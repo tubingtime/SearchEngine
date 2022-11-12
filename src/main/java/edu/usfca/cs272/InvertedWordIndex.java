@@ -60,6 +60,7 @@ public class InvertedWordIndex {
         wordMap.putIfAbsent(word, new TreeMap<>());               // new location map if it doesn't exist
         wordMap.get(word).putIfAbsent(location, new TreeSet<>()); // new position set if it doesn't exist
         boolean didNotContain = wordMap.get(word).get(location).add(position);            // finally add
+
         if (didNotContain){
             increment(location);
         }
@@ -152,13 +153,7 @@ public class InvertedWordIndex {
     }
 
     public Integer getCount(String location) {
-        Integer count;
-        if (!wordCount.containsKey(location)) {
-            count = -1;
-        } else {
-            count = wordCount.get(location);
-        }
-        return count;
+        return wordCount.getOrDefault(location, -1);
     }
 
     /**
@@ -169,84 +164,23 @@ public class InvertedWordIndex {
      */
     public List<SearchResult> exactSearch(Set<String> queries) {
         List<SearchResult> results = new ArrayList<>();
-        Map<String, Integer> matchCounts = new HashMap<>();  /* <Location, matchCount> */
-        
-        // TODO Map<String, SearchResult> matchCounts = new HashMap<>();
+        Map<String, SearchResult> matchCounts = new HashMap<>();
+
         for (String queryWord : queries) {
-            if (contains(queryWord)) { // TODO Directly access the wordMap everywhere you can inside this method
-                Set<String> wordLocations = getLocations(queryWord);
+            if (wordMap.containsKey(queryWord)) {
+                Set<String> wordLocations = wordMap.get(queryWord).keySet();
                 for (String location : wordLocations) {
-                			/* TODO 
-                			check if you need to create a new search result
-                				create a new result
-                				add the result to the list
-                				add the result to the map
-                			
-                			get the search result and update its count and score
-                			mathcCounts.get(location).update(queryWord);
-                			*/
-                	
-                	
-                    int matchCount = matchCounts.getOrDefault(location, 0);
-                    matchCount += getPositions(queryWord, location).size();
-                    matchCounts.put(location, matchCount);
+                    if (!matchCounts.containsKey(location)){
+                        SearchResult searchResult = new SearchResult(location);
+                        matchCounts.put(location, searchResult);
+                        results.add(searchResult);
+                    }
+                    SearchResult searchResult = matchCounts.get(location);
+                    searchResult.update(wordMap.get(queryWord).get(location).size());
                 }
             }
         }
-        for (var match : matchCounts.entrySet()) { // TODO Remove
-            String location = match.getKey();
-            Integer count = match.getValue();
-            double score = (count / Double.valueOf(wordCount.get(location)));
-            results.add(new SearchResult(count, score, location));
-        }
         Collections.sort(results);
-        return results;
-    }
-
-    /**
-     * Preforms an exact search on a Set of queries
-     *
-     * @param queries the queries to use
-     * @return a List of SearchResult containing the results
-     */
-    public List<SearchResult> exactSearch(ArrayList<String> queries) { // TODO Remove
-        List<SearchResult> results = new ArrayList<>();
-        Map<String, Integer> matchCounts = new HashMap<>();  /* <Location, matchCount> */
-        for (String queryWord : queries) {
-            if (contains(queryWord)) {
-                Set<String> wordLocations = getLocations(queryWord);
-                for (String location : wordLocations) {
-                    int matchCount = matchCounts.getOrDefault(location, 0);
-                    matchCount += getPositions(queryWord, location).size();
-                    matchCounts.put(location, matchCount);
-                }
-            }
-        }
-        for (var match : matchCounts.entrySet()) {
-            String location = match.getKey();
-            Integer count = match.getValue();
-            double score = (count / Double.valueOf(wordCount.get(location)));
-            results.add(new SearchResult(count, score, location));
-        }
-        Collections.sort(results);
-        return results;
-    }
-
-    // TODO Remove
-    /**
-     * Calls exactSearch for every query found in the given path
-     *
-     * @param queryInput the file containing queries
-     * @return a Map data structure containing the search results
-     * @throws IOException if the WordCleaner throws an IOException
-     */
-    public Map<String, List<SearchResult>> exactSearch2(Path queryInput) throws IOException {
-        ArrayList<Set<String>> parsedQueries = QueryFileHandler.parseQuerySet(queryInput);
-        Map<String, List<SearchResult>> results = new TreeMap<>();
-
-        for (Set<String> queries : parsedQueries) {
-            results.put(String.join(" ", queries), exactSearch(queries));
-        }
         return results;
     }
 
@@ -257,46 +191,32 @@ public class InvertedWordIndex {
      * @return a List of SearchResult containing the results
      */
     public List<SearchResult> partialSearch(Set<String> queries) {
-        // build partial matches
-        Set<String> wordList = this.getWords();
-        ArrayList<String> partialQueries = new ArrayList<>();
-        for (String word : wordList) {
-            for (String queryWord : queries) {
-                if (word.startsWith(queryWord)) {
-                    partialQueries.add(word);
+
+        List<SearchResult> results = new ArrayList<>();
+        Map<String, SearchResult> matchCounts = new HashMap<>();
+
+        for (String queryWord : queries) {
+            SortedMap<String, TreeMap<String, TreeSet<Integer>>> tailMap = wordMap.tailMap(queryWord);
+            Set<String> tailSet = wordMap.tailMap(queryWord).keySet();
+
+            Iterator<String> tailIterator = tailSet.iterator();
+            String word;
+            while ((tailIterator.hasNext() && (word = tailIterator.next()).startsWith(queryWord))){
+                // preform exact search on partial match
+                Set<String> wordLocations = wordMap.get(word).keySet();
+                for (String location : wordLocations) {
+                    if (!matchCounts.containsKey(location)){
+                        SearchResult searchResult = new SearchResult(location);
+                        matchCounts.put(location, searchResult);
+                        results.add(searchResult);
+                    }
+                    SearchResult searchResult = matchCounts.get(location);
+                    searchResult.update(wordMap.get(word).get(location).size());
                 }
             }
-        }
-        // search partial matches
-        return exactSearch(partialQueries);
-        
-        /* TODO 
-        create the list of results
-        create the map of location to search result
-        
-        loop through every query word
-        	loop through the appropriate keys in the wordMap --> use tailMap and break to avoid looping throuhg every key
-        		if the key is a partial match...
-        			then the same loop through locations as exact search
-        */
-        
-    }
 
-    // TODO Remove
-    /**
-     * Calls partialSearch for every query found in the given path
-     *
-     * @param queryInput the file containing queries
-     * @return a Map data structure containing the search results
-     * @throws IOException if the WordCleaner throws an IOException
-     */
-    public Map<String, List<SearchResult>> partialSearch2(Path queryInput) throws IOException {
-        ArrayList<Set<String>> parsedQueries = QueryFileHandler.parseQuerySet(queryInput);
-        Map<String, List<SearchResult>> results = new TreeMap<>();
-
-        for (Set<String> queries : parsedQueries) {
-            results.put(String.join(" ", queries), partialSearch(queries));
         }
+
         return results;
     }
 
@@ -372,7 +292,7 @@ public class InvertedWordIndex {
     /**
      * A data structure to hold a search result.
      */
-    public static class SearchResult implements Comparable<SearchResult> { // TODO non-static
+    public class SearchResult implements Comparable<SearchResult> { // TODO non-static
         /**
          * How many times the word stem was found
          */
@@ -386,7 +306,7 @@ public class InvertedWordIndex {
         /**
          * What file the search was preformed on
          */
-        public String where; // TODO private and final
+        public final String where; // TODO private and final
 
         /**
          * Constructs a new instance of this class
@@ -395,11 +315,21 @@ public class InvertedWordIndex {
          * @param score Total matches / Total words in file
          * @param where What file the search was preformed on
          */
-        // TODO public SearchResult(String where) {
         public SearchResult(long count, double score, String where) {
             this.count = count; // TODO 0
             this.score = score; // TODO 0
             this.where = where;
+        }
+
+        public SearchResult(String where) {
+            this.count = 0;
+            this.score = 0;
+            this.where = where;
+        }
+
+        public void update(long count){
+            this.count += count;
+            this.score = (this.count / Double.valueOf(wordCount.get(this.where)));
         }
 
         @Override

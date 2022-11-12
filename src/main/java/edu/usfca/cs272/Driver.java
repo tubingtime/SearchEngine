@@ -54,26 +54,10 @@ public class Driver {
 
         if (argumentParser.hasValue("-query")) {
             Path queryPath = argumentParser.getPath("-query");
-           /* TODO 
             try {
               queryFileHandler.parseQuery(queryPath, argumentParser.hasFlag("-exact"));
             } catch (IOException e) {
             	System.out.println("IO Error while attempting to use query: " + queryPath);
-            }
-            */
-            
-            if (argumentParser.hasFlag("-exact")) {
-                try {
-                    queryFileHandler.exactSearch(queryPath);
-                } catch (IOException e) {
-                    System.out.println("IO Error while attempting to use query: " + queryPath);
-                }
-            } else {
-                try {
-                    queryFileHandler.partialSearch(queryPath);
-                } catch (IOException e) {
-                    System.out.println("IO Error while attempting to use query: " + queryPath);
-                }
             }
         }
 

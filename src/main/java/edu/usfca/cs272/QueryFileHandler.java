@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import edu.usfca.cs272.InvertedWordIndex.SearchResult;
 
 /**
  * Counts the words in a InvertedWordIndex
@@ -42,41 +43,24 @@ public class QueryFileHandler {
         }
     }
     
-    public void parseQuery(String line, boolean exactSerch) {
-        ArrayList<String> stems = WordCleaner.listStems(line);
+    public void parseQuery(String line, boolean exactSearch) {
+        TreeSet<String> stems = WordCleaner.uniqueStems(line);
         if (stems.isEmpty()){
             return;
         }
-        line = String.join(" ", stems);
-        if (exactSerch){
-            exact
+        String key = String.join(" ", stems);
+        List<SearchResult> searchResults;
+        if (exactSearch){
+            searchResults = wordIndex.exactSearch(stems);
         }
-    	collect the search results for that line
-    	
-    	(figure out if we should skip this line... if its empty etc.)
+        else {
+            searchResults = wordIndex.partialSearch(stems);
+        }
+    	Collections.sort(searchResults);
+        results.put(key, searchResults);
     }
     
-    ...and maybe a nice get methods too
-
-
-    /**
-     * Parses queries into unique, sorted, cleaned, and stemmed words
-     *
-     * @param queryInput location of queries, each query separated by newline
-     * @return An nested ArrayList data structure containing an ArrayList for each query line
-     * @throws IOException if an IO error occurs while stemming
-     */
-    public static ArrayList<ArrayList<String>> parseQuery(Path queryInput) throws IOException {
-        ArrayList<TreeSet<String>> queries = WordCleaner.listUniqueStems(queryInput);
-        ArrayList<ArrayList<String>> nonBlankQueries = new ArrayList<>();
-
-        for (TreeSet<String> querySet : queries) {
-            if (querySet.size() > 0) {
-                nonBlankQueries.add(new ArrayList<>(querySet));
-            }
-        }
-        return nonBlankQueries;
-    }
+    // TODO: ...and maybe a nice get methods too
 
     /**
      * Parses queries into unique, sorted, cleaned, and stemmed words
@@ -96,30 +80,6 @@ public class QueryFileHandler {
             }
         }
         return nonBlankQueries;
-    }
-
-    /**
-     * Preforms an exact search
-     *
-     * @param queryPath the location of the queries
-     * @throws IOException if an IO error occurs while reading and stemming from file
-     */
-    public void exactSearch(Path queryPath) throws IOException {
-        this.results = wordIndex.exactSearch2(queryPath);
-    }
-
-    public void exactSearch(String query) {
-        return wordIndex.exactSearch(query);
-    }
-
-    /**
-     * Preforms a partial search
-     *
-     * @param queryPath the location of the queries
-     * @throws IOException if an IO error occurs while reading and stemming from file
-     */
-    public void partialSearch(Path queryPath) throws IOException {
-        this.results = wordIndex.partialSearch2(queryPath);
     }
 
     /**
