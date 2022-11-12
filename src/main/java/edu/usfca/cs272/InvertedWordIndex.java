@@ -61,7 +61,7 @@ public class InvertedWordIndex {
         wordMap.get(word).putIfAbsent(location, new TreeSet<>()); // new position set if it doesn't exist
         boolean didNotContain = wordMap.get(word).get(location).add(position);            // finally add
 
-        if (didNotContain){
+        if (didNotContain) {
             increment(location);
         }
     }
@@ -149,6 +149,7 @@ public class InvertedWordIndex {
 
     /**
      * Gets the wordCount
+     *
      * @return an unmodifiable version of the wordCount
      */
     public Map<String, Integer> getWordCount() {
@@ -157,6 +158,7 @@ public class InvertedWordIndex {
 
     /**
      * Gets the word count given a location
+     *
      * @param location the location to find the word count of
      * @return the Integer value of the word count at a given location
      */
@@ -178,7 +180,7 @@ public class InvertedWordIndex {
             if (wordMap.containsKey(queryWord)) {
                 Set<String> wordLocations = wordMap.get(queryWord).keySet();
                 for (String location : wordLocations) {
-                    if (!matchCounts.containsKey(location)){
+                    if (!matchCounts.containsKey(location)) {
                         SearchResult searchResult = new SearchResult(location);
                         matchCounts.put(location, searchResult);
                         results.add(searchResult);
@@ -210,11 +212,11 @@ public class InvertedWordIndex {
 
             Iterator<String> tailIterator = tailSet.iterator();
             String word;
-            while ((tailIterator.hasNext() && (word = tailIterator.next()).startsWith(queryWord))){
+            while ((tailIterator.hasNext() && (word = tailIterator.next()).startsWith(queryWord))) {
                 // preform exact search on partial match
                 Set<String> wordLocations = wordMap.get(word).keySet();
                 for (String location : wordLocations) {
-                    if (!matchCounts.containsKey(location)){
+                    if (!matchCounts.containsKey(location)) {
                         SearchResult searchResult = new SearchResult(location);
                         matchCounts.put(location, searchResult);
                         results.add(searchResult);
@@ -318,6 +320,7 @@ public class InvertedWordIndex {
 
         /**
          * Constructs a new instance of this class
+         *
          * @param where the associated location of this search result
          */
         public SearchResult(String where) {
@@ -328,9 +331,10 @@ public class InvertedWordIndex {
 
         /**
          * Updates the score and count
+         *
          * @param count the new match count to use
          */
-        public void update(long count){
+        public void update(long count) {
             this.count += count;
             this.score = (this.count / Double.valueOf(wordCount.get(this.where)));
         }
@@ -349,6 +353,7 @@ public class InvertedWordIndex {
 
         /**
          * Gets the word count
+         *
          * @return a {@link Long} value of the word count
          */
         public long getCount() {
@@ -357,6 +362,7 @@ public class InvertedWordIndex {
 
         /**
          * Gets the results' score
+         *
          * @return a {@link Double} value of the score
          */
         public double getScore() {
@@ -365,6 +371,7 @@ public class InvertedWordIndex {
 
         /**
          * Gets the results' location
+         *
          * @return a {@link String} value of the location
          */
         public String getWhere() {

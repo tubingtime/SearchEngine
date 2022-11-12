@@ -55,9 +55,9 @@ public class Driver {
         if (argumentParser.hasValue("-query")) {
             Path queryPath = argumentParser.getPath("-query");
             try {
-              queryFileHandler.parseQuery(queryPath, argumentParser.hasFlag("-exact"));
+                queryFileHandler.parseQuery(queryPath, argumentParser.hasFlag("-exact"));
             } catch (IOException e) {
-            	System.out.println("IO Error while attempting to use query: " + queryPath);
+                System.out.println("IO Error while attempting to use query: " + queryPath);
             }
         }
 
