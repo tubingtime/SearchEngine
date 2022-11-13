@@ -1,5 +1,8 @@
 package edu.usfca.cs272;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -21,6 +24,8 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  */
 public class Driver {
 
+    private static final Logger log = LogManager.getLogger();
+
     /**
      * Initializes the classes necessary based on the provided command-line
      * arguments. This includes (but is not limited to) how to build or search an
@@ -33,8 +38,8 @@ public class Driver {
         Instant start = Instant.now();
 
         ArgumentParser argumentParser = new ArgumentParser(args); /* parse args */
-        System.out.println("Actual args: " + Arrays.toString(args));
-        System.out.println("Parsed args: " + argumentParser);
+        log.debug("Actual args: {}", Arrays.toString(args));
+        log.debug("Parsed args: {}", argumentParser);
 
         // Build inverted word index
         InvertedWordIndex invertedWordIndex = new InvertedWordIndex();
@@ -44,7 +49,7 @@ public class Driver {
 
         if (argumentParser.hasValue("-text")) {
             Path inputPath = argumentParser.getPath("-text");
-            System.out.println("Input: " + inputPath);
+            log.debug("Input: " + inputPath);
             try {
                 WordIndexBuilder.build(inputPath, invertedWordIndex); /* populate wordIndex*/
             } catch (IOException e) {
@@ -91,6 +96,6 @@ public class Driver {
         // calculate time elapsed and output
         long elapsed = Duration.between(start, Instant.now()).toMillis();
         double seconds = (double) elapsed / Duration.ofSeconds(1).toMillis();
-        System.out.printf("Elapsed: %f seconds%n", seconds);
+        log.debug("Elapsed: {} seconds", seconds);
     }
 }

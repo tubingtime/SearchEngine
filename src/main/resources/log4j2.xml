@@ -7,7 +7,7 @@
 			</PatternLayout>
 		</Console>
 
-		<File name="Debug" fileName="debug.log" append="false" immediateFlush="true">
+		<File name="FileLog" fileName="debug.log" append="false" immediateFlush="true">
 			<PatternLayout
 				pattern="[%03sequenceNumber %level{lowerCase=true}] %file:%line %thread: %m %throwable%n">
 			</PatternLayout>
@@ -15,9 +15,13 @@
 	</Appenders>
 
 	<Loggers>
+		<!-- Class level logging levels-->
+		<Logger name="edu.usfca.cs272.QueryFileHandler" level="INFO" additivity="false"></Logger>
+		<Logger name="edu.usfca.cs272.Driver" level="FATAL" additivity="false"></Logger>
+
 		<Root level="ALL">
-			<AppenderRef ref="Console" level="INFO" />
-			<AppenderRef ref="Debug" level="ALL" />
+			<AppenderRef ref="Console" level="ALL" />
+			<AppenderRef ref="FileLog" level="ALL" />
 		</Root>
 	</Loggers>
 </Configuration>
