@@ -39,7 +39,7 @@ public class QueryFileHandler {
     /**
      * @return an unmodifiable version of the results data structure.
      */
-    public Map<String, List<SearchResult>> getAllResults() {
+    public Map<String, List<SearchResult>> getAllResults() { // TODO Set<String> getAllQueries() --> the unmodifiable keyset of results
         return Collections.unmodifiableMap(results);
     }
 
@@ -49,7 +49,12 @@ public class QueryFileHandler {
      * @param location the location to get SearchResults from
      * @return an unmodifiable list of SearchResults
      */
-    public List<SearchResult> getResults(String location) {
+    public List<SearchResult> getResults(String location) { // TODO location-->queryLine
+    	/*
+    	 * TODO
+    	 * getResults("hello hello world") --> results.getOrDefault("hello world", ...)
+    	 */
+
         List<SearchResult> resultList = results.getOrDefault(location, Collections.emptyList());
         return Collections.unmodifiableList(resultList);
     }
@@ -93,20 +98,23 @@ public class QueryFileHandler {
             return;
         }
         String key = String.join(" ", stems);
+        // TODO Make sure key isn't already in the results map!
+
+        // TODO List<SearchResult> searchResults = wordIndex.search(stems, exactSearch);
         List<SearchResult> searchResults;
         if (exactSearch) {
             searchResults = wordIndex.exactSearch(stems);
         } else {
             searchResults = wordIndex.partialSearch(stems);
         }
-        Collections.sort(searchResults);
+        Collections.sort(searchResults); // TODO Remove, sorting should happen inside of the search method
 
         synchronized (results) {
             results.put(key, searchResults);
         }
     }
 
-
+    // TODO Remove
     /**
      * Parses queries into unique, sorted, cleaned, and stemmed words
      *
