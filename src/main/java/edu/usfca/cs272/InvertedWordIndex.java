@@ -333,7 +333,7 @@ public class InvertedWordIndex {
          *
          * @param count the new match count to use
          */
-        public void update(long count) {
+        synchronized public void update(long count) {
             this.count += count;
             this.score = (this.count / Double.valueOf(wordCount.get(this.where)));
         }
@@ -355,7 +355,7 @@ public class InvertedWordIndex {
          *
          * @return a {@link Long} value of the word count
          */
-        public long getCount() {
+        synchronized public long getCount() {
             return count;
         }
 
@@ -364,7 +364,7 @@ public class InvertedWordIndex {
          *
          * @return a {@link Double} value of the score
          */
-        public double getScore() {
+        synchronized public double getScore() {
             return score;
         }
 
@@ -373,7 +373,7 @@ public class InvertedWordIndex {
          *
          * @return a {@link String} value of the location
          */
-        public String getWhere() {
+        synchronized public String getWhere() {
             return where;
         }
     }

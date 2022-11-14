@@ -23,8 +23,9 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * @version Fall 2022
  */
 public class Driver {
-
     private static final Logger log = LogManager.getLogger();
+
+    public static WorkQueue workQueue;
 
     /**
      * Initializes the classes necessary based on the provided command-line
@@ -36,16 +37,15 @@ public class Driver {
     public static void main(String[] args) {
         // store initial start time
         Instant start = Instant.now();
-
         ArgumentParser argumentParser = new ArgumentParser(args); /* parse args */
         log.debug("Actual args: {}", Arrays.toString(args));
         log.debug("Parsed args: {}", argumentParser);
 
-        boolean multiThreaded = true;
-
-        InvertedWordIndex invertedWordIndex = new InvertedWordIndex();
-        if (multiThreaded){
+        int threads = 5;
+        InvertedWordIndex invertedWordIndex;
+        if (threads > 0){
             invertedWordIndex = new ThreadSafeInvertedWordIndex();
+            workQueue = new WorkQueue(threads);
         }
         else {
             invertedWordIndex = new InvertedWordIndex();
@@ -58,7 +58,7 @@ public class Driver {
             Path inputPath = argumentParser.getPath("-text");
             log.debug("Input: " + inputPath);
             try {
-                WordIndexBuilder.build(inputPath, invertedWordIndex); /* populate wordIndex*/
+                WordIndexBuilder.build(inputPath, invertedWordIndex, threads); /* populate wordIndex*/
             } catch (IOException e) {
                 System.out.println("IO Error while scanning directory: " + inputPath);
             }
@@ -67,7 +67,7 @@ public class Driver {
         if (argumentParser.hasValue("-query")) {
             Path queryPath = argumentParser.getPath("-query");
             try {
-                queryFileHandler.parseQuery(queryPath, argumentParser.hasFlag("-exact"));
+                queryFileHandler.parseQuery(queryPath, argumentParser.hasFlag("-exact"), threads);
             } catch (IOException e) {
                 System.out.println("IO Error while attempting to query: " + queryPath);
             }

@@ -40,8 +40,6 @@ public class WorkQueue {
 
 	private int pending;
 
-	// TODO Modify existing methods if necessary.
-	// TODO Add new members and methods if necessary.
 
 	/**
 	 * Starts a work queue with the default number of threads.

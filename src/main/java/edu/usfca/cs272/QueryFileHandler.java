@@ -2,6 +2,7 @@ package edu.usfca.cs272;
 
 import edu.usfca.cs272.InvertedWordIndex.SearchResult;
 
+import javax.management.Query;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -61,11 +62,20 @@ public class QueryFileHandler {
      * @param exactSearch true for exact search, false to allow partial matches
      * @throws IOException if an IO error occurs while attemping to read from the file
      */
-    public void parseQuery(Path queryInput, boolean exactSearch) throws IOException {
+    public void parseQuery(Path queryInput, boolean exactSearch, int threads) throws IOException {
         try (BufferedReader buffReader = Files.newBufferedReader(queryInput)) {
             String line;
-            while ((line = buffReader.readLine()) != null) {
-                parseQuery(line, exactSearch);
+            WorkQueue workQueue = new WorkQueue(threads);
+            if (threads > 0) {
+                while ((line = buffReader.readLine()) != null) {
+                    workQueue.execute(new QueryTask(line, exactSearch));
+                }
+                workQueue.finish();
+                workQueue.shutdown();
+            } else {
+                while ((line = buffReader.readLine()) != null) {
+                    parseQuery(line, exactSearch);
+                }
             }
         }
     }
@@ -90,7 +100,10 @@ public class QueryFileHandler {
             searchResults = wordIndex.partialSearch(stems);
         }
         Collections.sort(searchResults);
-        results.put(key, searchResults);
+
+        synchronized (results) {
+            results.put(key, searchResults);
+        }
     }
 
 
@@ -122,5 +135,21 @@ public class QueryFileHandler {
      */
     public void resultsToJSON(Path output) throws IOException {
         PrettyJsonWriter.resultsToJSON(this.results, output);
+    }
+
+    public class QueryTask implements Runnable {
+
+        String line;
+
+        boolean exactSearch;
+
+        public QueryTask(String line, boolean exactSearch) {
+            this.line = line;
+            this.exactSearch = exactSearch;
+        }
+        @Override
+        public void run() {
+            parseQuery(line, exactSearch);
+        }
     }
 }
