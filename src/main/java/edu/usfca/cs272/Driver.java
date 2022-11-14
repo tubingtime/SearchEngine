@@ -41,8 +41,15 @@ public class Driver {
         log.debug("Actual args: {}", Arrays.toString(args));
         log.debug("Parsed args: {}", argumentParser);
 
-        // Build inverted word index
+        boolean multiThreaded = true;
+
         InvertedWordIndex invertedWordIndex = new InvertedWordIndex();
+        if (multiThreaded){
+            invertedWordIndex = new ThreadSafeInvertedWordIndex();
+        }
+        else {
+            invertedWordIndex = new InvertedWordIndex();
+        }
 
         QueryFileHandler queryFileHandler = new QueryFileHandler(invertedWordIndex);
 
@@ -62,7 +69,7 @@ public class Driver {
             try {
                 queryFileHandler.parseQuery(queryPath, argumentParser.hasFlag("-exact"));
             } catch (IOException e) {
-                System.out.println("IO Error while attempting to use query: " + queryPath);
+                System.out.println("IO Error while attempting to query: " + queryPath);
             }
         }
 

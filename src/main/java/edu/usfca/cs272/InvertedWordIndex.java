@@ -23,7 +23,6 @@ public class InvertedWordIndex {
      * * Nested data structure to store words, what file they were found in, and the line locations.
      */
     private final TreeMap<String, TreeMap<String, TreeSet<Integer>>> wordMap;
-
     /**
      * Stores the total number of words at a file location
      * String location, Integer, count
@@ -43,7 +42,7 @@ public class InvertedWordIndex {
      *
      * @param location the location to increment
      */
-    private void increment(String location) {
+    protected void increment(String location) {
         wordCount.putIfAbsent(location, 0);
         wordCount.put(location, wordCount.get(location) + 1);
     }

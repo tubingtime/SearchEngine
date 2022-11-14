@@ -18,6 +18,9 @@
 		<!-- Class level logging levels-->
 		<Logger name="edu.usfca.cs272.QueryFileHandler" level="INFO" additivity="false"></Logger>
 		<Logger name="edu.usfca.cs272.Driver" level="FATAL" additivity="false"></Logger>
+		<Logger name="edu.usfca.cs272.ReadWriteLock" level="FATAL" additivity="false">
+			<AppenderRef ref="FileLog" level="ALL" /> <!-- ????  -->
+		</Logger>
 
 		<Root level="ALL">
 			<AppenderRef ref="Console" level="ALL" />
