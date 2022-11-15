@@ -27,12 +27,11 @@ public class WordIndexBuilder {
     public static void build(Path start, InvertedWordIndex index, int threads) throws IOException {
         ArrayList<Path> files = TextFileTraverser.scanDirectory(start);
         if (threads > 0) {
-            WorkQueue workQueue = new WorkQueue(threads);
+            WorkQueue workQueue = Driver.workQueue;
             for (Path file : files) {
                 workQueue.execute(new ScannerTask(file, index));
             }
             workQueue.finish();
-            workQueue.shutdown();
         }
         for (Path file : files) {
             scanFile(file, index);

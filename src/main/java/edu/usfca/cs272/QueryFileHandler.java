@@ -1,12 +1,16 @@
 package edu.usfca.cs272;
 
 import edu.usfca.cs272.InvertedWordIndex.SearchResult;
+import opennlp.tools.stemmer.Stemmer;
+import opennlp.tools.stemmer.snowball.SnowballStemmer;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+
+import static opennlp.tools.stemmer.snowball.SnowballStemmer.ALGORITHM.ENGLISH;
 
 /**
  * Counts the words in a InvertedWordIndex
@@ -69,13 +73,12 @@ public class QueryFileHandler {
     public void parseQuery(Path queryInput, boolean exactSearch, int threads) throws IOException {
         try (BufferedReader buffReader = Files.newBufferedReader(queryInput)) {
             String line;
-            WorkQueue workQueue = new WorkQueue(threads);
+            WorkQueue workQueue = Driver.workQueue;
             if (threads > 0) {
                 while ((line = buffReader.readLine()) != null) {
                     workQueue.execute(new QueryTask(line, exactSearch));
                 }
                 workQueue.finish();
-                workQueue.shutdown();
             } else {
                 while ((line = buffReader.readLine()) != null) {
                     parseQuery(line, exactSearch);
@@ -92,7 +95,8 @@ public class QueryFileHandler {
      * @param exactSearch true for exact search, false to allow partial matches
      */
     public void parseQuery(String line, boolean exactSearch) {
-        TreeSet<String> stems = WordCleaner.uniqueStems(line);
+        Stemmer stemmer = new SnowballStemmer(ENGLISH);
+        TreeSet<String> stems = WordCleaner.uniqueStems(line, stemmer);
         if (stems.isEmpty()) {
             return;
         }

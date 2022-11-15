@@ -57,7 +57,7 @@ public class WorkQueue {
 	 * @param threads number of worker threads; should be greater than 1
 	 */
 	public WorkQueue(int threads) {
-		this.tasks = new LinkedList<Runnable>();
+		this.tasks = new LinkedList<>();
 		this.workers = new Worker[threads];
 		this.shutdown = false;
 		this.pending = 0;
@@ -170,7 +170,7 @@ public class WorkQueue {
 
 		@Override
 		public void run() {
-			Runnable task = null;
+			Runnable task;
 
 			try {
 				while (true) {
@@ -200,7 +200,7 @@ public class WorkQueue {
 					}
 					catch (RuntimeException e) {
 						// catch runtime exceptions to avoid leaking threads
-						System.err.printf("Warning: %s encountered an exception while running.%n", this.getName());
+						System.err.printf("Warning: %s encountered an exception while running.%s%n", this.getName(),e);
 						log.catching(Level.DEBUG, e);
 					}
 					finally {

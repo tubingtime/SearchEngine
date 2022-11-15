@@ -48,6 +48,12 @@ public class Driver {
         log.debug("Parsed args: {}", argumentParser);
 
         int threads = 0;
+        if (argumentParser.hasFlag("-threads")) {
+            threads = argumentParser.getInteger("-threads", 5);
+            if (threads < 1) {
+                threads = 5;
+            }
+        }
         InvertedWordIndex invertedWordIndex;
         if (threads > 0){
             invertedWordIndex = new ThreadSafeInvertedWordIndex();
@@ -106,6 +112,9 @@ public class Driver {
             }
         }
 
+        if (threads > 0) {
+            workQueue.shutdown();
+        }
         // calculate time elapsed and output
         long elapsed = Duration.between(start, Instant.now()).toMillis();
         double seconds = (double) elapsed / Duration.ofSeconds(1).toMillis();
