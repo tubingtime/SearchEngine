@@ -161,11 +161,6 @@ public class ReadWriteLock {
 		 */
 		@Override
 		public void lock() {
-			/*
-			 * TODO This starts with the basic implementation from lecture (plus some
-			 * logging). You will eventually need to modify it to check for whether
-			 * there is an active writer.
-			 */
 
 			log.debug("Acquiring read lock...");
 

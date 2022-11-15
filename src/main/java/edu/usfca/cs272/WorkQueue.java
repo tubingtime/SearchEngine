@@ -103,8 +103,6 @@ public class WorkQueue {
 			log.catching(Level.DEBUG, e);
 			Thread.currentThread().interrupt();
 		}
-		// TODO Fix this method implementation.
-		// TODO Add keywords to method declaration if necessary, but do not throw exceptions.
 	}
 
 	/**
@@ -223,64 +221,5 @@ public class WorkQueue {
 			}
 			log.debug("Worker thread terminating...");
 		}
-	}
-
-	// TODO Remove main method when done testing!
-
-	/**
-	 * Demonstrates this class.
-	 *
-	 * @param args unused
-	 */
-	public static void main(String[] args) {
-		int threads = 3;
-
-		Supplier<String> activeThreads = () -> {
-			Thread[] found = new Thread[Thread.activeCount() * 2];
-			Thread.enumerate(found);
-			return Arrays.stream(found)
-					.filter(Objects::nonNull)
-					.map(Thread::getName)
-					.collect(Collectors.joining(", "));
-		};
-
-		// demonstrates the workers in the background
-		WorkQueue demo = new WorkQueue(threads);
-
-		// do a bit of work in the background
-		demo.execute(() -> {
-			try {
-				Thread.sleep(500);
-			}
-			catch (InterruptedException e) {
-				Thread.currentThread().interrupt();
-			}
-		});
-
-		// finish, but do not shutdown
-		log.debug("Finish, but do not shutdown");
-		demo.finish();
-
-		// peek at the threads active in the system
-		System.out.println("Estimated active threads before join(): " + activeThreads.get());
-
-		// trigger threads to shutdown
-		demo.join();
-
-		// peek at the threads after shutdown and join
-		System.out.println("Estimated active threads after join(): " + activeThreads.get());
-
-		/*
-		 * The thread named "main" runs the main method.
-		 *
-		 * If you see any thread names starting with "ForkJoinPool", those are used
-		 * internally. They could come from Log4j2 or JUnit.
-		 *
-		 * If you see any thread names starting with "WorkerThread", those are
-		 * likely your work queue threads.
-		 *
-		 * If you see your work queue threads AFTER the join() call, something is
-		 * not quite working with the finish and/or shutdown calls.
-		 */
 	}
 }
