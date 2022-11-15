@@ -41,7 +41,7 @@ public class Driver {
         log.debug("Actual args: {}", Arrays.toString(args));
         log.debug("Parsed args: {}", argumentParser);
 
-        int threads = 5;
+        int threads = 0;
         InvertedWordIndex invertedWordIndex;
         if (threads > 0){
             invertedWordIndex = new ThreadSafeInvertedWordIndex();

@@ -2,7 +2,6 @@ package edu.usfca.cs272;
 
 import edu.usfca.cs272.InvertedWordIndex.SearchResult;
 
-import javax.management.Query;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -46,16 +45,16 @@ public class QueryFileHandler {
     /**
      * Gets results of a given location
      *
-     * @param location the location to get SearchResults from
+     * @param queryLine the location to get SearchResults from
      * @return an unmodifiable list of SearchResults
      */
-    public List<SearchResult> getResults(String location) { // TODO location-->queryLine
+    public List<SearchResult> getResults(String queryLine) {
     	/*
     	 * TODO
     	 * getResults("hello hello world") --> results.getOrDefault("hello world", ...)
     	 */
 
-        List<SearchResult> resultList = results.getOrDefault(location, Collections.emptyList());
+        List<SearchResult> resultList = results.getOrDefault(queryLine, Collections.emptyList());
         return Collections.unmodifiableList(resultList);
     }
 
@@ -98,41 +97,20 @@ public class QueryFileHandler {
             return;
         }
         String key = String.join(" ", stems);
-        // TODO Make sure key isn't already in the results map!
 
-        // TODO List<SearchResult> searchResults = wordIndex.search(stems, exactSearch);
-        List<SearchResult> searchResults;
-        if (exactSearch) {
-            searchResults = wordIndex.exactSearch(stems);
-        } else {
-            searchResults = wordIndex.partialSearch(stems);
+        synchronized (results) {
+            if (results.containsKey(key)){
+                return;
+            }
         }
+
+        List<SearchResult> searchResults = wordIndex.search(stems, exactSearch);
 
         synchronized (results) {
             results.put(key, searchResults);
         }
     }
 
-    // TODO Remove
-    /**
-     * Parses queries into unique, sorted, cleaned, and stemmed words
-     *
-     * @param queryInput location of queries, each query separated by newline
-     * @return A nested ArrayList data structure containing a Set for each query line
-     * @throws IOException if an IO error occurs while stemming
-     */
-    public static ArrayList<Set<String>> parseQuerySet(Path queryInput) throws IOException {
-        ArrayList<TreeSet<String>> queries = WordCleaner.listUniqueStems(queryInput);
-        //queries.removeIf(TreeSet::isEmpty);
-        ArrayList<Set<String>> nonBlankQueries = new ArrayList<>();
-
-        for (TreeSet<String> querySet : queries) {
-            if (querySet.size() > 0) {
-                nonBlankQueries.add(querySet);
-            }
-        }
-        return nonBlankQueries;
-    }
 
     /**
      * Converts the current SearchResults count to JSON

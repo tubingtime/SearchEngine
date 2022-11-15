@@ -173,21 +173,11 @@ public class InvertedWordIndex {
      */
     public List<SearchResult> exactSearch(Set<String> queries) {
         List<SearchResult> results = new ArrayList<>();
-        Map<String, SearchResult> matchCounts = new HashMap<>();
+        Map<String, SearchResult> resultsMap = new HashMap<>();
 
         for (String queryWord : queries) {
             if (wordMap.containsKey(queryWord)) {
-                Set<String> wordLocations = wordMap.get(queryWord).keySet();
-                for (String location : wordLocations) {
-                    if (!matchCounts.containsKey(location)) {
-                        SearchResult searchResult = new SearchResult(location);
-                        matchCounts.put(location, searchResult);
-                        results.add(searchResult);
-                    }
-                    SearchResult searchResult = matchCounts.get(location);
-                    searchResult.update(wordMap.get(queryWord).get(location).size());
-                    // TODO matchCounts.get(location).update(queryWord));
-                }
+                searchHelper(queryWord, resultsMap, results);
             }
         }
         Collections.sort(results);
@@ -204,40 +194,46 @@ public class InvertedWordIndex {
     public List<SearchResult> partialSearch(Set<String> queries) {
 
         List<SearchResult> results = new ArrayList<>();
-        Map<String, SearchResult> matchCounts = new HashMap<>();
+        Map<String, SearchResult> resultsMap = new HashMap<>();
 
         for (String queryWord : queries) {
-            SortedMap<String, TreeMap<String, TreeSet<Integer>>> tailMap = wordMap.tailMap(queryWord);
             Set<String> tailSet = wordMap.tailMap(queryWord).keySet();
-            // TODO Set<String> tailSet = tailMap.keySet();
 
-            // TODO Be consistent use an iterator or a for loop in both places
+            String partialQueryWord;
             Iterator<String> tailIterator = tailSet.iterator();
-            String word;
-            while ((tailIterator.hasNext() && (word = tailIterator.next()).startsWith(queryWord))) {
-            	// TODO Move the common code into a new private searchHelper(...)
-                // preform exact search on partial match
-                Set<String> wordLocations = wordMap.get(word).keySet();
-                for (String location : wordLocations) {
-                    if (!matchCounts.containsKey(location)) {
-                        SearchResult searchResult = new SearchResult(location);
-                        matchCounts.put(location, searchResult);
-                        results.add(searchResult);
-                    }
-                    SearchResult searchResult = matchCounts.get(location);
-                    searchResult.update(wordMap.get(word).get(location).size());
-                }
+            while ((tailIterator.hasNext() && (partialQueryWord = tailIterator.next()).startsWith(queryWord))) {
+            	searchHelper(partialQueryWord, resultsMap, results);
             }
         }
-
+        Collections.sort(results);
         return results;
     }
 
-    /* TODO
+    /**
+     * Helper function for partial and exact search
+     * Given a queryWord that was found in the wordIndex it will get the locations where that word is at and will
+     * update or add all SearchResults associated with that location
+     * @param queryWord the queryWord found in the wordIndex
+     * @param resultsMap Helper data structure for efficiently updating SearchResults
+     * @param results the list of searchResults to add to and eventually return
+     */
+    private void searchHelper(String queryWord, Map<String, SearchResult> resultsMap, List<SearchResult> results) {
+        Set<String> wordLocations = wordMap.get(queryWord).keySet();
+        for (String location : wordLocations) {
+            if (!resultsMap.containsKey(location)) {
+                SearchResult searchResult = new SearchResult(location);
+                resultsMap.put(location, searchResult);
+                results.add(searchResult);
+            }
+            resultsMap.get(location).update(queryWord);
+        }
+    }
+
+
     public List<SearchResult> search(Set<String> queries, boolean exactSearch) {
     	return exactSearch ? exactSearch(queries) : partialSearch(queries);
     }
-    */
+
 
     /**
      * @return the number of words in the index
@@ -341,12 +337,10 @@ public class InvertedWordIndex {
         /**
          * Updates the score and count
          *
-         * @param count the new match count to use
+         * @param queryWord the queryWord to get the new count of
          */
-        synchronized public void update(long count) {
-            // TODO private void update(String queryWord) {
-        	// TODO this.count += wordMap.get(queryWord).get(where).size();
-            this.count += count;
+        public void update(String queryWord) {
+        	this.count += wordMap.get(queryWord).get(where).size();
             this.score = (this.count / Double.valueOf(wordCount.get(this.where)));
         }
 
