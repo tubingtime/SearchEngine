@@ -107,7 +107,6 @@ public class QueryFileHandler {
         } else {
             searchResults = wordIndex.partialSearch(stems);
         }
-        Collections.sort(searchResults); // TODO Remove, sorting should happen inside of the search method
 
         synchronized (results) {
             results.put(key, searchResults);
