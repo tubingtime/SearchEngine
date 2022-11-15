@@ -38,6 +38,7 @@ public class WorkQueue {
 	/** Logger used for this class. */
 	private static final Logger log = LogManager.getLogger();
 
+	/** Tracks how much work is still being processed (aka tasks still in run method) */
 	private int pending;
 
 

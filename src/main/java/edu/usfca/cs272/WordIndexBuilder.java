@@ -21,6 +21,7 @@ public class WordIndexBuilder {
      *
      * @param start file or directory containing the words
      * @param index a {@link InvertedWordIndex} to store the words.
+     * @param threads the number of threads to use
      * @throws IOException if listStems throws an IOException while parsing
      */
     public static void build(Path start, InvertedWordIndex index, int threads) throws IOException {
@@ -28,7 +29,7 @@ public class WordIndexBuilder {
         if (threads > 0) {
             WorkQueue workQueue = new WorkQueue(threads);
             for (Path file : files) {
-                workQueue.execute(new Task(file, index));
+                workQueue.execute(new ScannerTask(file, index));
             }
             workQueue.finish();
             workQueue.shutdown();
@@ -61,13 +62,23 @@ public class WordIndexBuilder {
         }
     }
 
-    private static class Task implements Runnable {
+    /**
+     * Task to scan a single text file and puts the words into the wordIndex
+     */
+    private static class ScannerTask implements Runnable {
 
+        /** The Path to scan */
         private final Path file;
 
+        /** The index to put words into */
         private final InvertedWordIndex index;
 
-        public Task(Path file, InvertedWordIndex index) {
+        /**
+         * Constructs a new instance of this class
+         * @param file The Path to scan
+         * @param index The index to put words into
+         */
+        public ScannerTask(Path file, InvertedWordIndex index) {
             this.file = file;
             this.index = index;
         }

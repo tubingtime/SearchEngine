@@ -230,6 +230,12 @@ public class InvertedWordIndex {
     }
 
 
+    /**
+     * Helper method that calls either exact or partial search
+     * @param queries a set of queries
+     * @param exactSearch true for exact, false for partial
+     * @return a list of SearchResults
+     */
     public List<SearchResult> search(Set<String> queries, boolean exactSearch) {
     	return exactSearch ? exactSearch(queries) : partialSearch(queries);
     }

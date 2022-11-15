@@ -6,10 +6,13 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
 
+/** Thread safe version of InvertedWordIndex*/
 public class ThreadSafeInvertedWordIndex extends InvertedWordIndex {
 
+    /** Manages a read and write lock. Improves effiecncy for multithreading since there are many reads */
     private final ReadWriteLock lock;
 
+    /** Constructs a new instance of this class */
     public ThreadSafeInvertedWordIndex() {
         super();
         this.lock = new ReadWriteLock();

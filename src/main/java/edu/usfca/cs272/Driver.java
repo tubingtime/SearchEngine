@@ -23,8 +23,14 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * @version Fall 2022
  */
 public class Driver {
+    /**
+     * Log4J Logger
+     */
     private static final Logger log = LogManager.getLogger();
 
+    /**
+     * Pool of threads that wait for work
+     */
     public static WorkQueue workQueue;
 
     /**

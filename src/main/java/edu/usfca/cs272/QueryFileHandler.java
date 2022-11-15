@@ -36,10 +36,10 @@ public class QueryFileHandler {
     }
 
     /**
-     * @return an unmodifiable version of the results data structure.
+     * @return an unmodifiable set of the queries in the results data structure.
      */
-    public Map<String, List<SearchResult>> getAllResults() { // TODO Set<String> getAllQueries() --> the unmodifiable keyset of results
-        return Collections.unmodifiableMap(results);
+    public Set<String> getAllQueries(){
+        return Collections.unmodifiableSet(results.keySet());
     }
 
     /**
@@ -49,13 +49,12 @@ public class QueryFileHandler {
      * @return an unmodifiable list of SearchResults
      */
     public List<SearchResult> getResults(String queryLine) {
-    	/*
-    	 * TODO
-    	 * getResults("hello hello world") --> results.getOrDefault("hello world", ...)
-    	 */
 
-        List<SearchResult> resultList = results.getOrDefault(queryLine, Collections.emptyList());
-        return Collections.unmodifiableList(resultList);
+        TreeSet<String> stems = WordCleaner.uniqueStems(queryLine);
+        String processedQuery = String.join(" ", stems);
+        results.getOrDefault(processedQuery, Collections.emptyList());
+
+        return results.getOrDefault(processedQuery, Collections.emptyList());
     }
 
     /**
@@ -64,6 +63,7 @@ public class QueryFileHandler {
      *
      * @param queryInput  the location of the query file
      * @param exactSearch true for exact search, false to allow partial matches
+     * @param threads how many threads to use
      * @throws IOException if an IO error occurs while attemping to read from the file
      */
     public void parseQuery(Path queryInput, boolean exactSearch, int threads) throws IOException {
@@ -122,12 +122,26 @@ public class QueryFileHandler {
         PrettyJsonWriter.resultsToJSON(this.results, output);
     }
 
+    /**
+     * A runnable object that calls parseQuery
+     */
     public class QueryTask implements Runnable {
 
+        /**
+         * The query line to process
+         */
         String line;
 
+        /**
+         * True for exact search, false if not
+         */
         boolean exactSearch;
 
+        /**
+         * Constructs a new instance of this class
+         * @param line The query line to process
+         * @param exactSearch True for exact search, false if not
+         */
         public QueryTask(String line, boolean exactSearch) {
             this.line = line;
             this.exactSearch = exactSearch;
