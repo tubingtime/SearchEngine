@@ -22,8 +22,8 @@
 		<Logger name="edu.usfca.cs272.WorkQueue" level="FATAL" additivity="false"></Logger>
 
 		<Root level="ALL">
-			<AppenderRef ref="Console" level="ALL" />
-			<AppenderRef ref="FileLog" level="ALL" />
+			<AppenderRef ref="Console" level="WARN" />
+			<AppenderRef ref="FileLog" level="DEBUG" />
 		</Root>
 	</Loggers>
 </Configuration>

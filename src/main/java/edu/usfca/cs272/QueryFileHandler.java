@@ -20,13 +20,13 @@ public class QueryFileHandler {
     /**
      * Point to an associated InvertedWordIndex
      */
-    private final InvertedWordIndex wordIndex;
+    protected final InvertedWordIndex wordIndex;
 
     /**
      * Search results data structure
      * String location, List SearchResult
      */
-    private final Map<String, List<InvertedWordIndex.SearchResult>> results;
+    protected final Map<String, List<InvertedWordIndex.SearchResult>> results;
 
 
     /**
@@ -67,22 +67,13 @@ public class QueryFileHandler {
      *
      * @param queryInput  the location of the query file
      * @param exactSearch true for exact search, false to allow partial matches
-     * @param threads how many threads to use
      * @throws IOException if an IO error occurs while attemping to read from the file
      */
-    public void parseQuery(Path queryInput, boolean exactSearch, int threads) throws IOException {
+    public void parseQuery(Path queryInput, boolean exactSearch) throws IOException {
         try (BufferedReader buffReader = Files.newBufferedReader(queryInput)) {
             String line;
-            WorkQueue workQueue = Driver.workQueue;
-            if (threads > 0) {
-                while ((line = buffReader.readLine()) != null) {
-                    workQueue.execute(new QueryTask(line, exactSearch));
-                }
-                workQueue.finish();
-            } else {
-                while ((line = buffReader.readLine()) != null) {
-                    parseQuery(line, exactSearch);
-                }
+            while ((line = buffReader.readLine()) != null) {
+                parseQuery(line, exactSearch);
             }
         }
     }
@@ -95,24 +86,19 @@ public class QueryFileHandler {
      * @param exactSearch true for exact search, false to allow partial matches
      */
     public void parseQuery(String line, boolean exactSearch) {
-        Stemmer stemmer = new SnowballStemmer(ENGLISH);
-        TreeSet<String> stems = WordCleaner.uniqueStems(line, stemmer);
+        TreeSet<String> stems = WordCleaner.uniqueStems(line);
         if (stems.isEmpty()) {
             return;
         }
         String key = String.join(" ", stems);
 
-        synchronized (results) {
-            if (results.containsKey(key)){
-                return;
-            }
+        if (results.containsKey(key)){
+            return;
         }
 
         List<SearchResult> searchResults = wordIndex.search(stems, exactSearch);
+        results.put(key, searchResults);
 
-        synchronized (results) {
-            results.put(key, searchResults);
-        }
     }
 
 
@@ -124,35 +110,5 @@ public class QueryFileHandler {
      */
     public void resultsToJSON(Path output) throws IOException {
         PrettyJsonWriter.resultsToJSON(this.results, output);
-    }
-
-    /**
-     * A runnable object that calls parseQuery
-     */
-    public class QueryTask implements Runnable {
-
-        /**
-         * The query line to process
-         */
-        String line;
-
-        /**
-         * True for exact search, false if not
-         */
-        boolean exactSearch;
-
-        /**
-         * Constructs a new instance of this class
-         * @param line The query line to process
-         * @param exactSearch True for exact search, false if not
-         */
-        public QueryTask(String line, boolean exactSearch) {
-            this.line = line;
-            this.exactSearch = exactSearch;
-        }
-        @Override
-        public void run() {
-            parseQuery(line, exactSearch);
-        }
     }
 }

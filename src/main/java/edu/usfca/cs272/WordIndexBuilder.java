@@ -32,9 +32,10 @@ public class WordIndexBuilder {
                 workQueue.execute(new ScannerTask(file, index));
             }
             workQueue.finish();
-        }
-        for (Path file : files) {
-            scanFile(file, index);
+        } else {
+            for (Path file : files) {
+                scanFile(file, index);
+            }
         }
     }
 

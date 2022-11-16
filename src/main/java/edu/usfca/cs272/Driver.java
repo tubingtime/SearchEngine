@@ -47,23 +47,22 @@ public class Driver {
         log.debug("Actual args: {}", Arrays.toString(args));
         log.debug("Parsed args: {}", argumentParser);
 
+        InvertedWordIndex invertedWordIndex;
+        QueryFileHandler queryFileHandler;
         int threads = 0;
         if (argumentParser.hasFlag("-threads")) {
             threads = argumentParser.getInteger("-threads", 5);
             if (threads < 1) {
                 threads = 5;
             }
-        }
-        InvertedWordIndex invertedWordIndex;
-        if (threads > 0){
-            invertedWordIndex = new ThreadSafeInvertedWordIndex();
             workQueue = new WorkQueue(threads);
-        }
-        else {
-            invertedWordIndex = new InvertedWordIndex();
-        }
+            invertedWordIndex = new ThreadSafeInvertedWordIndex();
+            queryFileHandler = new ThreadSafeQueryFileHandler(invertedWordIndex, workQueue);
 
-        QueryFileHandler queryFileHandler = new QueryFileHandler(invertedWordIndex);
+        } else {
+            invertedWordIndex = new InvertedWordIndex();
+            queryFileHandler = new QueryFileHandler(invertedWordIndex);
+        }
 
 
         if (argumentParser.hasValue("-text")) {
@@ -79,7 +78,7 @@ public class Driver {
         if (argumentParser.hasValue("-query")) {
             Path queryPath = argumentParser.getPath("-query");
             try {
-                queryFileHandler.parseQuery(queryPath, argumentParser.hasFlag("-exact"), threads);
+                queryFileHandler.parseQuery(queryPath, argumentParser.hasFlag("-exact"));
             } catch (IOException e) {
                 System.out.println("IO Error while attempting to query: " + queryPath);
             }
