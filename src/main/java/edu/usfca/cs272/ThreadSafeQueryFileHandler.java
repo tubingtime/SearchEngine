@@ -12,10 +12,20 @@ import java.util.*;
 
 import static opennlp.tools.stemmer.snowball.SnowballStemmer.ALGORITHM.ENGLISH;
 
+/**
+ * Thread safe version of {@link QueryFileHandler}
+ * Uses a {@link WorkQueue to execute tasks}
+ */
 public class ThreadSafeQueryFileHandler extends QueryFileHandler {
 
+    /** The associated WorkQueue of threads to execute work */
     private final WorkQueue workQueue;
 
+    /**
+     * Constructs a new instance of this class
+     * @param wordIndex associated wordIndex
+     * @param workQueue associated workQueue
+     */
     public ThreadSafeQueryFileHandler(InvertedWordIndex wordIndex, WorkQueue workQueue) {
         super(wordIndex);
         this.workQueue = workQueue;
