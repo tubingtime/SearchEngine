@@ -140,7 +140,6 @@ public class ReadWriteLock {
     /**
      * A simple lock used for conditional synchronization as an alternative to using
      * a {@code synchronized} block.
-     * <p>
      * Similar but simpler than {@link Lock}.
      *
      * @author CS 272 Software Development (University of San Francisco)
