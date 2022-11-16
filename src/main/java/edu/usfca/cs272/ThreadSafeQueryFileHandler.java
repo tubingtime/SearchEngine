@@ -8,7 +8,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.List;
+import java.util.TreeSet;
 
 import static opennlp.tools.stemmer.snowball.SnowballStemmer.ALGORITHM.ENGLISH;
 
@@ -18,11 +19,14 @@ import static opennlp.tools.stemmer.snowball.SnowballStemmer.ALGORITHM.ENGLISH;
  */
 public class ThreadSafeQueryFileHandler extends QueryFileHandler {
 
-    /** The associated WorkQueue of threads to execute work */
+    /**
+     * The associated WorkQueue of threads to execute work
+     */
     private final WorkQueue workQueue;
 
     /**
      * Constructs a new instance of this class
+     *
      * @param wordIndex associated wordIndex
      * @param workQueue associated workQueue
      */
@@ -51,7 +55,7 @@ public class ThreadSafeQueryFileHandler extends QueryFileHandler {
         }
         String key = String.join(" ", stems);
         synchronized (results) {
-            if (results.containsKey(key)){
+            if (results.containsKey(key)) {
                 return;
             }
         }
@@ -80,13 +84,15 @@ public class ThreadSafeQueryFileHandler extends QueryFileHandler {
 
         /**
          * Constructs a new instance of this class
-         * @param line The query line to process
+         *
+         * @param line        The query line to process
          * @param exactSearch True for exact search, false if not
          */
         public QueryTask(String line, boolean exactSearch) {
             this.line = line;
             this.exactSearch = exactSearch;
         }
+
         @Override
         public void run() {
             parseQuery(line, exactSearch);

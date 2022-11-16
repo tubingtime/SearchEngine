@@ -19,8 +19,8 @@ public class WordIndexBuilder {
     /**
      * Builds a provided InvertedWordIndex from a path to a file or directory
      *
-     * @param start file or directory containing the words
-     * @param index a {@link InvertedWordIndex} to store the words.
+     * @param start   file or directory containing the words
+     * @param index   a {@link InvertedWordIndex} to store the words.
      * @param threads the number of threads to use
      * @throws IOException if listStems throws an IOException while parsing
      */
@@ -67,21 +67,27 @@ public class WordIndexBuilder {
      */
     private static class ScannerTask implements Runnable {
 
-        /** The Path to scan */
+        /**
+         * The Path to scan
+         */
         private final Path file;
 
-        /** The index to put words into */
+        /**
+         * The index to put words into
+         */
         private final InvertedWordIndex index;
 
         /**
          * Constructs a new instance of this class
-         * @param file The Path to scan
+         *
+         * @param file  The Path to scan
          * @param index The index to put words into
          */
         public ScannerTask(Path file, InvertedWordIndex index) {
             this.file = file;
             this.index = index;
         }
+
         @Override
         public void run() {
             try {

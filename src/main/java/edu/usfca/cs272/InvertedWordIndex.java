@@ -202,7 +202,7 @@ public class InvertedWordIndex {
             String partialQueryWord;
             Iterator<String> tailIterator = tailSet.iterator();
             while ((tailIterator.hasNext() && (partialQueryWord = tailIterator.next()).startsWith(queryWord))) {
-            	searchHelper(partialQueryWord, resultsMap, results);
+                searchHelper(partialQueryWord, resultsMap, results);
             }
         }
         Collections.sort(results);
@@ -213,9 +213,10 @@ public class InvertedWordIndex {
      * Helper function for partial and exact search
      * Given a queryWord that was found in the wordIndex it will get the locations where that word is at and will
      * update or add all SearchResults associated with that location
-     * @param queryWord the queryWord found in the wordIndex
+     *
+     * @param queryWord  the queryWord found in the wordIndex
      * @param resultsMap Helper data structure for efficiently updating SearchResults
-     * @param results the list of searchResults to add to and eventually return
+     * @param results    the list of searchResults to add to and eventually return
      */
     private void searchHelper(String queryWord, Map<String, SearchResult> resultsMap, List<SearchResult> results) {
         Set<String> wordLocations = wordMap.get(queryWord).keySet();
@@ -232,12 +233,13 @@ public class InvertedWordIndex {
 
     /**
      * Helper method that calls either exact or partial search
-     * @param queries a set of queries
+     *
+     * @param queries     a set of queries
      * @param exactSearch true for exact, false for partial
      * @return a list of SearchResults
      */
     public List<SearchResult> search(Set<String> queries, boolean exactSearch) {
-    	return exactSearch ? exactSearch(queries) : partialSearch(queries);
+        return exactSearch ? exactSearch(queries) : partialSearch(queries);
     }
 
 
@@ -346,7 +348,7 @@ public class InvertedWordIndex {
          * @param queryWord the queryWord to get the new count of
          */
         public void update(String queryWord) {
-        	this.count += wordMap.get(queryWord).get(where).size();
+            this.count += wordMap.get(queryWord).get(where).size();
             this.score = (this.count / Double.valueOf(wordCount.get(this.where)));
         }
 

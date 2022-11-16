@@ -1,16 +1,12 @@
 package edu.usfca.cs272;
 
 import edu.usfca.cs272.InvertedWordIndex.SearchResult;
-import opennlp.tools.stemmer.Stemmer;
-import opennlp.tools.stemmer.snowball.SnowballStemmer;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
-
-import static opennlp.tools.stemmer.snowball.SnowballStemmer.ALGORITHM.ENGLISH;
 
 /**
  * Counts the words in a InvertedWordIndex
@@ -42,7 +38,7 @@ public class QueryFileHandler {
     /**
      * @return an unmodifiable set of the queries in the results data structure.
      */
-    public Set<String> getAllQueries(){
+    public Set<String> getAllQueries() {
         return Collections.unmodifiableSet(results.keySet());
     }
 
@@ -92,7 +88,7 @@ public class QueryFileHandler {
         }
         String key = String.join(" ", stems);
 
-        if (results.containsKey(key)){
+        if (results.containsKey(key)) {
             return;
         }
 
