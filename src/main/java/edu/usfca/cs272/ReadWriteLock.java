@@ -14,13 +14,12 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * for writing. The read lock may be held simultaneously by multiple reader
  * threads, so long as there are no writers. The write lock is exclusive. The
  * active writer is able to acquire read or write locks as long as it is active.
- * <p>
+ *
  * <!-- simplified lock used for this class -->
  *
  * @author CS 272 Software Development (University of San Francisco)
  * @version Fall 2022
  * @see SimpleLock
- * <p>
  * <!-- built-in Java locks that are similar (but more complex) -->
  * @see Lock
  * @see ReentrantLock
