@@ -12,7 +12,8 @@ import java.util.Set;
 public class ThreadSafeInvertedWordIndex extends InvertedWordIndex {
 
     /**
-     * Manages a read and write lock. Improves efficiency for multithreading since there are many reads
+     * Manages a read and write lock. Improves efficiency for multithreading since queries involve only reading
+     * that can happen concurrently.
      */
     private final ReadWriteLock lock;
 

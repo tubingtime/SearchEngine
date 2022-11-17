@@ -24,7 +24,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  */
 public class Driver {
     /**
-     * Log4J Logger
+     * Log4J Logger used for this class
      */
     private static final Logger log = LogManager.getLogger();
 
@@ -55,11 +55,13 @@ public class Driver {
             if (threads < 1) {
                 threads = 5;
             }
+            log.debug("-threads detected! Initializing a workQueue with {} threads", threads);
             workQueue = new WorkQueue(threads);
             invertedWordIndex = new ThreadSafeInvertedWordIndex();
             queryFileHandler = new ThreadSafeQueryFileHandler(invertedWordIndex, workQueue);
 
         } else {
+            log.debug("-threads not detected.");
             invertedWordIndex = new InvertedWordIndex();
             queryFileHandler = new QueryFileHandler(invertedWordIndex);
         }
@@ -112,7 +114,7 @@ public class Driver {
         }
 
         if (threads > 0) {
-            workQueue.shutdown();
+            workQueue.join();
         }
         // calculate time elapsed and output
         long elapsed = Duration.between(start, Instant.now()).toMillis();

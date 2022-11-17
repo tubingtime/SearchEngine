@@ -18,9 +18,7 @@ import java.util.LinkedList;
  * Java Theory and Practice: Thread Pools and Work Queues</a>
  */
 public class WorkQueue {
-    /**
-     * Workers that wait until work (or tasks) are available.
-     */
+    /** Workers that wait until work (or tasks) are available. */
     private final Worker[] workers;
 
     /**
@@ -155,6 +153,14 @@ public class WorkQueue {
      */
     public int size() {
         return workers.length;
+    }
+
+    public int getPending() {
+        return pending;
+    }
+
+    public int getTaskSize() {
+        return tasks.size();
     }
 
     /**

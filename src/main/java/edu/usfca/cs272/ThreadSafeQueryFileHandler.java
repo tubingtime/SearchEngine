@@ -3,6 +3,8 @@ package edu.usfca.cs272;
 import edu.usfca.cs272.InvertedWordIndex.SearchResult;
 import opennlp.tools.stemmer.Stemmer;
 import opennlp.tools.stemmer.snowball.SnowballStemmer;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -24,6 +26,10 @@ public class ThreadSafeQueryFileHandler extends QueryFileHandler {
      */
     private final WorkQueue workQueue;
 
+    /** Logger used for this class */
+    private static final Logger log = LogManager.getLogger();
+
+
     /**
      * Constructs a new instance of this class
      *
@@ -33,15 +39,19 @@ public class ThreadSafeQueryFileHandler extends QueryFileHandler {
     public ThreadSafeQueryFileHandler(InvertedWordIndex wordIndex, WorkQueue workQueue) {
         super(wordIndex);
         this.workQueue = workQueue;
+        log.debug("ThreadSafeQueryFileHandler initialized.");
     }
 
     @Override
     public void parseQuery(Path queryInput, boolean exactSearch) throws IOException {
         try (BufferedReader buffReader = Files.newBufferedReader(queryInput)) {
             String line;
+            log.debug("parseQuery: creating tasks...");
             while ((line = buffReader.readLine()) != null) {
                 workQueue.execute(new QueryTask(line, exactSearch));
             }
+            log.debug("parseQuery: called .finish() with {} remaining tasks and {} tasks pending",
+                    workQueue.getTaskSize(), workQueue.getPending());
             workQueue.finish();
         }
     }
