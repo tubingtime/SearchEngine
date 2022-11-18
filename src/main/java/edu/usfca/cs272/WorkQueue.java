@@ -155,10 +155,18 @@ public class WorkQueue {
         return workers.length;
     }
 
+    /**
+     * Returns the amount of pending work
+     * @return the amount of pending work
+     */
     public int getPending() {
         return pending;
     }
 
+    /**
+     * Returns the amount of remaining tasks
+     * @return the amount of pending tasks
+     */
     public int getTaskSize() {
         return tasks.size();
     }
