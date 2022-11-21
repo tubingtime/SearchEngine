@@ -42,7 +42,7 @@ public class InvertedWordIndex {
      *
      * @param location the location to increment
      */
-    protected void increment(String location) {
+    protected void increment(String location) { // TODO private
         wordCount.putIfAbsent(location, 0);
         wordCount.put(location, wordCount.get(location) + 1);
     }
@@ -347,7 +347,7 @@ public class InvertedWordIndex {
          *
          * @param queryWord the queryWord to get the new count of
          */
-        public void update(String queryWord) {
+        public void update(String queryWord) { // TODO private
             this.count += wordMap.get(queryWord).get(where).size();
             this.score = (this.count / Double.valueOf(wordCount.get(this.where)));
         }

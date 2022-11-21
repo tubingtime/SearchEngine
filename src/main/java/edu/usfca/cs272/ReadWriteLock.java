@@ -256,7 +256,7 @@ public class ReadWriteLock {
                 if (writers == 0) {
                     log.debug("No writers to unlock!");
                     throw new IllegalStateException("No writers to unlock!");
-                } else if (activeWriter != null && !isActiveWriter()) {
+                } else if (activeWriter != null && !isActiveWriter()) { // TODO Don't need the null check here
                     log.debug("Current Active writer:" + activeWriter);
                     throw new ConcurrentModificationException("Current thread does not hold write lock.");
                 }

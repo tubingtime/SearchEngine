@@ -11,7 +11,7 @@ import java.util.*;
 /**
  * Counts the words in a InvertedWordIndex
  */
-public class QueryFileHandler {
+public class QueryFileHandler { // TODO make the members private
 
     /**
      * Point to an associated InvertedWordIndex

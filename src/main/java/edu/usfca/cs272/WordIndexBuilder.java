@@ -38,6 +38,12 @@ public class WordIndexBuilder {
             }
         }
     }
+    
+    /* TODO 
+    public static void build(Path start, ThreadSafeInvertedWordIndex index, WorkQueue workQueue) throws IOException {
+    	
+    }
+    */
 
     /**
      * Scans a single text file and puts the words into an InvertedWordIndex
@@ -75,7 +81,7 @@ public class WordIndexBuilder {
         /**
          * The index to put words into
          */
-        private final InvertedWordIndex index;
+        private final InvertedWordIndex index; // TODO thread-safe
 
         /**
          * Constructs a new instance of this class
@@ -83,7 +89,7 @@ public class WordIndexBuilder {
          * @param file  The Path to scan
          * @param index The index to put words into
          */
-        public ScannerTask(Path file, InvertedWordIndex index) {
+        public ScannerTask(Path file, InvertedWordIndex index) { // TODO thread-safe
             this.file = file;
             this.index = index;
         }
@@ -92,6 +98,18 @@ public class WordIndexBuilder {
         public void run() {
             try {
                 scanFile(file, index);
+                	/* TODO 
+                in the multithreaded traverser code to reduce blocking...
+                
+                	1) created local data
+								InvertedWordIndex local = new InvertedWordIndex();
+
+								2) add to the local data (no blocking)
+								scanFile(file, local);
+								
+								3) single blocking addAll to combine the shared and local data
+								index.addAll(local);
+								*/
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
