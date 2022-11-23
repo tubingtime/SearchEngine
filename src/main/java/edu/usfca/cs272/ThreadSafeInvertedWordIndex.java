@@ -6,6 +6,8 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
 
+// TODO Not yet thread-safe... need to override more methods
+
 /**
  * Thread safe version of InvertedWordIndex
  */
@@ -27,11 +29,13 @@ public class ThreadSafeInvertedWordIndex extends InvertedWordIndex {
 
 
     @Override
-    protected void increment(String location) {
+    protected void increment(String location) { // TODO Remove
         lock.write().lock();
         super.increment(location);
         lock.write().unlock();
     }
+    
+    // TODO try/finally pattern for all the lock/unlock calls
 
     /**
      * Adds a new word to the WordIndex. Given the word, it's Path location, and the position number it was found at.

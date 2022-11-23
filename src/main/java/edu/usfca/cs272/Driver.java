@@ -31,7 +31,7 @@ public class Driver {
     /**
      * Pool of threads that wait for work
      */
-    public static WorkQueue workQueue;
+    public static WorkQueue workQueue; // TODO Create this as a local variable inside of main instead
 
     /**
      * Initializes the classes necessary based on the provided command-line

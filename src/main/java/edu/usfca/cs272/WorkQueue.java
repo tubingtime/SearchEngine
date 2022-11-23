@@ -76,6 +76,11 @@ public class WorkQueue {
         log.debug("Work queue initialized with {} worker threads.", workers.length);
     }
 
+    /*
+     * TODO everything that deals with the pending variable needs to use
+     * a different lock object other thank tasks
+     */
+    
     /**
      * Adds a work (or task) request to the queue. A worker thread will process
      * this request when available.
@@ -96,7 +101,7 @@ public class WorkQueue {
     public void finish() {
         try {
             synchronized (tasks) {
-                while (!tasks.isEmpty() || pending != 0) {
+                while (!tasks.isEmpty() || pending != 0) { // TODO Remove tasks.isEmpty from the condition
                     log.debug("Waiting to finish. Tasks: {} | Pending: {}", tasks.size(), pending);
                     tasks.wait();
                 }
@@ -159,7 +164,7 @@ public class WorkQueue {
      * Returns the amount of pending work
      * @return the amount of pending work
      */
-    public int getPending() {
+    public int getPending() { // TODO Need to protect access here
         return pending;
     }
 
@@ -167,7 +172,7 @@ public class WorkQueue {
      * Returns the amount of remaining tasks
      * @return the amount of pending tasks
      */
-    public int getTaskSize() {
+    public int getTaskSize() {  // TODO Need to protect access here
         return tasks.size();
     }
 
@@ -209,7 +214,7 @@ public class WorkQueue {
                         } else {
                             log.debug("Worker found {} tasks...", tasks.size());
                             task = tasks.removeFirst();
-                            pending++;
+                            pending++; // TODO Move into the execute method instead
                         }
                     }
 
@@ -223,7 +228,7 @@ public class WorkQueue {
                     } finally {
                         synchronized (tasks) {
                             pending--;
-                            if (tasks.isEmpty() && pending == 0) {
+                            if (tasks.isEmpty() && pending == 0) { // TODO Remove the tasks.isEmpty check
                                 tasks.notifyAll();
                             }
                         }

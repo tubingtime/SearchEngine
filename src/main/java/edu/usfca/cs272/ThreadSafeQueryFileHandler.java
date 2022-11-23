@@ -15,6 +15,14 @@ import java.util.TreeSet;
 
 import static opennlp.tools.stemmer.snowball.SnowballStemmer.ALGORITHM.ENGLISH;
 
+/*
+ * TODO Create a shared interface between the single thread and multi thread
+ * versions of this class that both implement
+ * 
+ * Make public void parseQuery(Path queryInput, boolean exactSearch) throws IOException {
+ * a default implementation in the interface
+ */
+
 /**
  * Thread safe version of {@link QueryFileHandler}
  * Uses a {@link WorkQueue to execute tasks}
@@ -36,6 +44,7 @@ public class ThreadSafeQueryFileHandler extends QueryFileHandler {
      * @param wordIndex associated wordIndex
      * @param workQueue associated workQueue
      */
+    // TODO Pass in a thread-safe index instead
     public ThreadSafeQueryFileHandler(InvertedWordIndex wordIndex, WorkQueue workQueue) {
         super(wordIndex);
         this.workQueue = workQueue;
@@ -80,8 +89,9 @@ public class ThreadSafeQueryFileHandler extends QueryFileHandler {
     /**
      * A runnable object that calls parseQuery
      */
-    public class QueryTask implements Runnable {
+    public class QueryTask implements Runnable { // TODO private
 
+    	// TODO private and final
         /**
          * The query line to process
          */
