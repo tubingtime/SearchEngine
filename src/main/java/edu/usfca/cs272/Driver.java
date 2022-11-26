@@ -29,11 +29,6 @@ public class Driver {
     private static final Logger log = LogManager.getLogger();
 
     /**
-     * Pool of threads that wait for work
-     */
-    public static WorkQueue workQueue; // TODO Create this as a local variable inside of main instead
-
-    /**
      * Initializes the classes necessary based on the provided command-line
      * arguments. This includes (but is not limited to) how to build or search an
      * inverted index.
@@ -49,6 +44,7 @@ public class Driver {
 
         InvertedWordIndex invertedWordIndex;
         QueryFileHandler queryFileHandler;
+        WorkQueue workQueue = null;
         int threads = 0;
         if (argumentParser.hasFlag("-threads")) {
             threads = argumentParser.getInteger("-threads", 5);
@@ -66,12 +62,16 @@ public class Driver {
             queryFileHandler = new QueryFileHandler(invertedWordIndex);
         }
 
-
         if (argumentParser.hasValue("-text")) {
             Path inputPath = argumentParser.getPath("-text");
             log.debug("Input: " + inputPath);
             try {
-                WordIndexBuilder.build(inputPath, invertedWordIndex, threads); /* populate wordIndex*/
+                if (invertedWordIndex instanceof ThreadSafeInvertedWordIndex) {
+                    WordIndexBuilder.build(inputPath, (ThreadSafeInvertedWordIndex) invertedWordIndex, workQueue);
+                }
+                else {
+                    WordIndexBuilder.build(inputPath, invertedWordIndex); /* populate wordIndex*/
+                }
             } catch (IOException e) {
                 System.out.println("IO Error while scanning directory: " + inputPath);
             }
@@ -113,7 +113,7 @@ public class Driver {
             }
         }
 
-        if (threads > 0) {
+        if (workQueue != null) {
             workQueue.join();
         }
         // calculate time elapsed and output
