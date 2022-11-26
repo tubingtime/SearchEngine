@@ -28,12 +28,7 @@ public class ThreadSafeInvertedWordIndex extends InvertedWordIndex {
     }
 
 
-    @Override
-    protected void increment(String location) { // TODO Remove
-        lock.write().lock();
-        super.increment(location);
-        lock.write().unlock();
-    }
+
     
     // TODO try/finally pattern for all the lock/unlock calls
 
