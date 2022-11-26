@@ -45,9 +45,8 @@ public class Driver {
         InvertedWordIndex invertedWordIndex;
         QueryFileHandler queryFileHandler;
         WorkQueue workQueue = null;
-        int threads = 0;
         if (argumentParser.hasFlag("-threads")) {
-            threads = argumentParser.getInteger("-threads", 5);
+            int threads = argumentParser.getInteger("-threads", 5);
             if (threads < 1) {
                 threads = 5;
             }
