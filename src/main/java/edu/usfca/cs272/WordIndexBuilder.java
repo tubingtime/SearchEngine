@@ -49,14 +49,14 @@ public class WordIndexBuilder {
     public static void scanFile(Path file, InvertedWordIndex index) throws IOException {
         try (BufferedReader reader = Files.newBufferedReader(file, UTF_8)) {
             SnowballStemmer stemmer = new SnowballStemmer(ENGLISH);
-            String fileString = file.toString();
+            String fileName = file.toString();
             int position = 1;
             String[] parsedLine;
             String line;
             while ((line = reader.readLine()) != null) {
                 parsedLine = WordCleaner.parse(line);
                 for (String word : parsedLine) {
-                    index.add(stemmer.stem(word).toString(), fileString, position++);
+                    index.add(stemmer.stem(word).toString(), fileName, position++);
                 }
             }
         }
@@ -91,19 +91,9 @@ public class WordIndexBuilder {
         @Override
         public void run() {
             try {
-                scanFile(file, index);
-                	/* TODO 
-                in the multithreaded traverser code to reduce blocking...
-                
-                	1) created local data
-								InvertedWordIndex local = new InvertedWordIndex();
-
-								2) add to the local data (no blocking)
-								scanFile(file, local);
-								
-								3) single blocking addAll to combine the shared and local data
-								index.addAll(local);
-								*/
+                InvertedWordIndex localIndex = new InvertedWordIndex();
+                scanFile(file, localIndex);
+                index.addAll(localIndex);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

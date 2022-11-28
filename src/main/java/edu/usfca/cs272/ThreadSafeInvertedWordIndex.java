@@ -48,6 +48,18 @@ public class ThreadSafeInvertedWordIndex extends InvertedWordIndex {
     }
 
     /**
+     * Adds everything in the provided InvertedWordIndex
+     *
+     * @param index Adds everything in the here
+     */
+    @Override
+    public void addAll(InvertedWordIndex index) {
+        lock.write().lock();
+        super.addAll(index);
+        lock.write().unlock();
+    }
+
+    /**
      * @param word the word whose associated locations to return
      * @return an unmodifiable view of the locations or an empty set
      * if the word doesn't exist

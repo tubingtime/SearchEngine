@@ -21,6 +21,7 @@ public class InvertedWordIndex {
 
     /**
      * * Nested data structure to store words, what file they were found in, and the line locations.
+     * String word, String location, Integer position
      */
     private final TreeMap<String, TreeMap<String, TreeSet<Integer>>> wordMap;
     /**
@@ -58,9 +59,9 @@ public class InvertedWordIndex {
     public void add(String word, String location, Integer position) {
         wordMap.putIfAbsent(word, new TreeMap<>());               // new location map if it doesn't exist
         wordMap.get(word).putIfAbsent(location, new TreeSet<>()); // new position set if it doesn't exist
-        boolean didNotContain = wordMap.get(word).get(location).add(position);            // finally add
+        boolean addedSomethingNew = wordMap.get(word).get(location).add(position);            // finally add
 
-        if (didNotContain) {
+        if (addedSomethingNew) {
             increment(location);
         }
     }
@@ -69,12 +70,29 @@ public class InvertedWordIndex {
      * Adds a list of words to the WordIndex. Given the word, it's Path location, and the position number it was found at.
      *
      * @param words    the words to add
-     * @param location where the wod was found
+     * @param location where the word was found
      * @param position what position the word was found at
      */
     public void addAll(ArrayList<String> words, String location, Integer position) {
         for (String word : words) {
             add(word, location, position++);
+        }
+    }
+
+    /**
+     * Adds everything in the provided InvertedWordIndex
+     *
+     * @param index    Adds everything in the here
+     */
+    public void addAll(InvertedWordIndex index) {
+        for (var entry : index.wordMap.entrySet()) {
+            String word = entry.getKey();
+            for (var locationEntry : entry.getValue().entrySet()) {
+                String location = locationEntry.getKey();
+                for (Integer position : locationEntry.getValue()) {
+                    add(word, location, position);
+                }
+            }
         }
     }
 
