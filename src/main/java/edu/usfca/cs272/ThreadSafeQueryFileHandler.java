@@ -14,16 +14,9 @@ import java.util.*;
 
 import static opennlp.tools.stemmer.snowball.SnowballStemmer.ALGORITHM.ENGLISH;
 
-/*
- * TODO Create a shared interface between the single thread and multi thread
- * versions of this class that both implement
- * 
- * Make public void parseQuery(Path queryInput, boolean exactSearch) throws IOException {
- * a default implementation in the interface
- */
 
 /**
- * Thread safe version of {@link QueryFileHandler}
+ * Thread safe version of QueryFileHandler
  * Uses a {@link WorkQueue to execute tasks}
  */
 public class ThreadSafeQueryFileHandler implements QueryFileHandlerInterface {
@@ -40,13 +33,14 @@ public class ThreadSafeQueryFileHandler implements QueryFileHandlerInterface {
     private final Map<String, List<SearchResult>> results;
 
 
-
     /**
      * The associated WorkQueue of threads to execute work
      */
     private final WorkQueue workQueue;
 
-    /** Logger used for this class */
+    /**
+     * Logger used for this class
+     */
     private static final Logger log = LogManager.getLogger();
 
 
@@ -103,7 +97,9 @@ public class ThreadSafeQueryFileHandler implements QueryFileHandlerInterface {
      */
     @Override
     public Set<String> getAllQueries() {
-        return null; //todo
+        synchronized (results) {
+            return Collections.unmodifiableSet(results.keySet());
+        }
     }
 
     /**
@@ -114,7 +110,11 @@ public class ThreadSafeQueryFileHandler implements QueryFileHandlerInterface {
      */
     @Override
     public List<SearchResult> getResults(String queryLine) {
-        return null; //todo
+        TreeSet<String> stems = WordCleaner.uniqueStems(queryLine);
+        String processedQuery = String.join(" ", stems);
+        synchronized (results) {
+            return results.getOrDefault(processedQuery, Collections.emptyList());
+        }
     }
 
 

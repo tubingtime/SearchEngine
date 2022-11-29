@@ -2,12 +2,11 @@ package edu.usfca.cs272;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
 
 public interface QueryFileHandlerInterface {
+
     /**
      * @return an unmodifiable set of the queries in the results data structure.
      */
@@ -19,9 +18,10 @@ public interface QueryFileHandlerInterface {
      * @param queryLine the location to get SearchResults from
      * @return an unmodifiable list of SearchResults
      */
-     List<InvertedWordIndex.SearchResult> getResults(String queryLine);
+    List<InvertedWordIndex.SearchResult> getResults(String queryLine);
 
     void parseQuery(Path queryInput, boolean exactSearch) throws IOException;
+    // how to do default implementation?
 
     void parseQuery(String line, boolean exactSearch);
 

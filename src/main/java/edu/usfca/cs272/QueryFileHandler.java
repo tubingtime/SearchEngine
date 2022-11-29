@@ -11,7 +11,7 @@ import java.util.*;
 /**
  * Counts the words in a InvertedWordIndex
  */
-public class QueryFileHandler implements QueryFileHandlerInterface { // TODO make the members private
+public class QueryFileHandler implements QueryFileHandlerInterface {
 
     /**
      * Point to an associated InvertedWordIndex
@@ -22,7 +22,7 @@ public class QueryFileHandler implements QueryFileHandlerInterface { // TODO mak
      * Search results data structure
      * String location, List SearchResult
      */
-    protected final Map<String, List<InvertedWordIndex.SearchResult>> results;
+    private final Map<String, List<InvertedWordIndex.SearchResult>> results;
 
 
     /**
@@ -91,11 +91,8 @@ public class QueryFileHandler implements QueryFileHandlerInterface { // TODO mak
      * @return an unmodifiable list of SearchResults
      */
     public List<SearchResult> getResults(String queryLine) {
-
         TreeSet<String> stems = WordCleaner.uniqueStems(queryLine);
         String processedQuery = String.join(" ", stems);
-        results.getOrDefault(processedQuery, Collections.emptyList());
-
         return results.getOrDefault(processedQuery, Collections.emptyList());
     }
 

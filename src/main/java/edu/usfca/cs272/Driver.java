@@ -52,7 +52,7 @@ public class Driver {
             }
             log.debug("-threads detected! Initializing a workQueue with {} threads", threads);
             workQueue = new WorkQueue(threads);
-            invertedWordIndex =  new ThreadSafeInvertedWordIndex();
+            invertedWordIndex = new ThreadSafeInvertedWordIndex();
             queryFileHandler =
                     new ThreadSafeQueryFileHandler((ThreadSafeInvertedWordIndex) invertedWordIndex, workQueue);
 
@@ -68,8 +68,7 @@ public class Driver {
             try {
                 if (invertedWordIndex instanceof ThreadSafeInvertedWordIndex) {
                     WordIndexBuilder.build(inputPath, (ThreadSafeInvertedWordIndex) invertedWordIndex, workQueue);
-                }
-                else {
+                } else {
                     WordIndexBuilder.build(inputPath, invertedWordIndex); /* populate wordIndex*/
                 }
             } catch (IOException e) {

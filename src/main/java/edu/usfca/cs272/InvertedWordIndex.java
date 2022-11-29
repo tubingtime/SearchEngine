@@ -82,7 +82,7 @@ public class InvertedWordIndex {
     /**
      * Adds everything in the provided InvertedWordIndex
      *
-     * @param index    Adds everything in the here
+     * @param index Adds everything in the here
      */
     public void addAll(InvertedWordIndex index) {
         for (var entry : index.wordMap.entrySet()) {
@@ -335,19 +335,17 @@ public class InvertedWordIndex {
      */
     public class SearchResult implements Comparable<SearchResult> {
         /**
+         * What file the search was preformed on
+         */
+        private final String where;
+        /**
          * How many times the word stem was found
          */
         private long count;
-
         /**
          * score = total matches / total words in file
          */
         private double score;
-
-        /**
-         * What file the search was preformed on
-         */
-        private final String where;
 
         /**
          * Constructs a new instance of this class

@@ -19,8 +19,8 @@ public class WordIndexBuilder {
     /**
      * Builds a provided InvertedWordIndex from a path to a file or directory
      *
-     * @param start   file or directory containing the words
-     * @param index   a {@link InvertedWordIndex} to store the words.
+     * @param start file or directory containing the words
+     * @param index a {@link InvertedWordIndex} to store the words.
      * @throws IOException if listStems throws an IOException while parsing
      */
     public static void build(Path start, InvertedWordIndex index) throws IOException {
@@ -31,7 +31,7 @@ public class WordIndexBuilder {
     }
 
     public static void build(Path start, ThreadSafeInvertedWordIndex index, WorkQueue workQueue) throws IOException {
-    	ArrayList<Path> files = TextFileTraverser.scanDirectory(start);
+        ArrayList<Path> files = TextFileTraverser.scanDirectory(start);
         for (Path file : files) {
             workQueue.execute(new ScannerTask(file, index));
         }

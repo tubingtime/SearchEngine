@@ -4,11 +4,7 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.Arrays;
 import java.util.LinkedList;
-import java.util.Objects;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 /**
  * A simple work queue implementation based on the IBM developerWorks article by
@@ -22,7 +18,9 @@ import java.util.stream.Collectors;
  * Java Theory and Practice: Thread Pools and Work Queues</a>
  */
 public class WorkQueue {
-    /** Workers that wait until work (or tasks) are available. */
+    /**
+     * Workers that wait until work (or tasks) are available.
+     */
     private final Worker[] workers;
 
     /**
@@ -50,7 +48,9 @@ public class WorkQueue {
      */
     private int pending;
 
-    /** Lock for the pending variable */
+    /**
+     * Lock for the pending variable
+     */
     private final Object pendingLock;
 
 
@@ -84,7 +84,7 @@ public class WorkQueue {
         log.debug("Work queue initialized with {} worker threads.", workers.length);
     }
 
-    
+
     /**
      * Adds a work (or task) request to the queue. A worker thread will process
      * this request when available.
@@ -167,6 +167,7 @@ public class WorkQueue {
 
     /**
      * Returns the amount of pending work
+     *
      * @return the amount of pending work
      */
     public int getPending() {
@@ -179,6 +180,7 @@ public class WorkQueue {
 
     /**
      * Returns the amount of remaining tasks
+     *
      * @return the amount of pending tasks
      */
     public int getTaskSize() {

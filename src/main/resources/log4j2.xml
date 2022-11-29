@@ -15,7 +15,7 @@
 	</Appenders>
 
 	<Loggers>
-		<!-- Class level logging levels for some reason this disables logging. (idk what im doing)-->
+		<!-- Class level logging levels for some reason this disables logging. (idk what im doing)c-->
 		<Logger name="edu.usfca.cs272.QueryFileHandler" level="INFO" additivity="false"></Logger>
 		<Logger name="edu.usfca.cs272.Driver" level="FATAL" additivity="false"></Logger>
 		<Logger name="edu.usfca.cs272.ReadWriteLock" level="FATAL" additivity="false"></Logger>
