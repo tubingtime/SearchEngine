@@ -5,6 +5,9 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Interface for Single and Multithreaded QueryFileHandlers
+ */
 public interface QueryFileHandlerInterface {
 
     /**
@@ -20,9 +23,24 @@ public interface QueryFileHandlerInterface {
      */
     List<InvertedWordIndex.SearchResult> getResults(String queryLine);
 
+    /**
+     * Reads queries from a given {@link Path} line by line and then calls helper method to
+     * stem, search, and add to the results data structure.
+     *
+     * @param queryInput  the location of the query file
+     * @param exactSearch true for exact search, false to allow partial matches
+     * @throws IOException if an IO error occurs while attemping to read from the file
+     */
     void parseQuery(Path queryInput, boolean exactSearch) throws IOException;
     // how to do default implementation?
 
+    /**
+     * Cleans and stems a single query line. Then calls either exact or partial search and
+     * puts the results into the results data structure.
+     *
+     * @param line        a String of query words separated by spaces
+     * @param exactSearch true for exact search, false to allow partial matches
+     */
     void parseQuery(String line, boolean exactSearch);
 
     /**
