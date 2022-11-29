@@ -4,9 +4,9 @@ import java.io.IOException;
 import java.io.Writer;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
-// TODO Not yet thread-safe... need to override more methods
 
 /**
  * Thread safe version of InvertedWordIndex
@@ -27,63 +27,95 @@ public class ThreadSafeInvertedWordIndex extends InvertedWordIndex {
         this.lock = new ReadWriteLock();
     }
 
-
-
-    
-    // TODO try/finally pattern for all the lock/unlock calls
-
-    /**
-     * Adds a new word to the WordIndex. Given the word, it's Path location, and the position number it was found at.
-     * Also increments the word count
-     *
-     * @param word     the word to add
-     * @param location where the wod was found
-     * @param position what position the word was found at
-     */
     @Override
     public void add(String word, String location, Integer position) {
         lock.write().lock();
-        super.add(word, location, position);
-        lock.write().unlock();
+        try {
+            super.add(word, location, position);
+        } finally {
+            lock.write().unlock();
+            // make sure we unlock, even if there's a runtime exception
+        }
     }
 
-    /**
-     * Adds everything in the provided InvertedWordIndex
-     *
-     * @param index Adds everything in the here
-     */
     @Override
     public void addAll(InvertedWordIndex index) {
         lock.write().lock();
-        super.addAll(index);
-        lock.write().unlock();
+        try {
+            super.addAll(index);
+        } finally {
+            lock.write().unlock();
+        }
     }
 
-    /**
-     * @param word the word whose associated locations to return
-     * @return an unmodifiable view of the locations or an empty set
-     * if the word doesn't exist
-     */
     @Override
     public Set<String> getLocations(String word) {
         lock.read().lock();
-        Set<String> locations = super.getLocations(word);
-        lock.read().unlock();
-        return locations;
+        try {
+            return super.getLocations(word);
+        } finally {
+            lock.read().unlock();
+        }
     }
 
-    /**
-     * @param word     the word whose associated positions to return
-     * @param location the locations whose associated positions to return
-     * @return an unmodifiable view of the positions or an empty set if the
-     * positions couldn't be found.
-     */
     @Override
     public Set<Integer> getPositions(String word, String location) {
         lock.read().lock();
-        Set<Integer> positions = super.getPositions(word, location);
-        lock.read().unlock();
-        return positions;
+        try {
+            return super.getPositions(word, location);
+        } finally {
+            lock.read().unlock();
+        }
+    }
+
+    @Override
+    public boolean contains(String word) {
+        lock.read().lock();
+        try {
+            return super.contains(word);
+        } finally {
+            lock.read().unlock();
+        }
+    }
+
+    @Override
+    public Set<String> getWords() {
+        lock.read().lock();
+        try {
+            return super.getWords();
+        } finally {
+            lock.read().unlock();
+        }
+    }
+
+    @Override
+    public Map<String, Integer> getWordCount() {
+        lock.read().lock();
+        try {
+            return super.getWordCount();
+        } finally {
+            lock.read().unlock();
+        }
+    }
+
+    @Override
+    public Integer getCount(String location) {
+        lock.read().lock();
+        try {
+            return super.getCount(location);
+        } finally {
+            lock.read().unlock();
+        }
+    }
+
+    @Override
+    public int size() {
+        lock.read().lock();
+        try {
+            return super.size();
+        } finally {
+            lock.read().unlock();
+        }
     }
 
     /**
@@ -95,9 +127,11 @@ public class ThreadSafeInvertedWordIndex extends InvertedWordIndex {
     @Override
     public List<SearchResult> exactSearch(Set<String> queries) {
         lock.read().lock();
-        List<SearchResult> searchResults = super.exactSearch(queries);
-        lock.read().unlock();
-        return searchResults;
+        try {
+            return super.exactSearch(queries);
+        } finally {
+            lock.read().unlock();
+        }
     }
 
     /**
@@ -110,9 +144,11 @@ public class ThreadSafeInvertedWordIndex extends InvertedWordIndex {
     @Override
     public List<SearchResult> partialSearch(Set<String> queries) {
         lock.read().lock();
-        List<SearchResult> searchResults = super.partialSearch(queries);
-        lock.read().unlock();
-        return searchResults;
+        try {
+            return super.partialSearch(queries);
+        } finally {
+            lock.read().unlock();
+        }
     }
 
 
@@ -124,9 +160,11 @@ public class ThreadSafeInvertedWordIndex extends InvertedWordIndex {
     @Override
     public String toString() {
         lock.read().lock();
-        String str = super.toString();
-        lock.read().unlock();
-        return str;
+        try {
+            return super.toString();
+        } finally {
+            lock.read().unlock();
+        }
     }
 
     /**
@@ -139,8 +177,11 @@ public class ThreadSafeInvertedWordIndex extends InvertedWordIndex {
     @Override
     public void toJSON(Writer writer, int indent) throws IOException {
         lock.read().lock();
-        super.toJSON(writer, indent);
-        lock.read().unlock();
+        try {
+            super.toJSON(writer, indent);
+        } finally {
+            lock.read().unlock();
+        }
     }
 
     /**
@@ -152,8 +193,11 @@ public class ThreadSafeInvertedWordIndex extends InvertedWordIndex {
     @Override
     public void toJSON(Path path) throws IOException {
         lock.read().lock();
-        super.toJSON(path);
-        lock.read().unlock();
+        try {
+            super.toJSON(path);
+        } finally {
+            lock.read().unlock();
+        }
     }
 
     /**
@@ -165,7 +209,10 @@ public class ThreadSafeInvertedWordIndex extends InvertedWordIndex {
     @Override
     public void wordCountToJSON(Path output) throws IOException {
         lock.read().lock();
-        super.wordCountToJSON(output);
-        lock.read().unlock();
+        try {
+            super.wordCountToJSON(output);
+        } finally {
+            lock.read().unlock();
+        }
     }
 }
