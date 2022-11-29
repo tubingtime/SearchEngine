@@ -11,12 +11,12 @@ import java.util.*;
 /**
  * Counts the words in a InvertedWordIndex
  */
-public class QueryFileHandler { // TODO make the members private
+public class QueryFileHandler implements QueryFileHandlerInterface { // TODO make the members private
 
     /**
      * Point to an associated InvertedWordIndex
      */
-    protected final InvertedWordIndex wordIndex;
+    private final InvertedWordIndex wordIndex;
 
     /**
      * Search results data structure
@@ -33,6 +33,48 @@ public class QueryFileHandler { // TODO make the members private
     public QueryFileHandler(InvertedWordIndex wordIndex) {
         this.wordIndex = wordIndex;
         this.results = new TreeMap<>();
+    }
+
+    /**
+     * Reads queries from a given {@link Path} line by line and then calls helper method to
+     * stem, search, and add to the results data structure.
+     *
+     * @param queryInput  the location of the query file
+     * @param exactSearch true for exact search, false to allow partial matches
+     * @throws IOException if an IO error occurs while attemping to read from the file
+     */
+    @Override
+    public void parseQuery(Path queryInput, boolean exactSearch) throws IOException {
+        try (BufferedReader buffReader = Files.newBufferedReader(queryInput)) {
+            String line;
+            while ((line = buffReader.readLine()) != null) {
+                parseQuery(line, exactSearch);
+            }
+        }
+    }
+
+    /**
+     * Cleans and stems a single query line. Then calls either exact or partial search and
+     * puts the results into the results data structure.
+     *
+     * @param line        a String of query words separated by spaces
+     * @param exactSearch true for exact search, false to allow partial matches
+     */
+    @Override
+    public void parseQuery(String line, boolean exactSearch) {
+        TreeSet<String> stems = WordCleaner.uniqueStems(line);
+        if (stems.isEmpty()) {
+            return;
+        }
+        String key = String.join(" ", stems);
+
+        if (results.containsKey(key)) {
+            return;
+        }
+
+        List<SearchResult> searchResults = wordIndex.search(stems, exactSearch);
+        results.put(key, searchResults);
+
     }
 
     /**
@@ -56,47 +98,6 @@ public class QueryFileHandler { // TODO make the members private
 
         return results.getOrDefault(processedQuery, Collections.emptyList());
     }
-
-    /**
-     * Reads queries from a given {@link Path} line by line and then calls helper method to
-     * stem, search, and add to the results data structure.
-     *
-     * @param queryInput  the location of the query file
-     * @param exactSearch true for exact search, false to allow partial matches
-     * @throws IOException if an IO error occurs while attemping to read from the file
-     */
-    public void parseQuery(Path queryInput, boolean exactSearch) throws IOException {
-        try (BufferedReader buffReader = Files.newBufferedReader(queryInput)) {
-            String line;
-            while ((line = buffReader.readLine()) != null) {
-                parseQuery(line, exactSearch);
-            }
-        }
-    }
-
-    /**
-     * Cleans and stems a single query line. Then calls either exact or partial search and
-     * puts the results into the results data structure.
-     *
-     * @param line        a String of query words separated by spaces
-     * @param exactSearch true for exact search, false to allow partial matches
-     */
-    public void parseQuery(String line, boolean exactSearch) {
-        TreeSet<String> stems = WordCleaner.uniqueStems(line);
-        if (stems.isEmpty()) {
-            return;
-        }
-        String key = String.join(" ", stems);
-
-        if (results.containsKey(key)) {
-            return;
-        }
-
-        List<SearchResult> searchResults = wordIndex.search(stems, exactSearch);
-        results.put(key, searchResults);
-
-    }
-
 
     /**
      * Converts the current SearchResults count to JSON
