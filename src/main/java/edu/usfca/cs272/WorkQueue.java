@@ -4,7 +4,11 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.Objects;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 /**
  * A simple work queue implementation based on the IBM developerWorks article by
@@ -46,6 +50,9 @@ public class WorkQueue {
      */
     private int pending;
 
+    /** Lock for the pending variable */
+    private final Object pendingLock;
+
 
     /**
      * Starts a work queue with the default number of threads.
@@ -66,6 +73,7 @@ public class WorkQueue {
         this.workers = new Worker[threads];
         this.shutdown = false;
         this.pending = 0;
+        this.pendingLock = new Object();
 
         // start the threads so they are waiting in the background
         for (int i = 0; i < threads; i++) {
@@ -76,10 +84,6 @@ public class WorkQueue {
         log.debug("Work queue initialized with {} worker threads.", workers.length);
     }
 
-    /*
-     * TODO everything that deals with the pending variable needs to use
-     * a different lock object other thank tasks
-     */
     
     /**
      * Adds a work (or task) request to the queue. A worker thread will process
@@ -92,6 +96,9 @@ public class WorkQueue {
             tasks.addLast(task);
             tasks.notifyAll();
         }
+        synchronized (pendingLock) {
+            pending++;
+        }
     }
 
     /**
@@ -100,13 +107,12 @@ public class WorkQueue {
      */
     public void finish() {
         try {
-            synchronized (tasks) {
-                while (!tasks.isEmpty() || pending != 0) { // TODO Remove tasks.isEmpty from the condition
+            synchronized (pendingLock) {
+                while (pending != 0) {
                     log.debug("Waiting to finish. Tasks: {} | Pending: {}", tasks.size(), pending);
-                    tasks.wait();
+                    pendingLock.wait(); // question: how does anything modify pending while this thread is waiting with the lock?
                 }
                 log.debug("Work finished!");
-                tasks.notifyAll();
             }
         } catch (InterruptedException e) {
             System.err.println("Warning: Work queue interrupted while finishing.");
@@ -124,7 +130,6 @@ public class WorkQueue {
         try {
             finish();
             shutdown();
-
             for (Worker worker : workers) {
                 worker.join();
             }
@@ -164,16 +169,24 @@ public class WorkQueue {
      * Returns the amount of pending work
      * @return the amount of pending work
      */
-    public int getPending() { // TODO Need to protect access here
-        return pending;
+    public int getPending() {
+        int gotPending;
+        synchronized (pendingLock) {
+            gotPending = this.pending;
+        }
+        return gotPending;
     }
 
     /**
      * Returns the amount of remaining tasks
      * @return the amount of pending tasks
      */
-    public int getTaskSize() {  // TODO Need to protect access here
-        return tasks.size();
+    public int getTaskSize() {
+        int taskSize;
+        synchronized (tasks) {
+            taskSize = tasks.size();
+        }
+        return taskSize;
     }
 
     /**
@@ -214,7 +227,6 @@ public class WorkQueue {
                         } else {
                             log.debug("Worker found {} tasks...", tasks.size());
                             task = tasks.removeFirst();
-                            pending++; // TODO Move into the execute method instead
                         }
                     }
 
@@ -226,10 +238,10 @@ public class WorkQueue {
                         System.err.printf("Warning: %s encountered an exception while running.%s%n", this.getName(), e);
                         log.catching(Level.DEBUG, e);
                     } finally {
-                        synchronized (tasks) {
+                        synchronized (pendingLock) {
                             pending--;
-                            if (tasks.isEmpty() && pending == 0) { // TODO Remove the tasks.isEmpty check
-                                tasks.notifyAll();
+                            if (pending == 0) {
+                                pendingLock.notifyAll();
                             }
                         }
                     }
