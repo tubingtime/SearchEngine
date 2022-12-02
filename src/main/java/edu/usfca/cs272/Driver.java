@@ -44,7 +44,10 @@ public class Driver {
 
         InvertedWordIndex invertedWordIndex;
         QueryFileHandlerInterface queryFileHandler;
+        
+        ThreadSafeInvertedWordIndex threadSafe = null;
         WorkQueue workQueue = null;
+        
         if (argumentParser.hasFlag("-threads")) {
             int threads = argumentParser.getInteger("-threads", 5);
             if (threads < 1) {
@@ -56,6 +59,12 @@ public class Driver {
             queryFileHandler =
                     new ThreadSafeQueryFileHandler((ThreadSafeInvertedWordIndex) invertedWordIndex, workQueue);
 
+            	/* TODO 
+            	threadSafe = new ThreadSafeInvertedWordIndex();
+            invertedWordIndex = threadSafe;
+            queryFileHandler =
+                    new ThreadSafeQueryFileHandler(threadSafe, workQueue);
+ 						*/
         } else {
             log.debug("-threads not detected.");
             invertedWordIndex = new InvertedWordIndex();

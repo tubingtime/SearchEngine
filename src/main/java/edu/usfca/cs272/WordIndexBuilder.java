@@ -104,7 +104,7 @@ public class WordIndexBuilder {
                 scanFile(file, localIndex);
                 index.addAll(localIndex);
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw new RuntimeException(e); // TODO UncheckedIOException
             }
         }
     }
