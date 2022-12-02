@@ -69,10 +69,20 @@ public class ThreadSafeQueryFileHandler implements QueryFileHandlerInterface {
                     workQueue.getTaskSize(), workQueue.getPending());
             workQueue.finish();
         }
+        
+        /* TODO 
+        QueryFileHandlerInterface.super.parseQuery(queryInput, exactSearch);
+        workQueue.finish();
+        */
     }
 
     @Override
     public void parseQuery(String line, boolean exactSearch) {
+    	/*
+    	workQueue.execute(new QueryTask(line, exactSearch));
+    	
+    	move the rest of this into the task run method...
+    	*/
         Stemmer stemmer = new SnowballStemmer(ENGLISH);
         TreeSet<String> stems = WordCleaner.uniqueStems(line, stemmer);
         if (stems.isEmpty()) {
@@ -126,7 +136,8 @@ public class ThreadSafeQueryFileHandler implements QueryFileHandlerInterface {
      */
     @Override
     public void resultsToJSON(Path output) throws IOException {
-        PrettyJsonWriter.resultsToJSON(this.results, output);
+    	// TODO workQueue.finish(); (optional)
+        PrettyJsonWriter.resultsToJSON(this.results, output); // TODO synchronize
     }
 
     /**

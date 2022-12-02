@@ -96,7 +96,7 @@ public class WorkQueue {
             tasks.addLast(task);
             tasks.notifyAll();
         }
-        synchronized (pendingLock) {
+        synchronized (pendingLock) { // TODO Move before the sync on tasks block
             pending++;
         }
     }

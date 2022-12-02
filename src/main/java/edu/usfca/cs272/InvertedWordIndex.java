@@ -94,6 +94,23 @@ public class InvertedWordIndex {
                 }
             }
         }
+        
+        /* TODO 
+        for (var entry : index.wordMap.entrySet()) {
+        	String word = entry.getKey();
+        	if (this.wordMap.containsKey(word)) {
+        		figure out the logic here
+        		when there is overlap use the set.addAll method
+        	}
+        	else {
+        		this.wordMap.put(word, entry.getValue());
+        	}
+        }
+        
+        for (var entry : index.wordCount.entrySet()) {
+        	
+        }
+        */
     }
 
     /**

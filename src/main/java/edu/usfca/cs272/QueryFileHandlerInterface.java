@@ -33,6 +33,16 @@ public interface QueryFileHandlerInterface {
      */
     void parseQuery(Path queryInput, boolean exactSearch) throws IOException;
     // how to do default implementation?
+    /* TODO 
+    public default void parseQuery(Path queryInput, boolean exactSearch) throws IOException {
+      try (BufferedReader buffReader = Files.newBufferedReader(queryInput)) {
+          String line;
+          while ((line = buffReader.readLine()) != null) {
+              parseQuery(line, exactSearch);
+          }
+      }
+  }
+  */
 
     /**
      * Cleans and stems a single query line. Then calls either exact or partial search and

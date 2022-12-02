@@ -3,6 +3,7 @@ package edu.usfca.cs272;
 import java.io.IOException;
 import java.io.Writer;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -13,7 +14,16 @@ import java.util.Set;
  */
 public class ThreadSafeInvertedWordIndex extends InvertedWordIndex {
 
-    /**
+	/* TODO Override for speed
+    @Override
+	public void addAll(ArrayList<String> words, String location,
+			Integer position) {
+
+		super.addAll(words, location, position);
+	}
+	*/
+
+		/**
      * Manages a read and write lock. Improves efficiency for multithreading since queries involve only reading
      * that can happen concurrently.
      */

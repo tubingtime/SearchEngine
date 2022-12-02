@@ -35,6 +35,7 @@ public class QueryFileHandler implements QueryFileHandlerInterface {
         this.results = new TreeMap<>();
     }
 
+    // TODO REmove, it will be inherited from the itnerface
     /**
      * Reads queries from a given {@link Path} line by line and then calls helper method to
      * stem, search, and add to the results data structure.
