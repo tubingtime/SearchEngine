@@ -92,13 +92,14 @@ public class WorkQueue {
      * @param task work request (in the form of a {@link Runnable} object)
      */
     public void execute(Runnable task) {
+        synchronized (pendingLock) {
+            pending++;
+        }
         synchronized (tasks) {
             tasks.addLast(task);
             tasks.notifyAll();
         }
-        synchronized (pendingLock) { // TODO Move before the sync on tasks block
-            pending++;
-        }
+
     }
 
     /**
