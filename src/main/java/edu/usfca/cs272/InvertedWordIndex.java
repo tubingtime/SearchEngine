@@ -49,6 +49,16 @@ public class InvertedWordIndex {
     }
 
     /**
+     * Increments a locations word count by @param x
+     * @param x the amount to increment the word count by
+     * @param location the location to increment
+     */
+    private void increment(String location, int x) {
+        wordCount.putIfAbsent(location, 0);
+        wordCount.put(location, wordCount.get(location) + x);
+    }
+
+    /**
      * Adds a new word to the WordIndex. Given the word, it's Path location, and the position number it was found at.
      * Also increments the word count
      *
@@ -82,35 +92,41 @@ public class InvertedWordIndex {
     /**
      * Adds everything in the provided InvertedWordIndex
      *
-     * @param index Adds everything in the here
+     * @param srcIndex Adds everything in the here
      */
-    public void addAll(InvertedWordIndex index) {
-        for (var entry : index.wordMap.entrySet()) {
-            String word = entry.getKey();
-            for (var locationEntry : entry.getValue().entrySet()) {
-                String location = locationEntry.getKey();
-                for (Integer position : locationEntry.getValue()) {
-                    add(word, location, position);
+    public void addAll(InvertedWordIndex srcIndex) {
+        for (var wordEntry : srcIndex.wordMap.entrySet()) {
+            String word = wordEntry.getKey();
+            if (this.contains(word)) {
+                TreeMap<String, TreeSet<Integer>> thisLocations = this.wordMap.get(word);
+                for (var srcLocationEntry : wordEntry.getValue().entrySet()) {
+                    String srcLocation = srcLocationEntry.getKey();
+                    if (thisLocations.containsKey(srcLocation)) {
+                        Set<Integer> srcPositions = srcLocationEntry.getValue();
+                        thisLocations.get(srcLocation).addAll(srcPositions);
+                    }
+                    else {
+                        thisLocations.put(srcLocation, srcLocationEntry.getValue());
+                    }
                 }
             }
+            else {
+                this.wordMap.put(word, wordEntry.getValue());
+            }
         }
-        
-        /* TODO 
-        for (var entry : index.wordMap.entrySet()) {
-        	String word = entry.getKey();
-        	if (this.wordMap.containsKey(word)) {
-        		figure out the logic here
-        		when there is overlap use the set.addAll method
-        	}
-        	else {
-        		this.wordMap.put(word, entry.getValue());
-        	}
+
+        for (var countEntry : srcIndex.wordCount.entrySet()) {
+            String location = countEntry.getKey();
+            if (this.wordCount.containsKey(location)) {
+                Integer thisLocationsWordCount = wordCount.get(location);
+                Integer srcLocationsWordCount = countEntry.getValue();
+                this.wordCount.put(location, thisLocationsWordCount + srcLocationsWordCount);
+            }
+            else {
+                this.wordCount.put(location, countEntry.getValue());
+            }
         }
-        
-        for (var entry : index.wordCount.entrySet()) {
-        	
-        }
-        */
+
     }
 
     /**
