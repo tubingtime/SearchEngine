@@ -44,8 +44,8 @@ public class Driver {
 
         InvertedWordIndex invertedWordIndex;
         QueryFileHandlerInterface queryFileHandler;
-        
-        ThreadSafeInvertedWordIndex threadSafe = null;
+
+        ThreadSafeInvertedWordIndex threadSafe; // we use this to initialize queryFileHandler and avoid down-casting
         WorkQueue workQueue = null;
         
         if (argumentParser.hasFlag("-threads")) {
@@ -55,16 +55,10 @@ public class Driver {
             }
             log.debug("-threads detected! Initializing a workQueue with {} threads", threads);
             workQueue = new WorkQueue(threads);
-            invertedWordIndex = new ThreadSafeInvertedWordIndex();
-            queryFileHandler =
-                    new ThreadSafeQueryFileHandler((ThreadSafeInvertedWordIndex) invertedWordIndex, workQueue);
-
-            	/* TODO 
-            	threadSafe = new ThreadSafeInvertedWordIndex();
+            threadSafe = new ThreadSafeInvertedWordIndex();
             invertedWordIndex = threadSafe;
             queryFileHandler =
                     new ThreadSafeQueryFileHandler(threadSafe, workQueue);
- 						*/
         } else {
             log.debug("-threads not detected.");
             invertedWordIndex = new InvertedWordIndex();
