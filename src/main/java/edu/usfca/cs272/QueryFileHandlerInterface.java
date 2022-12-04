@@ -1,6 +1,8 @@
 package edu.usfca.cs272;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
@@ -29,12 +31,9 @@ public interface QueryFileHandlerInterface {
      *
      * @param queryInput  the location of the query file
      * @param exactSearch true for exact search, false to allow partial matches
-     * @throws IOException if an IO error occurs while attemping to read from the file
+     * @throws IOException if an IO error occurs while attempting to read from the file
      */
-    void parseQuery(Path queryInput, boolean exactSearch) throws IOException;
-    // how to do default implementation?
-    /* TODO 
-    public default void parseQuery(Path queryInput, boolean exactSearch) throws IOException {
+    default void parseQuery(Path queryInput, boolean exactSearch) throws IOException {
       try (BufferedReader buffReader = Files.newBufferedReader(queryInput)) {
           String line;
           while ((line = buffReader.readLine()) != null) {
@@ -42,7 +41,7 @@ public interface QueryFileHandlerInterface {
           }
       }
   }
-  */
+
 
     /**
      * Cleans and stems a single query line. Then calls either exact or partial search and

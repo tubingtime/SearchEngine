@@ -35,25 +35,6 @@ public class QueryFileHandler implements QueryFileHandlerInterface {
         this.results = new TreeMap<>();
     }
 
-    // TODO REmove, it will be inherited from the itnerface
-    /**
-     * Reads queries from a given {@link Path} line by line and then calls helper method to
-     * stem, search, and add to the results data structure.
-     *
-     * @param queryInput  the location of the query file
-     * @param exactSearch true for exact search, false to allow partial matches
-     * @throws IOException if an IO error occurs while attemping to read from the file
-     */
-    @Override
-    public void parseQuery(Path queryInput, boolean exactSearch) throws IOException {
-        try (BufferedReader buffReader = Files.newBufferedReader(queryInput)) {
-            String line;
-            while ((line = buffReader.readLine()) != null) {
-                parseQuery(line, exactSearch);
-            }
-        }
-    }
-
     /**
      * Cleans and stems a single query line. Then calls either exact or partial search and
      * puts the results into the results data structure.
