@@ -50,7 +50,8 @@ public class InvertedWordIndex {
 
     /**
      * Increments a locations word count by @param x
-     * @param x the amount to increment the word count by
+     *
+     * @param x        the amount to increment the word count by
      * @param location the location to increment
      */
     private void increment(String location, int x) {
@@ -90,9 +91,9 @@ public class InvertedWordIndex {
     }
 
     /**
-     * Adds everything in the provided InvertedWordIndex
+     * Adds everything in the provided InvertedWordIndex to this object's WordMap and WordCount
      *
-     * @param srcIndex Adds everything in the here
+     * @param srcIndex Source index
      */
     public void addAll(InvertedWordIndex srcIndex) {
         // 1. copy over word entries from source index to destination index

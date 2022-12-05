@@ -35,8 +35,8 @@ public class WordIndexBuilder {
      * Multithreaded implementation.
      * Builds a provided InvertedWordIndex from a path to a file or directory
      *
-     * @param start file or directory containing the words
-     * @param index a {@link InvertedWordIndex} to store the words.
+     * @param start     file or directory containing the words
+     * @param index     a {@link InvertedWordIndex} to store the words.
      * @param workQueue a workQueue to execute ScannerTasks
      * @throws IOException if listStems throws an IOException while parsing
      */

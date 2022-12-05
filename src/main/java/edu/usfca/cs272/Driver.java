@@ -47,7 +47,7 @@ public class Driver {
 
         ThreadSafeInvertedWordIndex threadSafe; // we use this to initialize queryFileHandler and avoid down-casting
         WorkQueue workQueue = null;
-        
+
         if (argumentParser.hasFlag("-threads")) {
             int threads = argumentParser.getInteger("-threads", 5);
             if (threads < 1) {

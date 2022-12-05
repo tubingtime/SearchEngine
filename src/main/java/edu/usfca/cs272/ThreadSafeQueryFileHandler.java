@@ -6,9 +6,7 @@ import opennlp.tools.stemmer.snowball.SnowballStemmer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
@@ -67,7 +65,7 @@ public class ThreadSafeQueryFileHandler implements QueryFileHandlerInterface {
 
     @Override
     public void parseQuery(String line, boolean exactSearch) {
-    	workQueue.execute(new QueryTask(line, exactSearch));
+        workQueue.execute(new QueryTask(line, exactSearch));
     }
 
     /**

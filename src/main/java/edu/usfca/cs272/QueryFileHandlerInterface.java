@@ -34,13 +34,13 @@ public interface QueryFileHandlerInterface {
      * @throws IOException if an IO error occurs while attempting to read from the file
      */
     default void parseQuery(Path queryInput, boolean exactSearch) throws IOException {
-      try (BufferedReader buffReader = Files.newBufferedReader(queryInput)) {
-          String line;
-          while ((line = buffReader.readLine()) != null) {
-              parseQuery(line, exactSearch);
-          }
-      }
-  }
+        try (BufferedReader buffReader = Files.newBufferedReader(queryInput)) {
+            String line;
+            while ((line = buffReader.readLine()) != null) {
+                parseQuery(line, exactSearch);
+            }
+        }
+    }
 
 
     /**
