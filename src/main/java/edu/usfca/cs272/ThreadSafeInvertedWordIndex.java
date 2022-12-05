@@ -14,14 +14,7 @@ import java.util.Set;
  */
 public class ThreadSafeInvertedWordIndex extends InvertedWordIndex {
 
-	/* TODO Override for speed
-    @Override
-	public void addAll(ArrayList<String> words, String location,
-			Integer position) {
 
-		super.addAll(words, location, position);
-	}
-	*/
 
 		/**
      * Manages a read and write lock. Improves efficiency for multithreading since queries involve only reading
@@ -47,6 +40,20 @@ public class ThreadSafeInvertedWordIndex extends InvertedWordIndex {
             // make sure we unlock, even if there's a runtime exception
         }
     }
+
+    @Override
+	public void addAll(ArrayList<String> words, String location,
+			Integer position) {
+        lock.write().lock();
+        try {
+            for (String word : words) {
+                super.add(word, location, position++);
+            }
+        } finally {
+            lock.write().unlock();
+        }
+	}
+
 
     @Override
     public void addAll(InvertedWordIndex index) {
