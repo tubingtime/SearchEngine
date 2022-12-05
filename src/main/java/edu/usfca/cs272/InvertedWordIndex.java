@@ -95,38 +95,38 @@ public class InvertedWordIndex {
      * @param srcIndex Adds everything in the here
      */
     public void addAll(InvertedWordIndex srcIndex) {
-        for (var wordEntry : srcIndex.wordMap.entrySet()) {
-            String word = wordEntry.getKey();
+        // 1. copy over word entries from source index to destination index
+        for (var srcWordEntry : srcIndex.wordMap.entrySet()) {
+            String word = srcWordEntry.getKey();
             if (this.contains(word)) {
-                TreeMap<String, TreeSet<Integer>> thisLocations = this.wordMap.get(word);
-                for (var srcLocationEntry : wordEntry.getValue().entrySet()) {
+                TreeMap<String, TreeSet<Integer>> destLocations = this.wordMap.get(word);
+                for (var srcLocationEntry : srcWordEntry.getValue().entrySet()) {
                     String srcLocation = srcLocationEntry.getKey();
-                    if (thisLocations.containsKey(srcLocation)) {
+                    if (destLocations.containsKey(srcLocation)) {
                         Set<Integer> srcPositions = srcLocationEntry.getValue();
-                        thisLocations.get(srcLocation).addAll(srcPositions);
+                        destLocations.get(srcLocation).addAll(srcPositions);
                     }
                     else {
-                        thisLocations.put(srcLocation, srcLocationEntry.getValue());
+                        destLocations.put(srcLocation, srcLocationEntry.getValue());
                     }
                 }
             }
             else {
-                this.wordMap.put(word, wordEntry.getValue());
+                this.wordMap.put(word, srcWordEntry.getValue());
             }
         }
-
+        // 2. copy over wordCounts
         for (var countEntry : srcIndex.wordCount.entrySet()) {
             String location = countEntry.getKey();
             if (this.wordCount.containsKey(location)) {
-                Integer thisLocationsWordCount = wordCount.get(location);
+                Integer destLocationsWordCount = wordCount.get(location);
                 Integer srcLocationsWordCount = countEntry.getValue();
-                this.wordCount.put(location, thisLocationsWordCount + srcLocationsWordCount);
+                this.wordCount.put(location, destLocationsWordCount + srcLocationsWordCount);
             }
             else {
                 this.wordCount.put(location, countEntry.getValue());
             }
         }
-
     }
 
     /**
