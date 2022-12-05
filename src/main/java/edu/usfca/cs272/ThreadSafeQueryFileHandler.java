@@ -59,47 +59,15 @@ public class ThreadSafeQueryFileHandler implements QueryFileHandlerInterface {
 
     @Override
     public void parseQuery(Path queryInput, boolean exactSearch) throws IOException {
-        try (BufferedReader buffReader = Files.newBufferedReader(queryInput)) {
-            String line;
-            log.debug("parseQuery: creating tasks...");
-            while ((line = buffReader.readLine()) != null) {
-                workQueue.execute(new QueryTask(line, exactSearch));
-            }
-            log.debug("parseQuery: called .finish() with {} remaining tasks and {} tasks pending",
-                    workQueue.getTaskSize(), workQueue.getPending());
-            workQueue.finish();
-        }
-        
-        /* TODO 
         QueryFileHandlerInterface.super.parseQuery(queryInput, exactSearch);
+        log.debug("parseQuery: called .finish() with {} remaining tasks and {} tasks pending",
+                workQueue.getTaskSize(), workQueue.getPending());
         workQueue.finish();
-        */
     }
 
     @Override
     public void parseQuery(String line, boolean exactSearch) {
-    	/*
     	workQueue.execute(new QueryTask(line, exactSearch));
-    	
-    	move the rest of this into the task run method...
-    	*/
-        Stemmer stemmer = new SnowballStemmer(ENGLISH);
-        TreeSet<String> stems = WordCleaner.uniqueStems(line, stemmer);
-        if (stems.isEmpty()) {
-            return;
-        }
-        String key = String.join(" ", stems);
-        synchronized (results) {
-            if (results.containsKey(key)) {
-                return;
-            }
-        }
-
-        List<SearchResult> searchResults = wordIndex.search(stems, exactSearch);
-
-        synchronized (results) {
-            results.put(key, searchResults);
-        }
     }
 
     /**
@@ -136,8 +104,9 @@ public class ThreadSafeQueryFileHandler implements QueryFileHandlerInterface {
      */
     @Override
     public void resultsToJSON(Path output) throws IOException {
-    	// TODO workQueue.finish(); (optional)
-        PrettyJsonWriter.resultsToJSON(this.results, output); // TODO synchronize
+        synchronized (results) {
+            PrettyJsonWriter.resultsToJSON(this.results, output);
+        }
     }
 
     /**
@@ -168,7 +137,23 @@ public class ThreadSafeQueryFileHandler implements QueryFileHandlerInterface {
 
         @Override
         public void run() {
-            parseQuery(line, exactSearch);
+            Stemmer stemmer = new SnowballStemmer(ENGLISH);
+            TreeSet<String> stems = WordCleaner.uniqueStems(line, stemmer);
+            if (stems.isEmpty()) {
+                return;
+            }
+            String key = String.join(" ", stems);
+            synchronized (results) {
+                if (results.containsKey(key)) {
+                    return;
+                }
+            }
+
+            List<SearchResult> searchResults = wordIndex.search(stems, exactSearch);
+
+            synchronized (results) {
+                results.put(key, searchResults);
+            }
         }
     }
 }
