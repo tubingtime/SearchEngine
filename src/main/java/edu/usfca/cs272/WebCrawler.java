@@ -45,8 +45,6 @@ public class WebCrawler {
         html = HtmlCleaner.stripBlockElements(html);
 
         // Find links
-        TreeSet<URL> sortedUrls = new TreeSet<>(Comparator.comparing(URL::toString));
-        LinkFinder.findUrls(url, html, sortedUrls);
         ArrayList<URL> urls = new ArrayList<>();
         LinkFinder.findUrls(url, html, urls);
         ArrayList<CrawlTask> crawlTasks = new ArrayList<>();
