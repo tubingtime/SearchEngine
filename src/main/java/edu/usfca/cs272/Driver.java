@@ -48,22 +48,32 @@ public class Driver {
         ThreadSafeInvertedWordIndex threadSafe; // we use this to initialize queryFileHandler and avoid down-casting
         WorkQueue workQueue = null;
 
-        if (argumentParser.hasFlag("-threads")) {
+        if (argumentParser.hasFlag("-threads") || argumentParser.hasFlag("-html")) {
             int threads = argumentParser.getInteger("-threads", 5);
             if (threads < 1) {
                 threads = 5;
             }
-            log.debug("-threads detected! Initializing a workQueue with {} threads", threads);
+            log.debug("-threads or web crawling detected! Initializing a workQueue with {} threads", threads);
             workQueue = new WorkQueue(threads);
             threadSafe = new ThreadSafeInvertedWordIndex();
             invertedWordIndex = threadSafe;
             queryFileHandler =
                     new ThreadSafeQueryFileHandler(threadSafe, workQueue);
         } else {
-            log.debug("-threads not detected.");
             invertedWordIndex = new InvertedWordIndex();
             queryFileHandler = new QueryFileHandler(invertedWordIndex);
         }
+
+        if (argumentParser.hasFlag("-html")) {
+            String seed = argumentParser.getString("-html");
+            if (seed == null) {
+                System.out.println("No seed URL found. You must provide a seed URL for the -html flag." +
+                        "\nExiting...");
+                return;
+            }
+            // TODO: WebCrawler.build(seed, (ThreadSafeInvertedWordIndex) index, workQueue)
+        }
+
 
         if (argumentParser.hasValue("-text")) {
             Path inputPath = argumentParser.getPath("-text");
