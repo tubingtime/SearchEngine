@@ -73,6 +73,23 @@ public class WordIndexBuilder {
     }
 
     /**
+     * Scans a single string and puts the words into an InvertedWordIndex
+     *
+     * @param text  a String of text
+     * @param location where this text was found
+     * @param index a {@link InvertedWordIndex} to store the words.
+     */
+    public static void scanText(String text, String location, InvertedWordIndex index) {
+        SnowballStemmer stemmer = new SnowballStemmer(ENGLISH);
+        String[] parsedLine;
+        parsedLine = WordCleaner.parse(text);
+        int position = 1;
+        for (String word : parsedLine) {
+            index.add(stemmer.stem(word).toString(), location, position++);
+        }
+    }
+
+    /**
      * Task to scan a single text file and puts the words into the wordIndex
      */
     private static class ScannerTask implements Runnable {

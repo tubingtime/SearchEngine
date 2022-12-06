@@ -100,6 +100,18 @@ public class LinkFinder {
                 url.getPort(), url.getPath(), url.getQuery(), null).toURL();
     }
 
+    public static URL addIndex(URL url) {
+        if (url.getPath().endsWith("/")){
+            try {
+                url = new URL(String.join("",url.toString(), "index.html"));
+            } catch (MalformedURLException e) {
+                throw new RuntimeException(e);
+                //todo: just catch and return url?
+            }
+        }
+        return url;
+    }
+
     /**
      * Determines whether the URL provided uses the HTTP or HTTPS protocol.
      *
@@ -124,7 +136,10 @@ public class LinkFinder {
         System.out.println();
 
         // this demonstrates encoding
-        URL space = new URL("https://www.google.com/search?q=hello world");
+        URL space = new URL("https://usf-cs272-fall2022.github.io/project-web/input/birds/");
+        if (space.getPath().endsWith("/")){
+            System.out.println(String.join("",space.toString(), "index.html"));
+        }
         System.out.println(" Link: " + space);
         System.out.println("Clean: " + normalize(space));
         System.out.println();

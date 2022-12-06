@@ -107,7 +107,7 @@ public class HtmlCleaner {
 	 */
 	public static String stripComments(String html) {
 		// regex: https://regex101.com/r/SnRdmc/1
-		final String regex = "<!--[^-]+?-->";
+		final String regex = "(?s)<!--.+?-->";
 		return html.replaceAll(regex, "");
 	}
 

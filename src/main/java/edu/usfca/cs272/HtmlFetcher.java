@@ -32,6 +32,9 @@ public class HtmlFetcher {
      */
     public static boolean isHtml(Map<String, List<String>> headers) {
         List<String> contentType = headers.get("Content-Type");
+        if (contentType == null) {
+            return false;
+        }
 		return contentType.get(0).startsWith("text/html");
 	}
 

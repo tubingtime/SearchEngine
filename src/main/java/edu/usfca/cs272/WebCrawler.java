@@ -2,56 +2,93 @@ package edu.usfca.cs272;
 
 
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.ArrayList;
+import java.util.*;
 
 public class WebCrawler {
 
-    private final Object maxLock;
+    private final Object maxLock; //todo: rename?
 
-    private final int max;
+    private int max;
 
-    public WebCrawler(Object maxLock, int max) {
-        this.maxLock = maxLock;
+    private HashSet<URL> crawledUrls;
+
+    public WebCrawler(int max) {
+        this.maxLock = new Object();
         this.max = max;
+        this.crawledUrls = new HashSet<>();
     }
 
-    public void crawl (URL url, ThreadSafeInvertedWordIndex index, WorkQueue workQueue, int max)
-            throws MalformedURLException {
-        String html = HtmlFetcher.fetch(url);
+    public void startCrawl (String seed, ThreadSafeInvertedWordIndex index, WorkQueue workQueue) throws MalformedURLException {
+        URL seedUrl = new URL(seed);
+        try { // todo: maybe unnecessary
+            LinkFinder.normalize(seedUrl);
+            if (seedUrl.getPath().endsWith("/")){
+                System.out.println(String.join("",seedUrl.toString(), "index.html"));
+            }
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+        synchronized (maxLock) {
+            crawledUrls.add(seedUrl);
+        }
+        crawl(seedUrl, index, workQueue);
+        workQueue.finish();
+    }
+
+    public void crawl (URL url, ThreadSafeInvertedWordIndex index, WorkQueue workQueue) {
+        String html = HtmlFetcher.fetch(url, 3);
         if (html == null){
-            return;
+            return; // unable to find resource or is not html
         }
         html = HtmlCleaner.stripBlockElements(html);
-        ArrayList<URL> urls = LinkFinder.listUrls(url, html);
+
+        // Find links
+        TreeSet<URL> sortedUrls = new TreeSet<>(Comparator.comparing(URL::toString));
+        LinkFinder.findUrls(url, html, sortedUrls);
+        ArrayList<URL> urls = new ArrayList<>();
+        LinkFinder.findUrls(url, html, urls);
         ArrayList<CrawlTask> crawlTasks = new ArrayList<>();
         synchronized (maxLock) {
             for (URL foundURL : urls) {
-                if (max >= 1) {
-                    break;
+                if (this.max <= 1) {
+                    break; // todo: could make this a while loop for simplification
                 }
-                crawlTasks.add(new CrawlTask(foundURL, index, workQueue));
+                if (!crawledUrls.contains(foundURL) || crawledUrls.contains(LinkFinder.addIndex(foundURL))) {
+                    crawlTasks.add(new CrawlTask(foundURL, index, workQueue, this));
+                    max--;
+                }
             }
         }
+        for (CrawlTask crawlTask : crawlTasks) {
+            workQueue.execute(crawlTask);
+        }
 
+        // Continue processing HTML from current link
+        html = HtmlCleaner.stripTags(html);
+        html = HtmlCleaner.stripEntities(html);
+
+        WordIndexBuilder.scanText(html, url.toString(), index);
     }
 
 
 
 
     private static class CrawlTask implements Runnable {
-
         private final URL url;
 
         private final ThreadSafeInvertedWordIndex index;
 
         private final WorkQueue workQueue;
 
+        private final WebCrawler crawler;
 
-        public CrawlTask (URL url, ThreadSafeInvertedWordIndex index, WorkQueue workQueue) {
+        public CrawlTask (URL url, ThreadSafeInvertedWordIndex index, WorkQueue workQueue, WebCrawler crawler) {
             this.url = url;
             this.index = index;
             this.workQueue = workQueue;
+            this.crawler = crawler;
         }
         /**
          * When an object implementing interface {@code Runnable} is used
@@ -66,11 +103,7 @@ public class WebCrawler {
          */
         @Override
         public void run() {
-
-                crawl(url, index, workQueue);
-            } catch (MalformedURLException e) {
-                throw new RuntimeException(e);
-            }
+            crawler.crawl(url, index, workQueue);
         }
     }
 }

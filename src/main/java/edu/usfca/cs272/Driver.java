@@ -5,6 +5,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
@@ -67,11 +68,21 @@ public class Driver {
         if (argumentParser.hasFlag("-html")) {
             String seed = argumentParser.getString("-html");
             if (seed == null) {
-                System.out.println("No seed URL found. You must provide a seed URL for the -html flag." +
+                System.out.println("No URL found. You must provide a URL for the -html flag." +
                         "\nExiting...");
                 return;
             }
-            // TODO: WebCrawler.build(seed, (ThreadSafeInvertedWordIndex) index, workQueue)
+            int max = argumentParser.getInteger("-max", 1);
+            if (max < 0) {
+                max = 1;
+            }
+            WebCrawler webCrawler = new WebCrawler(max);
+            assert invertedWordIndex instanceof ThreadSafeInvertedWordIndex;
+            try {
+                webCrawler.startCrawl(seed, (ThreadSafeInvertedWordIndex) invertedWordIndex, workQueue);
+            } catch (MalformedURLException e) {
+                System.out.printf("Malformed URL detected: " + seed);
+            }
         }
 
 
