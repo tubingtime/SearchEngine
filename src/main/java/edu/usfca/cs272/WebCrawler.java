@@ -53,8 +53,9 @@ public class WebCrawler {
                 if (this.max <= 1) {
                     break; // todo: could make this a while loop for simplification
                 }
-                if (!crawledUrls.contains(foundURL) || crawledUrls.contains(LinkFinder.addIndex(foundURL))) {
+                if (!crawledUrls.contains(foundURL) && !crawledUrls.contains(LinkFinder.addIndex(foundURL))) {
                     crawlTasks.add(new CrawlTask(foundURL, index, workQueue, this));
+                    crawledUrls.add(foundURL);
                     max--;
                 }
             }
