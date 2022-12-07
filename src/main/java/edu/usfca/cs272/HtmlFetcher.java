@@ -35,8 +35,8 @@ public class HtmlFetcher {
         if (contentType == null) {
             return false;
         }
-		return contentType.get(0).startsWith("text/html");
-	}
+        return contentType.get(0).startsWith("text/html");
+    }
 
     /**
      * Parses the HTTP status code from the provided HTTP headers, assuming the
@@ -90,7 +90,7 @@ public class HtmlFetcher {
                 PrintWriter request = new PrintWriter(socket.getOutputStream());
                 InputStreamReader input = new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8);
                 BufferedReader response = new BufferedReader(input)
-		) {
+        ) {
             // make http GET request of the web server
             HttpsFetcher.printGetRequest(request, url);
 

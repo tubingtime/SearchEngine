@@ -4,10 +4,13 @@ package edu.usfca.cs272;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
 
 /**
  * Multithreaded web crawler that will recursively crawl on links found inside html
+ *
  * @author Thomas de Laveaga
  */
 public class WebCrawler {
@@ -30,6 +33,7 @@ public class WebCrawler {
     /**
      * Creates a new instance of this class with a specified amount of URLs to crawl if
      * more are found from the seed url.
+     *
      * @param maxUrls the maximum amount of URLs to crawl before stopping.
      */
     public WebCrawler(int maxUrls) {
@@ -41,12 +45,13 @@ public class WebCrawler {
     /**
      * Starts a recursive web crawl using Sockets to download the page. Follows up to 3 redirects and up to
      * a specified amount of links found inside href tags.
-     * @param seed the url to crawl, any links found inside will be crawled
-     * @param index the {@link ThreadSafeInvertedWordIndex} to add data to
+     *
+     * @param seed      the url to crawl, any links found inside will be crawled
+     * @param index     the {@link ThreadSafeInvertedWordIndex} to add data to
      * @param workQueue A {@link WorkQueue} to distribute work to threads.
      * @throws MalformedURLException if the seed url is invalid
      */
-    public void startCrawl (String seed, ThreadSafeInvertedWordIndex index, WorkQueue workQueue) throws MalformedURLException {
+    public void startCrawl(String seed, ThreadSafeInvertedWordIndex index, WorkQueue workQueue) throws MalformedURLException {
         URL seedUrl = new URL(seed);
         try { // todo: maybe unnecessary
             LinkFinder.normalize(seedUrl);
@@ -65,13 +70,14 @@ public class WebCrawler {
      * looks for links inside href tags. We create a new {@link CrawlTask} if the link is: it's a valid URL,
      * it hasn't already been crawled,
      * and we haven't reached our maxUrls crawled.
-     * @param url the url to crawl
-     * @param index the index to add data to
+     *
+     * @param url       the url to crawl
+     * @param index     the index to add data to
      * @param workQueue a {@link WorkQueue} to handle the execution of {@link CrawlTask}
      */
-    private void crawl (URL url, ThreadSafeInvertedWordIndex index, WorkQueue workQueue) {
+    private void crawl(URL url, ThreadSafeInvertedWordIndex index, WorkQueue workQueue) {
         String html = HtmlFetcher.fetch(url, 3);
-        if (html == null){
+        if (html == null) {
             return; // unable to find resource or is not html
         }
         html = HtmlCleaner.stripBlockElements(html);
@@ -130,12 +136,13 @@ public class WebCrawler {
 
         /**
          * Constructs a new CrawlTask
-         * @param url The url to crawl
-         * @param index The workQueue to add more CrawlTasks to
+         *
+         * @param url       The url to crawl
+         * @param index     The workQueue to add more CrawlTasks to
          * @param workQueue The workQueue to add more CrawlTasks to
-         * @param crawler A webcrawler that holds the maxUrls and crawledUrls
+         * @param crawler   A webcrawler that holds the maxUrls and crawledUrls
          */
-        public CrawlTask (URL url, ThreadSafeInvertedWordIndex index, WorkQueue workQueue, WebCrawler crawler) {
+        public CrawlTask(URL url, ThreadSafeInvertedWordIndex index, WorkQueue workQueue, WebCrawler crawler) {
             this.url = url;
             this.index = index;
             this.workQueue = workQueue;

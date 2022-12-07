@@ -75,9 +75,9 @@ public class WordIndexBuilder {
     /**
      * Scans a single string and puts the words into an InvertedWordIndex
      *
-     * @param text  a String of text
+     * @param text     a String of text
      * @param location where this text was found
-     * @param index a {@link InvertedWordIndex} to store the words.
+     * @param index    a {@link InvertedWordIndex} to store the words.
      */
     public static void scanText(String text, String location, InvertedWordIndex index) {
         SnowballStemmer stemmer = new SnowballStemmer(ENGLISH);

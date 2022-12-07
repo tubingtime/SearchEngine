@@ -36,7 +36,7 @@ public class HttpsFetcher {
                 PrintWriter request = new PrintWriter(socket.getOutputStream());
                 InputStreamReader input = new InputStreamReader(socket.getInputStream(), UTF_8);
                 BufferedReader response = new BufferedReader(input)
-		) {
+        ) {
             // make http GET request of the web server
             printGetRequest(request, url);
 

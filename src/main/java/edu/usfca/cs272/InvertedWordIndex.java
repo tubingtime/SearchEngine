@@ -106,13 +106,11 @@ public class InvertedWordIndex {
                     if (destLocations.containsKey(srcLocation)) {
                         Set<Integer> srcPositions = srcLocationEntry.getValue();
                         destLocations.get(srcLocation).addAll(srcPositions);
-                    }
-                    else {
+                    } else {
                         destLocations.put(srcLocation, srcLocationEntry.getValue());
                     }
                 }
-            }
-            else {
+            } else {
                 this.wordMap.put(word, srcWordEntry.getValue());
             }
         }
@@ -123,8 +121,7 @@ public class InvertedWordIndex {
                 Integer destLocationsWordCount = wordCount.get(location);
                 Integer srcLocationsWordCount = countEntry.getValue();
                 this.wordCount.put(location, destLocationsWordCount + srcLocationsWordCount);
-            }
-            else {
+            } else {
                 this.wordCount.put(location, countEntry.getValue());
             }
         }
