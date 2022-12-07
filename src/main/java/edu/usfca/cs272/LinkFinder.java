@@ -100,13 +100,18 @@ public class LinkFinder {
                 url.getPort(), url.getPath(), url.getQuery(), null).toURL();
     }
 
+    /**
+     * Adds "index.html" to the end of a URL if it ends with /
+     * For example google.com/ will turn into google.com/index.html
+     * @param url the url to add "index.html" to
+     * @return a url with "index.html" appended if it ends with /
+     */
     public static URL addIndex(URL url) {
         if (url.getPath().endsWith("/")){
             try {
                 url = new URL(String.join("",url.toString(), "index.html"));
             } catch (MalformedURLException e) {
                 throw new RuntimeException(e);
-                //todo: just catch and return url?
             }
         }
         return url;
