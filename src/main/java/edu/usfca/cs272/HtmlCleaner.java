@@ -173,44 +173,4 @@ public class HtmlCleaner {
 		html = stripEntities(html);
 		return html;
 	}
-
-	/**
-	 * Demonstrates this class.
-	 *
-	 * @param args unused
-	 */
-	public static void main(String[] args) {
-		String html = """
-				<!doctype html>
-				<html lang="en">
-				<head>
-					<meta charset="utf-8">
-					<title>Hello, world!</title>
-				</head>
-				<body>
-					<style>
-						body {
-							font-size: 12pt;
-						}
-					</style>
-
-					<p>Hello, <strong>world</strong>!</p>
-					<p>&copy; 2022</p>
-				</body>
-				</html>
-				""";
-
-		/*
-		 * The output should eventually look like:
-		 *
-		 * 	Hello, world!
-		 * 	© 2022
-		 */
-
-		System.out.println("---------------------");
-		System.out.println(html);
-		System.out.println("---------------------");
-		System.out.println(stripHtml(html));
-		System.out.println("---------------------");
-	}
 }

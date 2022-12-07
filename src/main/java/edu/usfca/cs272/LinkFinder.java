@@ -121,36 +121,4 @@ public class LinkFinder {
     public static boolean isHttp(URL url) {
         return url.getProtocol().matches("(?i)https?");
     }
-
-    /**
-     * Demonstrates this class.
-     *
-     * @param args unused
-     * @throws Exception if any issues occur
-     */
-    public static void main(String[] args) throws Exception {
-        // this demonstrates cleaning
-        URL valid = new URL("https://docs.python.org/3/library/functions.html?highlight=string#format");
-        System.out.println(" Link: " + valid);
-        System.out.println("Clean: " + normalize(valid));
-        System.out.println();
-
-        // this demonstrates encoding
-        URL space = new URL("https://usf-cs272-fall2022.github.io/project-web/input/birds/");
-        if (space.getPath().endsWith("/")){
-            System.out.println(String.join("",space.toString(), "index.html"));
-        }
-        System.out.println(" Link: " + space);
-        System.out.println("Clean: " + normalize(space));
-        System.out.println();
-
-        // this demonstrates a non-HTTP URL
-        URL email = new URL("mailto:username@example.edu");
-        System.out.println(email);
-        System.out.println("HTTP? " + isHttp(email));
-
-        // this throws an exception
-        URL invalid = new URL("javascript:alert('Hello!');");
-        System.out.println(invalid);
-    }
 }
