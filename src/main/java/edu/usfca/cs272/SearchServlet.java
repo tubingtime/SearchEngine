@@ -7,7 +7,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.text.StringEscapeUtils;
 import org.apache.commons.text.StringSubstitutor;
 
-import java.io.BufferedWriter;
+import edu.usfca.cs272.InvertedWordIndex.SearchResult;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -15,6 +15,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 public class SearchServlet extends HttpServlet {
@@ -54,7 +55,17 @@ public class SearchServlet extends HttpServlet {
         var results = queryFileHandler.parseQueryGetResults(query, false);
 
         try (StringWriter stringWriter = new StringWriter()) {
-            PrettyJsonWriter.writeNestedSearchResults(results, stringWriter, 0);
+            Iterator<SearchResult> resultsIterator = results.iterator();
+            for (int i = 1; resultsIterator.hasNext(); i++) {
+                SearchResult result = resultsIterator.next();
+                stringWriter.write(String.valueOf(i));
+                stringWriter.write(":<br>\n");
+                stringWriter.write(result.getWhere());
+                stringWriter.write(":<br>\n");
+                stringWriter.write("Matches: ");
+                stringWriter.write(String.valueOf(result.getCount()));
+                stringWriter.write("<br>\n");
+            }
             if (results.isEmpty()){
                 values.put("results", "No results found.");
             } else {
