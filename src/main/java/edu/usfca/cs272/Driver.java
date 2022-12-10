@@ -39,6 +39,8 @@ public class Driver {
     public static void main(String[] args) {
         // store initial start time
         Instant start = Instant.now();
+        args = new String[]{"-server", "8081",
+                "-text", Path.of("/home/thomas/Documents/Fall2022/CS-272/search-engine/project-tests/input/text/simple").toString()}; //debug todo: remove
         ArgumentParser argumentParser = new ArgumentParser(args); /* parse args */
         log.debug("Actual args: {}", Arrays.toString(args));
         log.debug("Parsed args: {}", argumentParser);
@@ -49,7 +51,8 @@ public class Driver {
         ThreadSafeInvertedWordIndex threadSafe; // we use this to initialize queryFileHandler and avoid down-casting
         WorkQueue workQueue = null;
 
-        if (argumentParser.hasFlag("-threads") || argumentParser.hasFlag("-html")) {
+
+        if (argumentParser.hasFlag("-threads") || argumentParser.hasFlag("-html") || argumentParser.hasFlag("-server")) {
             int threads = argumentParser.getInteger("-threads", 5);
             if (threads < 1) {
                 threads = 5;
@@ -133,6 +136,18 @@ public class Driver {
                 queryFileHandler.resultsToJSON(queryOutput);
             } catch (IOException e) {
                 System.out.println("IO Error occurred while attempting to output search results to: " + queryOutput);
+            }
+        }
+
+        if (argumentParser.hasFlag("-server")) {
+            int port = argumentParser.getInteger("-server", 8080);
+            try {
+                System.out.println("Starting server on: " + port);
+                assert queryFileHandler instanceof ThreadSafeQueryFileHandler;
+                SearchServer searchServer = new SearchServer((ThreadSafeQueryFileHandler) queryFileHandler, port);
+                searchServer.start();
+            } catch (Exception e) {
+                System.out.println("Error occurred while attempting to start the server on port " + port);
             }
         }
 

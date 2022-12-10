@@ -110,7 +110,7 @@ public class LinkFinder {
     public static URL addIndex(URL url) {
         if (url.getPath().endsWith("/")) {
             try {
-                url = new URL(String.join("", url.toString(), "index.html"));
+                url = new URL(String.join("", url.toString(), "html/index.html"));
             } catch (MalformedURLException e) {
                 throw new RuntimeException(e);
             }

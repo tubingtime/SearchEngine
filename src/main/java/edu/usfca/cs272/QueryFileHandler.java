@@ -18,7 +18,7 @@ public class QueryFileHandler implements QueryFileHandlerInterface {
 
     /**
      * Search results data structure
-     * String location, List SearchResult
+     * String query, List SearchResult
      */
     private final Map<String, List<InvertedWordIndex.SearchResult>> results;
 
@@ -54,7 +54,6 @@ public class QueryFileHandler implements QueryFileHandlerInterface {
 
         List<SearchResult> searchResults = wordIndex.search(stems, exactSearch);
         results.put(key, searchResults);
-
     }
 
     /**

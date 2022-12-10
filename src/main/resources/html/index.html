@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>${title}</title>
+</head>
+
+<body>
+<h1>SUPA SEARCH</h1>
+
+
+<form method="${method}" action="${action}">
+  <p>
+    <label for="query">Enter your search.</label>
+    <input type="text" name="query" id="query" maxlength="50" size="20">
+  </p>
+  <p><input type="submit" value="Search"></p>
+</form>
+<h2>Results:</h2><br>
+${results}
+
+<p>This request was handled by thread ${thread}.</p>
+
+</body>
+</html>

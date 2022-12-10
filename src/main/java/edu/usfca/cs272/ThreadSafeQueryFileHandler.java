@@ -68,6 +68,15 @@ public class ThreadSafeQueryFileHandler implements QueryFileHandlerInterface {
         workQueue.execute(new QueryTask(line, exactSearch));
     }
 
+    //todo: make this in the interface? also could avoid
+    // 1. stemming twice
+    // 2. only calling .finish() on this thread (?) <-- maybe we dont create task: just call .run directly here
+    public List<SearchResult> parseQueryGetResults(String line, boolean exactSearch) {
+        workQueue.execute(new QueryTask(line, exactSearch));
+        workQueue.finish();
+        return getResults(line);
+    }
+
     /**
      * @return an unmodifiable set of the queries in the results data structure.
      */
@@ -79,10 +88,11 @@ public class ThreadSafeQueryFileHandler implements QueryFileHandlerInterface {
     }
 
     /**
-     * Gets results of a given location
+     * Gets results given an unprocessed query. In order to find the results, this
+     * method will stem the query since that is how they key is stored in the data structure.
      *
      * @param queryLine the location to get SearchResults from
-     * @return an unmodifiable list of SearchResults
+     * @return an unmodifiable list of SearchResults or an empty list if no results were found
      */
     @Override
     public List<SearchResult> getResults(String queryLine) {
