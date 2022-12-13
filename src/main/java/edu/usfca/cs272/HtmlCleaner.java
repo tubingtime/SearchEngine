@@ -167,4 +167,21 @@ public class HtmlCleaner {
         html = stripEntities(html);
         return html;
     }
+
+    /**
+     * Gets the title of a given page or null if the page does not have a title tag
+     * Also Escapes HTML tags to avoid XSS
+     * @param html the html to find the title of
+     * @return the HTML escaped title or null if the title is not found
+     */
+    public static String getTitle(String html) {
+        final String regex = "(?i)(?s)(<title|<title\\s[^>]*)>(.*?)<\\/title>";
+        final Pattern pattern = Pattern.compile(regex);
+        final Matcher matcher = pattern.matcher(html);
+        if (matcher.find()){
+            return StringEscapeUtils.escapeHtml4(matcher.group(2));
+        }
+        return null;
+
+    }
 }

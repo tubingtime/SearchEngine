@@ -1,12 +1,17 @@
 package edu.usfca.cs272;
 
 
+import org.apache.commons.text.StringEscapeUtils;
+
+import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.*;
 
 /**
  * Multithreaded web crawler that will recursively crawl on links found inside html
@@ -66,6 +71,30 @@ public class WebCrawler {
     }
 
     /**
+     * Starts a recursive web crawl using Sockets to download the page. Follows up to 3 redirects and up to
+     * a specified amount of links found inside href tags.
+     *
+     * @param seed      the url to crawl, any links found inside will be crawled
+     * @param index     the {@link ThreadSafeInvertedWordIndex} to add data to
+     * @param workQueue A {@link WorkQueue} to distribute work to threads.
+     * @throws MalformedURLException if the seed url is invalid
+     */
+    public void startCrawl(String seed, ThreadSafeInvertedWordIndex index, WorkQueue workQueue, Connection db)
+            throws MalformedURLException {
+        URL seedUrl = new URL(seed);
+        try { // todo: maybe unnecessary
+            LinkFinder.normalize(seedUrl);
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+        synchronized (urlLock) {
+            crawledUrls.add(seedUrl);
+        }
+        crawl(seedUrl, index, workQueue, db);
+        workQueue.finish();
+    }
+
+    /**
      * Uses Sockets to download a webpage if it's content type is text/html. After stripping block elements, it
      * looks for links inside href tags. We create a new {@link CrawlTask} if the link is: it's a valid URL,
      * it hasn't already been crawled,
@@ -108,6 +137,81 @@ public class WebCrawler {
         WordIndexBuilder.scanText(html, url.toString(), index);
     }
 
+    /**
+     * Uses Sockets to download a webpage if it's content type is text/html. After stripping block elements, it
+     * looks for links inside href tags. We create a new {@link CrawlTask} if the link is: it's a valid URL,
+     * it hasn't already been crawled,
+     * and we haven't reached our maxUrls crawled. // todo; update javadoc
+     *
+     * @param url       the url to crawl
+     * @param index     the index to add data to
+     * @param workQueue a {@link WorkQueue} to handle the execution of {@link CrawlTask}
+     */
+    private void crawl(URL url, ThreadSafeInvertedWordIndex index, WorkQueue workQueue, Connection db) {
+        Map<String, List<String>> headers = new HashMap<>();
+        String html = HtmlFetcher.fetch(url, 3, headers); // todo: fix headers always null
+        if (html == null) {
+            return; // unable to find resource or is not html
+        }
+        String title = HtmlCleaner.getTitle(html);
+        html = HtmlCleaner.stripBlockElements(html);
+
+        // Find links
+        ArrayList<URL> urls = new ArrayList<>();
+        LinkFinder.findUrls(url, html, urls); //todo: could save some time by only finding enough urls to satisfy maxURLs
+        ArrayList<CrawlTask> crawlTasks = new ArrayList<>();
+        synchronized (urlLock) {
+            Iterator<URL> urlsIterator = urls.iterator();
+            while (urlsIterator.hasNext() && this.maxUrls > 1) {
+                URL foundURL = urlsIterator.next();
+                if (!crawledUrls.contains(foundURL)) {
+                    crawlTasks.add(new CrawlTask(foundURL, index, workQueue, this, db));
+                    crawledUrls.add(foundURL);
+                    maxUrls--;
+                }
+            }
+        }
+        for (CrawlTask crawlTask : crawlTasks) {
+            workQueue.execute(crawlTask);
+        }
+
+        // Continue processing HTML from current link
+        html = HtmlCleaner.stripTags(html);
+        html = HtmlCleaner.stripEntities(html);
+
+        WordIndexBuilder.scanText(html, url.toString(), index);
+
+        // get metadata and store in db
+        // todo: padright or make a seperate func
+        String snippet;
+        try {
+            snippet = StringEscapeUtils.escapeHtml4(html.substring(0, 30)) + "..."; //todo: string.join
+        } catch (StringIndexOutOfBoundsException ignored) {
+            snippet = html;
+        }
+
+        List<String> contentLengthHeader = headers.get("content-length");
+        Integer contentLength = (contentLengthHeader == null) ? -1 : Integer.parseInt(contentLengthHeader.get(0));
+        StringBuilder sql = new StringBuilder();
+        sql.append("INSERT INTO crawler_stats");
+        sql.append(System.lineSeparator());
+        sql.append("VALUES (");
+        sql.append("\"").append(url.toString()).append("\", ");
+        sql.append("\"").append(snippet).append("\", ");
+        sql.append("\"").append(title).append("\", ");
+        sql.append("\"").append(contentLength).append("\", ");
+        sql.append("CURRENT_TIMESTAMP").append(")");
+        sql.append(";");
+
+        try (PreparedStatement statement = db.prepareStatement(sql.toString())) {
+            ResultSet resultSet = statement.executeQuery();
+            System.out.println(resultSet.toString());
+        } catch (SQLException e) {
+            System.out.println("SQL Exception!");//todo: log
+        }
+
+
+    }
 
     /**
      * A task that calls crawl
@@ -134,6 +238,7 @@ public class WebCrawler {
          */
         private final WebCrawler crawler;
 
+        private final Connection db;
         /**
          * Constructs a new CrawlTask
          *
@@ -147,11 +252,26 @@ public class WebCrawler {
             this.index = index;
             this.workQueue = workQueue;
             this.crawler = crawler;
+            this.db = null;
+        }
+
+        public CrawlTask(URL url, ThreadSafeInvertedWordIndex index,
+                         WorkQueue workQueue, WebCrawler crawler, Connection db
+        ) {
+            this.url = url;
+            this.index = index;
+            this.workQueue = workQueue;
+            this.crawler = crawler;
+            this.db = db;
         }
 
         @Override
         public void run() {
-            crawler.crawl(url, index, workQueue);
+            if (db == null) {
+                crawler.crawl(url, index, workQueue);
+            } else {
+                crawler.crawl(url, index, workQueue, db);
+            }
         }
     }
 }

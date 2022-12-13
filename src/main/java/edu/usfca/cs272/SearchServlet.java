@@ -14,6 +14,10 @@ import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -63,22 +67,60 @@ public class SearchServlet extends HttpServlet {
         query = StringEscapeUtils.escapeHtml4(query);
         var results = queryFileHandler.parseQueryGetResults(query, false);
 
-        try (StringWriter stringWriter = new StringWriter()) {
+        try (
+                StringWriter stringWriter = new StringWriter();
+                Connection db = connector.getConnection();
+                PreparedStatement statement = db.prepareStatement(
+                        "SELECT * from crawler_stats WHERE page_url LIKE ?"
+                );
+        ) {
             for (SearchResult result : results) {
+                statement.setString(1, result.getWhere());
+                String snippet = "";
+                String title = "      ";
+                String contentLength = "";
+                String timestampCrawled = "";
+                try (ResultSet dbResults = statement.executeQuery()){
+                    //todo: escape to avoid xss
+                    if (dbResults.next()) {
+                        snippet = dbResults.getString("snippet");
+                        title = dbResults.getString("title");
+                        contentLength = dbResults.getString("content_length");
+                        timestampCrawled = dbResults.getString("timestamp_crawled");
+                    } else {
+                        System.out.println("no metadata found");
+                    }
+                }
                 String whereLink = String.join("", "<a href=\"", result.getWhere(), "\">",
-                        result.getWhere(), "</a>");
-                System.out.println(whereLink);
+                        title, "</a>");
                 stringWriter.write(whereLink);
                 stringWriter.write(":<br>\n");
                 stringWriter.write("Matches: ");
                 stringWriter.write(String.valueOf(result.getCount()));
                 stringWriter.write("<br>\n");
+                // get page stats
+                stringWriter.write("Snippet: ");
+                stringWriter.write(snippet);
+                stringWriter.write("<br>\n");
+                stringWriter.write("Content Length: ");
+                stringWriter.write(contentLength);
+                stringWriter.write(" | Timestamp Crawled: ");
+                stringWriter.write(timestampCrawled);
+                stringWriter.write("<br>\n");
+                stringWriter.write("----------------------------------------");
+                stringWriter.write("<br><br>\n\n");
+
+
+
             }
             if (results.isEmpty()){
                 values.put("results", "No results found.");
             } else {
                 values.put("results", stringWriter.toString());
             }
+        } catch (SQLException e) {
+            //todo : log.warn
+            throw new RuntimeException(e);
         }
 
         String html = StringSubstitutor.replace(htmlTemplate, values);

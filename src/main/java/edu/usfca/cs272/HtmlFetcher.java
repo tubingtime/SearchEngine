@@ -116,6 +116,57 @@ public class HtmlFetcher {
     }
 
     /**
+     * todo: remove and create a fetch that returns the response
+     * Fetches the resource at the URL using HTTP/1.1 and sockets. If the status
+     * code is 200 and the content type is HTML, returns the HTML as a single
+     * string. If the status code is a valid redirect, will follow that redirect
+     * if the number of redirects is greater than 0. Otherwise, returns
+     * {@code null}.
+     *
+     * @param url       the url to fetch
+     * @param redirects the number of times to follow redirects
+     * @return the html or {@code null} if unable to fetch the resource or the
+     * resource is not html
+     * @see HttpsFetcher#openConnection(URL)
+     * @see HttpsFetcher#printGetRequest(PrintWriter, URL)
+     * @see HttpsFetcher#getHeaderFields(BufferedReader)
+     * @see String#join(CharSequence, CharSequence...)
+     * @see #isHtml(Map)
+     * @see #isRedirect(Map)
+     */
+    public static String fetch(URL url, int redirects, Map<String, List<String>> headers) {
+        String html = null;
+        try (
+                Socket socket = HttpsFetcher.openConnection(url);
+                PrintWriter request = new PrintWriter(socket.getOutputStream());
+                InputStreamReader input = new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8);
+                BufferedReader response = new BufferedReader(input)
+        ) {
+            // make http GET request of the web server
+            HttpsFetcher.printGetRequest(request, url);
+
+            // the headers will be first in the response
+            headers = HttpsFetcher.getHeaderFields(response);
+            if (!isHtml(headers)) {
+                return null;
+            }
+            if (isRedirect(headers) && redirects > 0) {
+                URL redirection = new URL(headers.get("Location").get(0));
+                return fetch(redirection, redirects - 1);
+            }
+            if (getStatusCode(headers) != 200) {
+                return null;
+            }
+            // ELSE
+            html = response.lines().collect(Collectors.joining("\n"));
+        } catch (IOException e) {
+            html = null;
+        }
+
+        return html;
+    }
+
+    /**
      * Converts the {@link String} url into a {@link URL} object and then calls
      * {@link #fetch(URL, int)}.
      *

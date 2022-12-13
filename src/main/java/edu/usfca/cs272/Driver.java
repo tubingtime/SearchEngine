@@ -4,10 +4,13 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
@@ -40,7 +43,7 @@ public class Driver {
         // store initial start time
         Instant start = Instant.now();
         args = new String[]{"-server", "8081",
-                "-html", "https://usf-cs272-fall2022.github.io/project-web/input/simple/", "-max", "1"}; //debug todo: remove
+                "-html", "https://usf-cs272-fall2022.github.io/project-web/input/simple/", "-max", "50"}; //debug todo: remove
         ArgumentParser argumentParser = new ArgumentParser(args); /* parse args */
         log.debug("Actual args: {}", Arrays.toString(args));
         log.debug("Parsed args: {}", argumentParser);
@@ -82,9 +85,17 @@ public class Driver {
             WebCrawler webCrawler = new WebCrawler(max);
             assert invertedWordIndex instanceof ThreadSafeInvertedWordIndex;
             try {
-                webCrawler.startCrawl(seed, (ThreadSafeInvertedWordIndex) invertedWordIndex, workQueue);
-            } catch (MalformedURLException e) {
-                System.out.printf("Malformed URL detected: " + seed);
+                DatabaseConnector connector = new DatabaseConnector("database.properties");
+                try (Connection db = connector.getConnection()){
+                    webCrawler.startCrawl(seed, (ThreadSafeInvertedWordIndex) invertedWordIndex, workQueue, db);
+                } catch (MalformedURLException e) {
+                    System.out.printf("Malformed URL detected: " + seed);
+                } catch (SQLException e) {
+                    System.out.println("SQL ERROR, unable to connect to db");
+                    throw new RuntimeException(e); //todo: do not throw
+                }
+            } catch (IOException e) {
+                System.out.println("database.properties not found");
             }
         }
 
