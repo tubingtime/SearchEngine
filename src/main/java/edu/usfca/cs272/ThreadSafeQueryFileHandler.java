@@ -71,6 +71,7 @@ public class ThreadSafeQueryFileHandler implements QueryFileHandlerInterface {
     //todo: make this in the interface? also could avoid
     // 1. stemming twice
     // 2. only calling .finish() on this thread (?) <-- maybe we dont create task: just call .run directly here
+    //                                              ^ yeah but dont forget to lock read?
     public List<SearchResult> parseQueryGetResults(String line, boolean exactSearch) {
         workQueue.execute(new QueryTask(line, exactSearch));
         workQueue.finish();
