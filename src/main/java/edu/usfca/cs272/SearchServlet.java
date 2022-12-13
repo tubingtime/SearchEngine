@@ -37,6 +37,14 @@ public class SearchServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
+        DatabaseConnector connector = new DatabaseConnector("database.properties");
+
+        if (!connector.testConnection()) {
+            //todo: safely do not use db OR display html error, move to main server
+            System.out.println("Could not connect to DB");
+           return;
+        }
+
 
         // generate html
         Map<String, String> values = new HashMap<>();
@@ -47,6 +55,7 @@ public class SearchServlet extends HttpServlet {
         values.put("action", "search");
 
         String query = request.getParameter("query");
+
         if (query == null){
             query = "";
         }
@@ -55,12 +64,8 @@ public class SearchServlet extends HttpServlet {
         var results = queryFileHandler.parseQueryGetResults(query, false);
 
         try (StringWriter stringWriter = new StringWriter()) {
-            Iterator<SearchResult> resultsIterator = results.iterator();
-            for (int i = 1; resultsIterator.hasNext(); i++) {
-                SearchResult result = resultsIterator.next();
-                stringWriter.write(String.valueOf(i));
-                stringWriter.write(":<br>\n");
-                String whereLink = String.join("","<a href=\"", result.getWhere(),"\">",
+            for (SearchResult result : results) {
+                String whereLink = String.join("", "<a href=\"", result.getWhere(), "\">",
                         result.getWhere(), "</a>");
                 System.out.println(whereLink);
                 stringWriter.write(whereLink);
