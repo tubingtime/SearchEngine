@@ -60,7 +60,10 @@ public class SearchServlet extends HttpServlet {
                 SearchResult result = resultsIterator.next();
                 stringWriter.write(String.valueOf(i));
                 stringWriter.write(":<br>\n");
-                stringWriter.write(result.getWhere());
+                String whereLink = String.join("","<a href=\"", result.getWhere(),"\">",
+                        result.getWhere(), "</a>");
+                System.out.println(whereLink);
+                stringWriter.write(whereLink);
                 stringWriter.write(":<br>\n");
                 stringWriter.write("Matches: ");
                 stringWriter.write(String.valueOf(result.getCount()));
