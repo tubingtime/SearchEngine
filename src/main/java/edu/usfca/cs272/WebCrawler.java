@@ -188,6 +188,7 @@ public class WebCrawler {
                 if (!crawledUrls.contains(foundURL)) {
                     crawlTasks.add(new CrawlTask(foundURL, index, workQueue, this, db));
                     crawledUrls.add(foundURL);
+                    // TODO call execute here instead of in a separate loop
                     maxUrls--;
                 }
             }
@@ -200,6 +201,7 @@ public class WebCrawler {
         html = HtmlCleaner.stripTags(html);
         html = HtmlCleaner.stripEntities(html);
 
+        // TODO Faster if you call scanText on a local index, then addAll
         WordIndexBuilder.scanText(html, url.toString(), index);
 
         // get metadata and store in db

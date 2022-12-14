@@ -47,6 +47,7 @@ public class SearchServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
+    	// TODO Inefficient---should be 1 database connecter per server
         DatabaseConnector connector = new DatabaseConnector("database.properties");
 
         if (!connector.testConnection()) {
@@ -132,7 +133,7 @@ public class SearchServlet extends HttpServlet {
         response.setStatus(HttpServletResponse.SC_OK);
 
         // output html
-        PrintWriter out = response.getWriter();
+        PrintWriter out = response.getWriter(); // TODO Use this more directly to make it a bit faster
         out.println(html);
         out.flush();
     }
