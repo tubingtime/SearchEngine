@@ -23,6 +23,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 public class SearchServlet extends HttpServlet {
@@ -49,7 +50,6 @@ public class SearchServlet extends HttpServlet {
         DatabaseConnector connector = new DatabaseConnector("database.properties");
 
         if (!connector.testConnection()) {
-            //todo: safely do not use db OR display html error, move to main server
            return;
         }
 
@@ -67,9 +67,9 @@ public class SearchServlet extends HttpServlet {
         if (query == null){
             query = "";
         }
-        // avoid xss
         query = StringEscapeUtils.escapeHtml4(query);
-        var results = queryFileHandler.parseQueryGetResults(query, false);
+        List<SearchResult> results =
+                queryFileHandler.parseQueryGetResults(query, false);
 
         try (
                 StringWriter stringWriter = new StringWriter();
@@ -87,12 +87,12 @@ public class SearchServlet extends HttpServlet {
                 try (ResultSet dbResults = statement.executeQuery()){
                     //todo: escape to avoid xss
                     if (dbResults.next()) {
-                        snippet = dbResults.getString("snippet");
-                        title = dbResults.getString("title");
-                        contentLength = dbResults.getString("content_length");
-                        timestampCrawled = dbResults.getString("timestamp_crawled");
+                        snippet = escape(dbResults, "snippet");
+                        title = escape(dbResults, "title");
+                        contentLength = escape(dbResults, "content_length");
+                        timestampCrawled = escape(dbResults, "timestamp_crawled");
                     } else {
-                        System.out.println("no metadata found");
+                        log.warn("No metadata found for:" + result.getWhere());
                     }
                 }
                 stringWriter.write("<p>");
@@ -115,9 +115,6 @@ public class SearchServlet extends HttpServlet {
                 stringWriter.write("----------------------------------------");
                 stringWriter.write("<br><br>\n\n");
                 stringWriter.write("</p>");
-
-
-
             }
             if (results.isEmpty()){
                 values.put("results", "No results found.");
@@ -125,8 +122,8 @@ public class SearchServlet extends HttpServlet {
                 values.put("results", stringWriter.toString());
             }
         } catch (SQLException e) {
-            //todo : log.warn
-            throw new RuntimeException(e);
+            log.error("Error occurred while retrieving metadata");
+            log.catching(e);
         }
 
         String html = StringSubstitutor.replace(htmlTemplate, values);
@@ -139,5 +136,18 @@ public class SearchServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
         out.println(html);
         out.flush();
+    }
+
+    /**
+     * Attempts to retrieve data from a result set and escape any special
+     * characters returned. Useful for avoiding XSS attacks.
+     *
+     * @param results the set of results returned from a database
+     * @param column the name of the column to fetch
+     * @return escaped text (or null if result was null)
+     * @throws SQLException if unable to get and escape results
+     */
+    public static String escape(ResultSet results, String column) throws SQLException {
+        return StringEscapeUtils.escapeHtml4(results.getString(column));
     }
 }

@@ -1,5 +1,8 @@
 package edu.usfca.cs272;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import java.io.FileNotFoundException;
@@ -35,6 +38,8 @@ public class DatabaseConnector {
 
 	/** Properties with username and password for connecting to database. */
 	private final Properties login;
+
+	private static final Logger log = LogManager.getLogger();
 
 	/**
 	 * Creates a connector from a "database.properties" file located in the
@@ -149,7 +154,6 @@ public class DatabaseConnector {
 
 		// Open database connection and close when done
 		try (Connection db = getConnection();) {
-			System.out.println("Executing SHOW TABLES...");
 			Set<String> tables = getTables(db);
 
 			if (tables != null) {
@@ -159,7 +163,8 @@ public class DatabaseConnector {
 			}
 		}
 		catch (SQLException e) {
-			System.err.println(e.getMessage());
+			log.error("Unable to connect to DB!");
+			log.catching(e);
 		}
 
 		return okay;
