@@ -146,7 +146,7 @@ public class HtmlFetcher {
             HttpsFetcher.printGetRequest(request, url);
 
             // the headers will be first in the response
-            headers = HttpsFetcher.getHeaderFields(response);
+            headers.putAll(HttpsFetcher.getHeaderFields(response));
             if (!isHtml(headers)) {
                 return null;
             }

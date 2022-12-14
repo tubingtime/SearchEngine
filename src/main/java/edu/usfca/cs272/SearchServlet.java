@@ -8,6 +8,9 @@ import org.apache.commons.text.StringEscapeUtils;
 import org.apache.commons.text.StringSubstitutor;
 
 import edu.usfca.cs272.InvertedWordIndex.SearchResult;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -32,6 +35,8 @@ public class SearchServlet extends HttpServlet {
 
     ThreadSafeQueryFileHandler queryFileHandler;
 
+    private static final Logger log = LogManager.getLogger();
+
     public SearchServlet(ThreadSafeQueryFileHandler queryFileHandler) throws IOException {
         super();
         this.queryFileHandler = queryFileHandler;
@@ -45,7 +50,6 @@ public class SearchServlet extends HttpServlet {
 
         if (!connector.testConnection()) {
             //todo: safely do not use db OR display html error, move to main server
-            System.out.println("Could not connect to DB");
            return;
         }
 
@@ -91,6 +95,7 @@ public class SearchServlet extends HttpServlet {
                         System.out.println("no metadata found");
                     }
                 }
+                stringWriter.write("<p>");
                 String whereLink = String.join("", "<a href=\"", result.getWhere(), "\">",
                         title, "</a>");
                 stringWriter.write(whereLink);
@@ -109,6 +114,7 @@ public class SearchServlet extends HttpServlet {
                 stringWriter.write("<br>\n");
                 stringWriter.write("----------------------------------------");
                 stringWriter.write("<br><br>\n\n");
+                stringWriter.write("</p>");
 
 
 

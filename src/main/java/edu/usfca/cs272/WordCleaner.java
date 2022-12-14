@@ -66,6 +66,16 @@ public class WordCleaner {
         return text.isBlank() ? new String[0] : SPLIT_REGEX.split(text.strip());
     }
 
+    public static String splitAndGetSubString(String text, int beginIndex, int endIndex) {
+        String[] splouted = split(text);
+        StringBuilder substring = new StringBuilder();
+        for (int i = beginIndex; (i < endIndex && i < splouted.length); i++) {
+            substring.append(splouted[i]);
+            substring.append(" ");
+        }
+        return substring.toString();
+    }
+
     /**
      * Parses the text into an array of clean words.
      *

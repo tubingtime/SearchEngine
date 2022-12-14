@@ -3,10 +3,14 @@ package edu.usfca.cs272;
 
 import org.apache.commons.text.StringEscapeUtils;
 
+import java.io.IOException;
 import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -85,11 +89,28 @@ public class WebCrawler {
         try { // todo: maybe unnecessary
             LinkFinder.normalize(seedUrl);
         } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException(e); // todo:  maybe not throw
         }
+
+        //add our seed url to already crawled urls list
         synchronized (urlLock) {
             crawledUrls.add(seedUrl);
         }
+
+        //setup db tables if it doesn't already exist
+        Path sql = Path.of("src", "main", "resources", "sql", "CREATE_TABLE.sql");
+        try {
+            String sqlCreateTable = Files.readString(sql, StandardCharsets.UTF_8);
+            try (PreparedStatement statement = db.prepareStatement(sqlCreateTable)) {
+                ResultSet resultSet = statement.executeQuery();
+                System.out.println(resultSet.toString()); // todo: log?
+            } catch (SQLException e) {
+                System.out.println("SQL Exception!");//todo: log
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e); //todo: log
+        }
+
         crawl(seedUrl, index, workQueue, db);
         workQueue.finish();
     }
@@ -149,7 +170,7 @@ public class WebCrawler {
      */
     private void crawl(URL url, ThreadSafeInvertedWordIndex index, WorkQueue workQueue, Connection db) {
         Map<String, List<String>> headers = new HashMap<>();
-        String html = HtmlFetcher.fetch(url, 3, headers); // todo: fix headers always null
+        String html = HtmlFetcher.fetch(url, 3, headers);
         if (html == null) {
             return; // unable to find resource or is not html
         }
@@ -182,21 +203,30 @@ public class WebCrawler {
         WordIndexBuilder.scanText(html, url.toString(), index);
 
         // get metadata and store in db
-        // todo: padright or make a seperate func
         String snippet;
-        try {
-            snippet = StringEscapeUtils.escapeHtml4(html.substring(0, 30)) + "..."; //todo: string.join
-        } catch (StringIndexOutOfBoundsException ignored) {
-            snippet = html;
+        if (html.length() > 200) {
+            snippet = html.substring(0, 200);
+        }
+        snippet = String.join("",WordCleaner.splitAndGetSubString(html, 0, 15));
+
+        snippet = StringEscapeUtils.escapeHtml4(snippet);
+
+        if (title != null) {
+            title = StringEscapeUtils.escapeHtml4(title);
+            if (title.length() > 30) {
+                title = String.join("", WordCleaner.splitAndGetSubString(title, 0, 6), "...");
+            }
+        } else {
+            title = "No title";
         }
 
-        List<String> contentLengthHeader = headers.get("content-length");
+        List<String> contentLengthHeader = headers.get("Content-Length");
         Integer contentLength = (contentLengthHeader == null) ? -1 : Integer.parseInt(contentLengthHeader.get(0));
         StringBuilder sql = new StringBuilder();
         sql.append("INSERT INTO crawler_stats");
         sql.append(System.lineSeparator());
         sql.append("VALUES (");
-        sql.append("\"").append(url.toString()).append("\", ");
+        sql.append("\"").append(url).append("\", ");
         sql.append("\"").append(snippet).append("\", ");
         sql.append("\"").append(title).append("\", ");
         sql.append("\"").append(contentLength).append("\", ");

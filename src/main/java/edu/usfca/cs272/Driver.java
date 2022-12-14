@@ -43,7 +43,7 @@ public class Driver {
         // store initial start time
         Instant start = Instant.now();
         args = new String[]{"-server", "8081",
-                "-html", "https://usf-cs272-fall2022.github.io/project-web/input/simple/", "-max", "50"}; //debug todo: remove
+                "-html", "https://usf-cs272-fall2022.github.io/", "-max", "50"}; //debug todo: remove
         ArgumentParser argumentParser = new ArgumentParser(args); /* parse args */
         log.debug("Actual args: {}", Arrays.toString(args));
         log.debug("Parsed args: {}", argumentParser);
@@ -89,13 +89,12 @@ public class Driver {
                 try (Connection db = connector.getConnection()){
                     webCrawler.startCrawl(seed, (ThreadSafeInvertedWordIndex) invertedWordIndex, workQueue, db);
                 } catch (MalformedURLException e) {
-                    System.out.printf("Malformed URL detected: " + seed);
+                    System.out.println("Malformed URL detected: " + seed);
                 } catch (SQLException e) {
-                    System.out.println("SQL ERROR, unable to connect to db");
-                    throw new RuntimeException(e); //todo: do not throw
+                    System.out.println("SQL ERROR, unable to connect to db. No web crawl preformed.");
                 }
             } catch (IOException e) {
-                System.out.println("database.properties not found");
+                System.out.println("database.properties not found in: " + System.getProperty("user.dir"));
             }
         }
 
