@@ -85,7 +85,6 @@ public class SearchServlet extends HttpServlet {
                 String contentLength = "";
                 String timestampCrawled = "";
                 try (ResultSet dbResults = statement.executeQuery()){
-                    //todo: escape to avoid xss
                     if (dbResults.next()) {
                         snippet = escape(dbResults, "snippet");
                         title = escape(dbResults, "title");

@@ -42,8 +42,6 @@ public class Driver {
     public static void main(String[] args) {
         // store initial start time
         Instant start = Instant.now();
-        args = new String[]{"-server", "8081",
-                "-html", "https://usf-cs272-fall2022.github.io/", "-max", "50"}; //debug todo: remove
         ArgumentParser argumentParser = new ArgumentParser(args); /* parse args */
         log.debug("Actual args: {}", Arrays.toString(args));
         log.debug("Parsed args: {}", argumentParser);

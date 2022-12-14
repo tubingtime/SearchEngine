@@ -68,13 +68,9 @@ public class ThreadSafeQueryFileHandler implements QueryFileHandlerInterface {
         workQueue.execute(new QueryTask(line, exactSearch));
     }
 
-    //todo: make this in the interface? also could avoid
-    // 1. stemming twice
-    // 2. only calling .finish() on this thread (?) <-- maybe we dont create task: just call .run directly here
-    //                                              ^ yeah but dont forget to lock read?
+
     public List<SearchResult> parseQueryGetResults(String line, boolean exactSearch) {
-        workQueue.execute(new QueryTask(line, exactSearch));
-        workQueue.finish();
+        parseQueryThreadSafe(line, exactSearch);
         return getResults(line);
     }
 
@@ -146,23 +142,26 @@ public class ThreadSafeQueryFileHandler implements QueryFileHandlerInterface {
 
         @Override
         public void run() {
-            Stemmer stemmer = new SnowballStemmer(ENGLISH);
-            TreeSet<String> stems = WordCleaner.uniqueStems(line, stemmer);
-            if (stems.isEmpty()) {
+            parseQueryThreadSafe(line, exactSearch);
+        }
+    }
+    private void parseQueryThreadSafe(String line, boolean exactSearch){
+        Stemmer stemmer = new SnowballStemmer(ENGLISH);
+        TreeSet<String> stems = WordCleaner.uniqueStems(line, stemmer);
+        if (stems.isEmpty()) {
+            return;
+        }
+        String key = String.join(" ", stems);
+        synchronized (results) {
+            if (results.containsKey(key)) {
                 return;
             }
-            String key = String.join(" ", stems);
-            synchronized (results) {
-                if (results.containsKey(key)) {
-                    return;
-                }
-            }
+        }
 
-            List<SearchResult> searchResults = wordIndex.search(stems, exactSearch);
+        List<SearchResult> searchResults = wordIndex.search(stems, exactSearch);
 
-            synchronized (results) {
-                results.put(key, searchResults);
-            }
+        synchronized (results) {
+            results.put(key, searchResults);
         }
     }
 }
